@@ -73,7 +73,6 @@ public class VisionTest {
 	@Test
 	public void testSmallGrid() {
 		assertTrue(Util.lengthOfIterable(v) == 9);
-		System.out.println(v);
 
 		assertTrue(v.get(RelPos.of(-1, -1)) == Vision.FOOD);
 		assertTrue(v.get(RelPos.of(0, -1)) == Vision.EMPTY);

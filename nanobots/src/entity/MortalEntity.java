@@ -1,5 +1,5 @@
 package entity;
 
-public interface MortalEntity {
-	public int getEnergy();
+public abstract class MortalEntity extends DynamicEntity {
+	public abstract int getEnergy();
 }

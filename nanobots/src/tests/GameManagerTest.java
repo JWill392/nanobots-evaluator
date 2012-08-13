@@ -17,11 +17,10 @@ import game.Settings;
 import org.junit.Before;
 import org.junit.Test;
 
-import ca.camosun.jwill392.datatypes.grid2d.point.AbsPos;
-import ca.camosun.jwill392.datatypes.grid2d.point.RelPos;
+import teampg.grid2d.point.AbsPos;
+import teampg.grid2d.point.RelPos;
 
-
-import action.cmd.ActionCmd;
+import action.ActionCmd;
 import action.cmd.Attack;
 import action.cmd.Harvest;
 import action.cmd.Move;
@@ -70,19 +69,19 @@ public class GameManagerTest {
 				Vision vis = info.getVision();
 
 				// if enough energy to reproduce, do, down 1 square
-				RelPos adjDown = new RelPos(0, -1);
+				RelPos adjDown = RelPos.of(0, -1);
 				if (info.getEnergy() >= 75) {
 					return new BrainCommand(new Reproduce(adjDown), null);
 				}
 
 				// if food to right, eat it
-				RelPos adjRight = new RelPos(1, 0);
+				RelPos adjRight = RelPos.of(1, 0);
 				if (vis.get(adjRight) == Vision.FOOD) {
 					return new BrainCommand(new Harvest(adjRight), null);
 				}
 
 				// if enemy to upper right, attack it
-				RelPos adjUpRight = new RelPos(1, 1);
+				RelPos adjUpRight = RelPos.of(1, 1);
 				if (vis.get(adjUpRight) == Vision.ENEMY_BOT) {
 					return new BrainCommand(new Attack(adjUpRight), null);
 				}
@@ -108,7 +107,7 @@ public class GameManagerTest {
 				Vision vis = info.getVision();
 
 				// if enemy at down-left, attack
-				RelPos adjDownLeft = new RelPos(-1, -1);
+				RelPos adjDownLeft = RelPos.of(-1, -1);
 				if (vis.get(adjDownLeft) == Vision.ENEMY_BOT) {
 					return new BrainCommand(new Attack(adjDownLeft), null);
 				}
@@ -151,56 +150,56 @@ public class GameManagerTest {
 		 * +---+---+---+---+
 		 * | A |   | A |   |
 		 * +---+---+---+---+
-		 * 
-		 * 
+		 *
+		 *
 		 */
 		// added entities by row (y)
-		gm.addBot(harvestBot, new AbsPos(0, 0));
-		grid.addNewEntity(new AbsPos(1, 0), theFood);
-		grid.addNewEntity(new AbsPos(2, 0), Entity.getNewWall());
+		gm.addBot(harvestBot, AbsPos.of(0, 0));
+		grid.addNewEntity(AbsPos.of(1, 0), theFood);
+		grid.addNewEntity(AbsPos.of(2, 0), Entity.getNewWall());
 
-		gm.addBot(otherAttackBot, new AbsPos(3, 1));
+		gm.addBot(otherAttackBot, AbsPos.of(3, 1));
 
-		gm.addBot(msgBot, new AbsPos(0, 2));
-		gm.addBot(attackBot, new AbsPos(2, 2));
+		gm.addBot(msgBot, AbsPos.of(0, 2));
+		gm.addBot(attackBot, AbsPos.of(2, 2));
 
 		/*-******************************************************
 		 * TURN 1 - A Team
 		 * ------------------------------------
 		 * EXPECTED ACTIONS
-		 * 
+		 *
 		 * Bot 0,0 HARVEST food to right
 		 * Bot 0,2 TRANSMIT {true, true, false}
 		 * Bot 2,2 ATTACK enemy to up-right
-		 * 
+		 *
 		 * OUTCOME
 		 * --------------------------
-		 * 
+		 *
 		 *  Bot 0,0 energy is decreased by HARVEST cost,
 		 *  				  increased by HARVEST_ENERGY
 		 *  Bot 0,2 energy is decreased by TRANSMIT cost
 		 *  Bot 2,2 energy is decreased by ATTACK cost
-		 *  
+		 *
 		 *  Food 1,0 energy is decreased by HARVEST_ENERGY
 		 *  Enemy Bot 3,1 energy is decreased by ATTACK damage
-		 *  
+		 *
 		 ********************************************************
 		 *  TURN 2 - Other Team
 		 *  ----------------------------
-		 *  EXPECTED ACTIONS 
-		 *  
+		 *  EXPECTED ACTIONS
+		 *
 		 *  Bot 3,1 ATTACK enemy to down-left
-		 *  
+		 *
 		 *  OUTCOME
 		 *  -----------------------------
 		 *  Bot 3,1 energy is decreased by ATTACK cost
-		 *  
+		 *
 		 *  Enemy Bot 2,2 energy is decreased by ATTACK damage
 		 *******************************************************
 		 *  TURN 3 - A TEAM
 		 *  --------------------------
 		 *  EXPECTED ACTIONS
-		 *  
+		 *
 		 *  Bot 0,0 REPRODUCE down
 		 *  Transmitted MESSAGE recieved {true, true, false}
 		 *
@@ -262,7 +261,7 @@ public class GameManagerTest {
 		assertTrue(Util.actionIsInIterable(harvestActions, harvestBot));
 
 		int currentEnergy = harvestBot.getEnergy();
-		
+
 		int gainedEnergy = Settings.getHarvestEnergy();
 		int expectedEnergy = getExpectedEnergy(harvestBot, Harvest.class) + gainedEnergy;
 
@@ -282,38 +281,38 @@ public class GameManagerTest {
 		assertTrue(theFood.getEnergy() == (START_ENERGY.get(theFood) - Settings
 				.getHarvestEnergy()));
 	}*/
-	
+
 	@Test
 	public void testDoValidHarvest() {
 		/*-******************************************************
 		 * TURN 1 - A Team
 		 * ------------------------------------
 		 * EXPECTED ACTIONS
-		 * -------------------------- 
+		 * --------------------------
 		 * Bot 0,0 HARVEST food to right
-		 * 
+		 *
 		 * OUTCOME
 		 * --------------------------
 		 *  Bot 0,0 energy is decreased by HARVEST cost,
 		 *  				  increased by HARVEST_ENERGY
 		 *  Food 1,0 energy is decreased by HARVEST_ENERGY
 		 */
-		
+
 		gm.doTurn(aTeamID);
 		assertTrue(harvestBot.getAction() instanceof Harvest);
 		assertTrue(harvestBot.getTurnsActionExecuted() == 1);
-		
-		Harvest act = (Harvest) harvestBot.getAction(); 
+
+		Harvest act = (Harvest) harvestBot.getAction();
 		assertTrue(act.getRelTarget().equals(RelPos.RIGHT));
-		
+
 		int currentEnergy = harvestBot.getEnergy();
-		
+
 		int gainedEnergy = Settings.getHarvestEnergy();
 		int expectedEnergy = getExpectedEnergy(harvestBot, Harvest.class) + gainedEnergy;
-		
+
 		// EXPECTED RESULT
 		assertTrue(currentEnergy == expectedEnergy);
-		
+
 		// target was affected
 		assertTrue(theFood.getEnergy() == (START_ENERGY.get(theFood) - Settings
 				.getHarvestEnergy()));
@@ -342,13 +341,13 @@ public class GameManagerTest {
 		assertTrue(victim.getEnergy() == (START_ENERGY.get(victim) - Settings
 				.getAttackDamage()));
 	}*/
-	
+
 	private int getExpectedEnergy(BotEntity bot, Class<? extends ActionCmd> actionType) {
 		int startEnergy = START_ENERGY.get(bot);
 		int actionCost = Settings.getActionCost(actionType);
-		
+
 		int expectedEnergy = startEnergy - actionCost;
-		
+
 		return expectedEnergy;
 	}
 

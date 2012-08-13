@@ -1,5 +1,7 @@
 package entity;
 
+import game.Team;
+
 public abstract class Entity {
 	public static final Class<? extends Entity> WALL = WallEntity.class;
 	public static final Class<? extends Entity> FOOD = FoodEntity.class;
@@ -14,15 +16,11 @@ public abstract class Entity {
 		return new FoodEntity(energy);
 	}
 
-	public static BotEntity getNewBot(int energy, int teamID) {
-		return BotEntity.getNewBotEntity(energy, teamID);
+	public static BotEntity getNewBot(int energy, Team team) {
+		return BotEntity.getNewBotEntity(energy, team);
 	}
 
 	public static WallEntity getNewWall() {
 		return new WallEntity();
-	}
-
-	public static boolean isType(Entity e, Class<? extends Entity> c) {
-		return e.getClass() == c;
 	}
 }

@@ -1,66 +1,63 @@
 package entity;
 
 import java.util.ArrayList;
-
+import java.util.Collection;
 import com.google.common.collect.ImmutableList;
-
 import entity.bot.Memory;
 import entity.bot.MessageSignal;
 
 import game.Settings;
-import action.cmd.ActionCmd;
-import action.cmd.ContinuePreviousAction;
+import game.Team;
+import action.RunningAction;
 
-public class BotEntity extends Entity implements DynamicEntity, MortalEntity {
+public class BotEntity extends MortalEntity implements MobileEntity{
 	private static int botIDCounter = 0;
 
 	private final int botID;
-	private final int teamID;
+	private final Team team;
+	private final Memory memory;
+
 	private int energy;
 	private ArrayList<MessageSignal> inbox;
-	private Memory memory;
-	private ActionCmd executing;
-	private int turnsExecuted;
+	private final Collection<RunningAction> runningActions;
 
-	public static BotEntity getNewBotEntity(int inEnergy, int inTeamID) {
+	static BotEntity getNewBotEntity(int energy, Team team) {
 		int botIDToUse = botIDCounter;
 		botIDCounter++;
 
-		return new BotEntity(inEnergy, inTeamID, botIDToUse);
+		return new BotEntity(energy, team, botIDToUse);
 	}
 
 	public static boolean areAllies(BotEntity a, BotEntity b) {
-		int aTeam = a.getTeamID();
-		int bTeam = b.getTeamID();
-
-		return aTeam == bTeam;
+		return a.team.equals(b.team);
 	}
 
-	private BotEntity(int inEnergy, int inTeamID, int inBotID) {
-		botID = inBotID;
+	private BotEntity(int inEnergy, Team team, int botID) {
+		this.botID = botID;
 		addEnergy(inEnergy);
-		teamID = inTeamID;
-		inbox = new ArrayList<MessageSignal>(5);
+		this.team = team;
+
+		inbox = new ArrayList<MessageSignal>();
 		memory = new Memory();
-		executing = new ContinuePreviousAction();
-		turnsExecuted = 0;
+		runningActions = new ArrayList<>();
 	}
-	
-	public ActionCmd getAction() {
-		return executing;
+
+
+
+	public void addRunningAction(RunningAction action) {
+		runningActions.add(action);
 	}
-	
-	public int getTurnsActionExecuted() {
-		return turnsExecuted;
+	public void removeRunningAction(RunningAction action) {
+		runningActions.remove(action);
 	}
-	
-	public void setAction(ActionCmd nextAction) {
-		executing = nextAction;
-		turnsExecuted = 0;
+	public ImmutableList<RunningAction> getRunningActions() {
+		return ImmutableList.copyOf(runningActions);
 	}
-	
+
+
+
+	@Override
 	public void tick() {
-		turnsExecuted++;
 		inbox = new ArrayList<MessageSignal>();
 	}
 
@@ -68,12 +65,15 @@ public class BotEntity extends Entity implements DynamicEntity, MortalEntity {
 		return botID;
 	}
 
+	@Override
 	public int getEnergy() {
 		return energy;
 	}
 
 	public void addEnergy(int inEnergy) {
 		int newEnergy = energy + inEnergy;
+
+		//TODO if energy is zero, die?  Or is that in tick?
 
 		if (newEnergy > Settings.getBotMaxEnergy()) {
 			newEnergy = Settings.getBotMaxEnergy();
@@ -82,16 +82,16 @@ public class BotEntity extends Entity implements DynamicEntity, MortalEntity {
 		energy = newEnergy;
 	}
 
-	public int getTeamID() {
-		return teamID;
+	public Team getTeam() {
+		return team;
 	}
 
 	public Memory getMemory() {
-		return Memory.newInstance(memory);
+		return (Memory) memory.clone();
 	}
 
 	public void setMemory(Memory inMem) {
-		memory.load(inMem);
+		memory.fill(inMem.getAll());
 	}
 
 	public void addReceivedMessage(MessageSignal msg) {

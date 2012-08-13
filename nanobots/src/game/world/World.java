@@ -1,16 +1,15 @@
-package game;
+package game.world;
 
 import java.awt.Dimension;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.google.common.collect.Iterables;
 
 import teampg.grid2d.GridInterface;
 import teampg.grid2d.GridInterface.Entry;
-import teampg.grid2d.ReadGrid;
 import teampg.grid2d.RectGrid;
 import teampg.grid2d.point.AbsPos;
 import teampg.grid2d.point.Pos2D;
@@ -20,13 +19,10 @@ import entity.DynamicEntity;
 import entity.EmptyEntity;
 import entity.Entity;
 import entity.MortalEntity;
-
+import game.Settings;
+import game.Team;
 import brain.BrainInfo;
-
-
-
-
-import action.cmd.Move;
+import brain.Vision;
 
 
 /**
@@ -36,25 +32,10 @@ import action.cmd.Move;
  *
  * @author Jackson Williams
  */
-public class World implements ReadGrid<Entity>{
+public class World {
 	private final GridInterface<Entity> grid;
 	private final Map<Integer, AbsPos> botIndex;
 	private final Entity TO_APPEAR_OUTSIDE_GRID = Entity.getNewWall();
-
-	/**
-	 * Loads and initializes a grid from a map file (*.nbm).
-	 *
-	 * @param mapFile
-	 *            A File path to a valid nanobots map file
-	 * @return The initialized Grid from the given map file
-	 */
-	public static World load(File mapFile) {
-		World g = null;
-
-		// TODO load map from file
-
-		return g;
-	}
 
 	// TODO consider making private and including a static method to load from a
 	// map
@@ -103,12 +84,12 @@ public class World implements ReadGrid<Entity>{
 	 * @return A {@link brain.BrainInfo} for specified bot
 	 */
 	public BrainInfo getBotInfo(int botID) {
-		BotEntity beholder = get(botID);
+		BotEntity observer = get(botID);
+		AbsPos observerPos = getBotPosition(botID);
 
-		int sideLen = Settings.getVisionRadius();
-		Collection<AbsPos> visPoints = Pos2D.getDiamondNear(getBotPosition(botID), Settings.getVisionRadius());
+		Collection<AbsPos> visPoints = Pos2D.getDiamondNear(observerPos, Settings.getVisionRadius());
 
-		BrainInfo info = new BrainInfo(beholder, this, visPoints);
+		BrainInfo info = new BrainInfo(observer, observerPos, new Vision(this, visPoints, observerPos));
 		return info;
 	}
 
@@ -119,7 +100,6 @@ public class World implements ReadGrid<Entity>{
 	 *            Position to look
 	 * @return Entity at position p
 	 */
-	@Override
 	public Entity get(AbsPos p) {
 		if (!grid.isInBounds(p)) {
 			return TO_APPEAR_OUTSIDE_GRID;
@@ -129,20 +109,42 @@ public class World implements ReadGrid<Entity>{
 		return found;
 	}
 
-	// TODO move to util
-	public List<BotEntity> getProxBots(int botID, int squareRadius) {
-		ArrayList<BotEntity> bots = new ArrayList<BotEntity>(squareRadius * 2);
+	/**
+	 * Get list of all bots on map in a certain team
+	 */
+	public Iterable<BotEntity> getTeamBots(final Team team) {
+		List<BotEntity> ret = new ArrayList<>();
 
-		AbsPos centre = getBotPosition(botID);
-		RectGrid<Entity> prox = grid.getProximate(centre, squareRadius, squareRadius);
-
-		for (Entity e : prox) {
-			if (e instanceof BotEntity) {
-				bots.add((BotEntity) e);
+		for (AbsPos botPos : botIndex.values()) {
+			BotEntity bot = (BotEntity) grid.get(botPos);
+			if (bot.getTeam().equals(team)) {
+				ret.add(bot);
 			}
 		}
 
-		return bots;
+		return ret;
+	}
+
+	public Iterable<Entry<Entity>> getEntries() {
+		return grid.getEntries();
+	}
+
+	// TODO move to util
+	public Collection<Entry<BotEntity>> getProxBots(AbsPos near, int radius) {
+		Collection<Entry<BotEntity>> ret = new ArrayList<>();
+
+		Collection<AbsPos> proxCells =
+				Pos2D.getDiamondNear(near, radius);
+		for (AbsPos cell : proxCells) {
+			Entity proxEntity = get(cell);
+			if (proxEntity instanceof BotEntity) {
+				BotEntity proxBot = (BotEntity) proxEntity;
+
+				ret.add(new Entry<BotEntity>(cell, proxBot));
+			}
+		}
+
+		return ret;
 	}
 
 	/**
@@ -155,7 +157,7 @@ public class World implements ReadGrid<Entity>{
 	 */
 	public void addNewEntity(AbsPos target, Entity toAdd) {
 		// target position for new entity should be empty
-		assert (grid.get(target).getClass() == EmptyEntity.class);
+		assert (grid.get(target) instanceof EmptyEntity);
 
 		if (toAdd instanceof BotEntity) {
 			BotEntity newBot = (BotEntity) toAdd;
@@ -165,30 +167,19 @@ public class World implements ReadGrid<Entity>{
 		grid.set(target, toAdd);
 	}
 
-	/**
-	 * Move a bot between two grid points. Starting position becomes Empty,
-	 * target holds bot.
-	 *
-	 * @param moverID
-	 *            ID of the bot to move.
-	 * @param target
-	 *            Position of the empty cell to move to.
-	 */
-	public void move(int moverID, AbsPos target) {
-		assert(grid.isInBounds(target));
-		// target to move to should always be empty
-		assert (grid.get(target).getClass() == EmptyEntity.class);
-		// move distance should never be more than settings range
-		assert (target.x < Settings.getActionRange(Move.class));
-		assert (target.y < Settings.getActionRange(Move.class));
+	public void swap(AbsPos a, AbsPos b) {
+		Entity aEnt = get(a);
+		if (aEnt instanceof BotEntity) {
+			botIndex.put(((BotEntity) aEnt).getID(), b);
+		}
 
-		AbsPos origin = botIndex.get(moverID);
-		BotEntity mover = (BotEntity) grid.get(origin);
+		Entity bEnt = get(b);
+		if (bEnt instanceof BotEntity) {
+			botIndex.put(((BotEntity) bEnt).getID(), a);
+		}
 
-		grid.set(target, mover);
-		grid.set(origin, Entity.getNewEmpty());
-
-		botIndex.put(moverID, target);
+		grid.set(a, bEnt);
+		grid.set(b, aEnt);
 	}
 
 	/**
@@ -197,27 +188,42 @@ public class World implements ReadGrid<Entity>{
 	 *
 	 * @param i
 	 */
-	public void destroy(AbsPos i) {
-		Entity entToDie = grid.get(i);
+	public void destroy(MortalEntity mortEnt) {
+		Entry<Entity> entry = grid.get(mortEnt);
+		AbsPos pos = entry.getPosition();
+		MortalEntity entToDie = (MortalEntity) entry.getContents();
 
-		// should never try to remove a non-dying entity
-		assert ((entToDie instanceof MortalEntity));
-
-		if (Entity.isType(entToDie, Entity.BOT)) {
+		if (entToDie instanceof BotEntity) {
 			BotEntity botToDie = ((BotEntity) entToDie);
 			botIndex.remove(botToDie.getID());
 		}
 
-
-		grid.set(i, Entity.getNewEmpty());
+		grid.set(pos, Entity.getNewEmpty());
 	}
 
 	public void tick() {
-		for (Entry<Entity> entry : grid.getEntries()) {
-			Entity entity = entry.getContents();
-			if (entity instanceof DynamicEntity) {
-				((DynamicEntity) entity).tick();
+
+		for (DynamicEntity dynEnt : Iterables.filter(grid, DynamicEntity.class)) {
+			dynEnt.tick();
+		}
+
+		for (MortalEntity mortEnt : Iterables.filter(grid, MortalEntity.class)) {
+			if (mortEnt.getEnergy() <= 0) {
+				destroy(mortEnt);
 			}
-		}//end foreach point
+		}
+	}
+
+	public boolean isInBounds(AbsPos pos) {
+		return grid.isInBounds(pos);
+	}
+
+	public Dimension getSize() {
+		return grid.getSize();
+	}
+
+	@Override
+	public String toString() {
+		return grid.toString();
 	}
 }

@@ -6,15 +6,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import action.cmd.ActionCmd;
-import action.cmd.Attack;
-import action.cmd.ContinuePreviousAction;
-import action.cmd.Harvest;
-import action.cmd.Move;
-import action.cmd.Reproduce;
-import action.cmd.TargettedAction;
-import action.cmd.Transmit;
-import action.cmd.Wait;
+import action.ActionCmd;
+import action.RunningAction;
+import action.AttackCmd;
+import action.HarvestCmd;
+import action.MoveCmd;
+import action.ReproduceCmd;
+import action.TransmitCmd;
+import action.WaitCmd;
+import action.TargettedAction;
 
 public class Settings {
 	public static Settings inst;
@@ -29,11 +29,13 @@ public class Settings {
 	private int HARVEST_ENERGY = 20;
 	private int BOT_NEWBORN_ENERGY = 50;
 
+	private int START_FOOD_ENERGY = 1000;
+
 	private int ATTACK_DAMAGE = 25;
 
-	private Map<Class<? extends TargettedAction>, Integer> ACTION_RANGES;
-	private Map<Class<? extends ActionCmd>, Integer> ACTION_COSTS;
-	private List<Class<? extends ActionCmd>> ACTION_EXECUTION_ORDER;
+	private final Map<Class<? extends TargettedAction>, Integer> ACTION_RANGES;
+	private final Map<Class<? extends ActionCmd>, Integer> ACTION_COSTS;
+	private final List<RunningAction> ACTION_EXECUTION_ORDER;
 
 	private boolean locked = false;
 
@@ -46,7 +48,7 @@ public class Settings {
 
 	/**
 	 * Loads settings from file
-	 * 
+	 *
 	 * @param file
 	 */
 	public static void load(File file) {
@@ -59,40 +61,39 @@ public class Settings {
 
 	private Settings() {
 		ACTION_COSTS = new HashMap<Class<? extends ActionCmd>, Integer>(10);
-		ACTION_COSTS.put(Attack.class, 10);
-		ACTION_COSTS.put(Harvest.class, 0);
-		ACTION_COSTS.put(Move.class, 0);
-		ACTION_COSTS.put(Reproduce.class, 75);
-		ACTION_COSTS.put(Transmit.class, 10);
-		ACTION_COSTS.put(Wait.class, 0);
-		ACTION_COSTS.put(ContinuePreviousAction.class, 0);
+		ACTION_COSTS.put(AttackCmd.class, 10);
+		ACTION_COSTS.put(HarvestCmd.class, 0);
+		ACTION_COSTS.put(MoveCmd.class, 0);
+		ACTION_COSTS.put(ReproduceCmd.class, 75);
+		ACTION_COSTS.put(TransmitCmd.class, 10);
+		ACTION_COSTS.put(WaitCmd.class, 0);
 
 		ACTION_RANGES = new HashMap<Class<? extends TargettedAction>, Integer>(10);
-		ACTION_RANGES.put(Attack.class, 2);
-		ACTION_RANGES.put(Harvest.class, 1);
-		ACTION_RANGES.put(Move.class, 2);
-		ACTION_RANGES.put(Reproduce.class, 1);
+		ACTION_RANGES.put(AttackCmd.class, 2);
+		ACTION_RANGES.put(HarvestCmd.class, 1);
+		ACTION_RANGES.put(MoveCmd.class, 2);
+		ACTION_RANGES.put(ReproduceCmd.class, 1);
 
-		ACTION_EXECUTION_ORDER = new ArrayList<Class<? extends ActionCmd>>(10);
-		ACTION_EXECUTION_ORDER.add(Attack.class);
-		ACTION_EXECUTION_ORDER.add(Move.class);
-		ACTION_EXECUTION_ORDER.add(Harvest.class);
-		ACTION_EXECUTION_ORDER.add(Transmit.class);
-		ACTION_EXECUTION_ORDER.add(Reproduce.class);
-		ACTION_EXECUTION_ORDER.add(Wait.class);
-		ACTION_EXECUTION_ORDER.add(ContinuePreviousAction.class);
+		ACTION_EXECUTION_ORDER = new ArrayList<>(10);
+		ACTION_EXECUTION_ORDER.add(new AttackCmd(null));
+		ACTION_EXECUTION_ORDER.add(new MoveCmd(null));
+		ACTION_EXECUTION_ORDER.add(new HarvestCmd(null));
+		ACTION_EXECUTION_ORDER.add(new TransmitCmd(null));
+		ACTION_EXECUTION_ORDER.add(new ReproduceCmd(null));
+		ACTION_EXECUTION_ORDER.add(new WaitCmd());
 	}
 
 	// ACTION EXECUTION ORDER
-	public static List<Class<? extends ActionCmd>> getActionExecutionOrder() {
+	public static List<RunningAction> getActionExecutionOrder() {
 		return inst.ACTION_EXECUTION_ORDER;
 	}
 
 	// ACTION RANGES
 	public static void setActionRange(Class<? extends TargettedAction> type,
 			Integer range) {
-		if (inst.locked)
+		if (inst.locked) {
 			return;
+		}
 		assert (range > 0);
 
 		inst.ACTION_RANGES.put(type, range);
@@ -105,8 +106,9 @@ public class Settings {
 	// ACTION COSTS
 	public static void setActionCost(Class<? extends ActionCmd> type,
 			Integer cost) {
-		if (inst.locked)
+		if (inst.locked) {
 			return;
+		}
 		assert (cost > 0);
 
 		inst.ACTION_COSTS.put(type, cost);
@@ -121,8 +123,9 @@ public class Settings {
 	}
 
 	public static void setMemorySize(int s) {
-		if (inst.locked)
+		if (inst.locked) {
 			return;
+		}
 		inst.MEMORY_SIZE = s;
 	}
 
@@ -131,8 +134,9 @@ public class Settings {
 	}
 
 	public static void setMessageLength(int messageLength) {
-		if (inst.locked)
+		if (inst.locked) {
 			return;
+		}
 		inst.MESSAGE_LENGTH = messageLength;
 	}
 
@@ -141,8 +145,9 @@ public class Settings {
 	}
 
 	public static void setBotMaxEnergy(int botMaxEnergy) {
-		if (inst.locked)
+		if (inst.locked) {
 			return;
+		}
 		inst.BOT_MAX_ENERGY = botMaxEnergy;
 	}
 
@@ -151,8 +156,9 @@ public class Settings {
 	}
 
 	public static void setMessageRange(int msgRange) {
-		if (inst.locked)
+		if (inst.locked) {
 			return;
+		}
 		inst.MESSAGE_RANGE = msgRange;
 	}
 
@@ -161,8 +167,9 @@ public class Settings {
 	}
 
 	public static void setVisionRadius(int visRad) {
-		if (inst.locked)
+		if (inst.locked) {
 			return;
+		}
 		inst.VISION_RAD = visRad;
 	}
 
@@ -171,8 +178,9 @@ public class Settings {
 	}
 
 	public static void setNewbornEnergy(int newbornEnergy) {
-		if (inst.locked)
+		if (inst.locked) {
 			return;
+		}
 		inst.BOT_NEWBORN_ENERGY = newbornEnergy;
 	}
 
@@ -181,8 +189,9 @@ public class Settings {
 	}
 
 	public static void setHarvestEnergy(int harvestEnergy) {
-		if (inst.locked)
+		if (inst.locked) {
 			return;
+		}
 		inst.HARVEST_ENERGY = harvestEnergy;
 	}
 
@@ -191,13 +200,25 @@ public class Settings {
 	}
 
 	public static void setAttackDamage(int attackDamage) {
-		if (inst.locked)
+		if (inst.locked) {
 			return;
+		}
 		inst.ATTACK_DAMAGE = attackDamage;
 	}
 
 	public static void lock() {
 		inst.locked = true;
+	}
+
+	public static int getFoodEnergy() {
+		return inst.START_FOOD_ENERGY;
+	}
+
+	public static void setFoodEnergy(int foodEnergy) {
+		if (inst.locked) {
+			return;
+		}
+		inst.START_FOOD_ENERGY = foodEnergy;
 	}
 
 }

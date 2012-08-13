@@ -1,8 +1,6 @@
 package brain;
 
 
-import java.util.Collection;
-
 import teampg.grid2d.point.AbsPos;
 
 import com.google.common.collect.ImmutableList;
@@ -10,20 +8,25 @@ import com.google.common.collect.ImmutableList;
 import entity.BotEntity;
 import entity.bot.Memory;
 import entity.bot.MessageSignal;
-import game.World;
 
 
 public class BrainInfo {
 	private final int energy;
 	private final Memory mem;
 	private final Vision vision;
+	private final AbsPos position;
 	private final ImmutableList<MessageSignal> msgs;
 
-	public BrainInfo(BotEntity beholder, World map, Collection<AbsPos> visibleCells) {
+	public BrainInfo(BotEntity beholder, AbsPos position, Vision vision) {
 		msgs = beholder.getReceivedMessages();
 		energy = beholder.getEnergy();
 		mem = beholder.getMemory();
-		vision = new Vision(map, visibleCells, map.getBotPosition(beholder.getID()));
+		this.vision = vision;
+		this.position = position;
+	}
+
+	public AbsPos getPosition() {
+		return position;
 	}
 
 	public int getEnergy() {

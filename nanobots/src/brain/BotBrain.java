@@ -2,17 +2,10 @@ package brain;
 
 
 public abstract class BotBrain {
-	private final String name;
-
 	protected abstract BrainCommand brainDecideAction(BrainInfo info)
 			throws Exception;
 
-	public BotBrain(String brainName) {
-		name = brainName;
-	}
-
-	public String getName() {
-		return name;
+	public BotBrain() {
 	}
 
 	public BrainCommand decideAction(BrainInfo info) {
@@ -26,14 +19,7 @@ public abstract class BotBrain {
 			e.printStackTrace(System.err);
 			brainAction = new BrainCommand(null, null);
 		}
-		
+
 		return brainAction;
-	}
-
-	@Override
-	public boolean equals(Object what) {
-		BotBrain other = (BotBrain) what;
-
-		return name.equals(other.name);
 	}
 }

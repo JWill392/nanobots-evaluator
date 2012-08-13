@@ -1,23 +1,23 @@
 package entity.bot;
 
-import util.ArrayBitString;
-import util.BitStringOnlyReader;
+import static com.google.common.base.Preconditions.checkArgument;
+import teampg.datatypes.BitStr;
+import teampg.datatypes.ReadBitStr;
 import game.Settings;
 
-public class Message implements BitStringOnlyReader {
-	private final ArrayBitString contents;
+public class Message implements ReadBitStr {
+	private final ReadBitStr contents;
 
-	public Message(boolean[] msgContents) {
-		if (msgContents.length != Settings.getMessageLength()) {
-			// TODO: throw a GameRule -> StructureIllegalArgumentException
-			assert (false);
-		}
+	public Message(ReadBitStr contents) {
+		checkArgument(contents.size() == Settings.getMessageLength());
 
-		contents = new ArrayBitString(msgContents);
+		this.contents = (ReadBitStr) contents.clone();
 	}
 
-	public static Message newInstance(Message toCopy) {
-		return toCopy;  // read only, so no need to make new instance
+	public Message(int messageData) {
+		checkArgument(BitStr.countBits(messageData) <= Settings.getMessageLength());
+
+		contents = new BitStr(Settings.getMessageLength(), messageData);
 	}
 
 	@Override
@@ -26,7 +26,7 @@ public class Message implements BitStringOnlyReader {
 	}
 
 	@Override
-	public boolean[] getBits(int startIndex, int bitCount) {
+	public int getBits(int startIndex, int bitCount) {
 		return contents.getBits(startIndex, bitCount);
 	}
 
@@ -35,5 +35,20 @@ public class Message implements BitStringOnlyReader {
 		Message other = (Message) what;
 
 		return contents.equals(other.contents);
+	}
+
+	@Override
+	public int size() {
+		return contents.size();
+	}
+
+	@Override
+	public int getAll() {
+		return contents.getAll();
+	}
+
+	@Override
+	public Object clone() {
+		return new Message(contents);
 	}
 }

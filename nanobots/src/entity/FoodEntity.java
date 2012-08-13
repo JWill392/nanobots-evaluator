@@ -1,18 +1,33 @@
 package entity;
 
-public class FoodEntity extends Entity implements DynamicEntity, MortalEntity {
+import static com.google.common.base.Preconditions.checkArgument;
+
+public class FoodEntity extends MortalEntity {
 	private int energy;
 
-	public FoodEntity(int inEnergy) {
+	FoodEntity(int inEnergy) {
 		energy = inEnergy;
 	}
 
+	@Override
 	public int getEnergy() {
 		return energy;
 	}
 
-	public void addEnergy(int energy) {
-		this.energy += energy;
+	/**
+	 * @return amount successfully harvested
+	 */
+	public int harvest(int amount) {
+		checkArgument(amount >= 0);
+
+		if (amount > energy) {
+			int amountHarvested = energy;
+			energy = 0;
+			return amountHarvested;
+		}
+
+		energy -= amount;
+		return amount;
 	}
 
 	@Override

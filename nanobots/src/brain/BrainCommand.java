@@ -1,22 +1,23 @@
 package brain;
 
 import entity.bot.Memory;
-import action.cmd.ActionCmd;
+import action.ActionCmd;
+import action.RunningAction;
 
 public class BrainCommand {
-	ActionCmd act;
+	RunningAction act;
 	Memory mem;
-	
+
 	public BrainCommand(ActionCmd actToTake, Memory toSetMem) {
-		act = actToTake;
+		act = (RunningAction) actToTake;
 		mem = toSetMem;
 	}
-	
+
 	public Memory getMemory() {
 		return mem;
 	}
-	
-	public ActionCmd getAction() {
+
+	public RunningAction getAction() {
 		return act;
 	}
 }

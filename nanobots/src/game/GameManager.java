@@ -2,10 +2,9 @@ package game;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-
+import teampg.grid2d.GridInterface.Entry;
 import teampg.grid2d.point.AbsPos;
 import teampg.grid2d.point.Pos2D;
 import teampg.grid2d.point.RelPos;
@@ -19,13 +18,12 @@ import entity.bot.MessageSignal;
 
 
 
-import action.cmd.ActionCmd;
+import action.ActionCmd;
+import action.TargettedAction;
 import action.cmd.Attack;
 import action.cmd.ContinuePreviousAction;
 import action.cmd.Harvest;
-import action.cmd.Move;
 import action.cmd.Reproduce;
-import action.cmd.TargettedAction;
 import action.cmd.Transmit;
 import action.cmd.Wait;
 import brain.BotBrain;
@@ -35,28 +33,27 @@ import brain.BrainInfo;
 
 public class GameManager {
 	private final World world;
-	private final Map<Integer, Team> teams;
+	private final List<Team> teams;
 	private int winCandidates;
 
 	public GameManager(File map) {
 		world = World.load(map);
-		teams = new HashMap<Integer, Team>();
+		teams = new ArrayList<>();
 	}
 
 	public GameManager(World map) {
 		world = map;
-		teams = new HashMap<Integer, Team>();
+		teams = new ArrayList<>();
 	}
 
 	public List<BotEntity> getBotsByAction(Team onTeam,
 			Class<? extends ActionCmd> type) {
 		List<BotEntity> bots = new ArrayList<>();
 
-		for (int botID : onTeam) {
-			BotEntity aBotOnTeam = world.get(botID);
+		for (BotEntity teamBot : world.getTeamBots(onTeam)) {
 
-			if (aBotOnTeam.getAction().getClass() == type) {
-				bots.add(aBotOnTeam);
+			if (teamBot.getAction().getClass() == type) {
+				bots.add(teamBot);
 			}
 		}
 
@@ -65,38 +62,17 @@ public class GameManager {
 
 	private void killBot(BotEntity bot) {
 		int botID = bot.getID();
-		Team t = teams.get(bot.getTeamID());
 
-		t.removeBot(botID);
 		world.destroy(world.getBotPosition(botID));
 	}
 
-	// TODO this shouldn't have to be public; but we need a way to add bots to
-	// team AND grid (at start when loading map; after that GM handles adding
-	// new bots)
-	public void addBot(BotEntity bot, AbsPos pos) {
-		assert (Entity.isType(world.get(pos), Entity.EMPTY));
-
-		// add to grid
-		world.addNewEntity(pos, bot);
-
-		// add to team
-		final Integer teamID = bot.getTeamID();
-		final Team theTeam = teams.get(teamID);
-		final Integer botID = bot.getID();
-		theTeam.addBot(botID);
-	}
-
-	public int addTeam(BotBrain brain, String name) {
+	public void addTeam(BotBrain brain, String name) {
 		Team theTeam = Team.getNewTeam(brain, name);
 
 		// should never add a given team twice
-		assert (!teams.containsValue(theTeam));
+		assert (!teams.contains(theTeam));
 
-		int teamID = theTeam.getID();
-
-		teams.put(teamID, theTeam);
-		return teamID;
+		teams.add(theTeam);
 	}
 
 	public boolean winnerExists() {
@@ -108,7 +84,7 @@ public class GameManager {
 	}
 
 	public String getWinnerName() {
-		for (Team t : teams.values()) {
+		for (Team t : teams) {
 			if (t.hasLost() == false) {
 				return t.getName();
 			}
@@ -121,10 +97,9 @@ public class GameManager {
 
 	// TODO-DESIGN so... if getNextTeamID is only ever called to give input for
 	// doTurn, why the heck is it public?
-	public int getNextTeamID() {
-		int teamID = 0;
-
-		return teamID;
+	public Team getNextPlayingTeam() {
+		//TODO
+		return null;
 	}
 
 	/**
@@ -135,8 +110,7 @@ public class GameManager {
 	 *            Team whose turn it is
 	 * @return TurnActions instance listing valid and invalid actions.
 	 */
-	public void doTurn(int teamID) {
-		Team t = teams.get(teamID);
+	public void doTurn(Team team) {
 
 		/*
 		 * TODO-PROBLEM tick() here would tick twice after a team died; we don't
@@ -146,6 +120,8 @@ public class GameManager {
 		 * TODO-TEST While you're at it, add a test case to detect this
 		 * potential bug.
 		 */
+
+
 
 		// get requested action for each bot
 		getActions(t);
@@ -178,22 +154,20 @@ public class GameManager {
 	// TODO change name to getBrainCommands
 	private void getActions(Team t) {
 		// TODO-OPTIMIZE get each bot's action in parallel
-		for (int botID : t) {
-			BrainInfo info = world.getBotInfo(botID);
-			BrainCommand brainCommand = t.decideAction(info, botID);
-
-			BotEntity theBot = world.get(botID);
+		for (BotEntity bot : world.getTeamBots(t)) {
+			BrainInfo info = world.getBotInfo(bot.getID());
+			BrainCommand brainCommand = t.decideAction(info);
 
 			// if Brain wants to change memory, change
 			Memory toSetMemory = brainCommand.getMemory();
 			if (toSetMemory != null) {
-				theBot.setMemory(toSetMemory);
+				bot.setMemory(toSetMemory);
 			}
 
 			// if Brain wants to change action, change
 			ActionCmd toSetAction = brainCommand.getAction();
 			if (toSetAction != null) {
-				theBot.setAction(toSetAction);
+				bot.setAction(toSetAction);
 			}
 		}
 	}
@@ -225,7 +199,7 @@ public class GameManager {
 	 * @return True if team has lost.
 	 */
 	private boolean checkTeamLost(Team t) {
-		if (t.iterator().hasNext() == false) {
+		if (world.getTeamBots(t).isEmpty()) {
 			t.setLost();
 			winCandidates--;
 			return true;
@@ -359,7 +333,7 @@ public class GameManager {
 
 		Entity targettedEnt = world.get(targPos);
 
-		return (Entity.isType(targettedEnt, entType));
+		return (targettedEnt.getClass().equals(entType));
 	}
 
 	/********************
@@ -384,12 +358,12 @@ public class GameManager {
 			} else if (action instanceof Reproduce) {
 				AbsPos target = getAbsoluteTarget(actor);
 
-				int teamID = actor.getTeamID();
+				Team actorTeam = actor.getTeam();
 
 				BotEntity newborn = Entity.getNewBot(
-						Settings.getNewbornEnergy(), teamID);
+						Settings.getNewbornEnergy(), actorTeam);
 
-				addBot(newborn, target);
+				world.addNewEntity(target, newborn);
 
 				// HARVEST
 			} else if (action instanceof Harvest) {
@@ -431,16 +405,18 @@ public class GameManager {
 				AbsPos origin = world.getBotPosition(botID);
 				Message toSend = ((Transmit) action).getMessage();
 
-				List<BotEntity> receivers = world.getProxBots(botID,
+				Collection<Entry<BotEntity>> receivers = world.getProxBots(origin,
 						Settings.getMessageRange());
 
-				for (BotEntity b : receivers) {
-					AbsPos destination = world.getBotPosition(b.getID());
+				for (Entry<BotEntity> entry : receivers) {
+					AbsPos destination = entry.getPosition();
+					BotEntity receiver = entry.getContents();
+
 					int dist = (int) Pos2D.diagDistance(origin, destination);
 					MessageSignal receivedMsgSgnl = new MessageSignal(toSend,
 							dist);
 
-					b.addReceivedMessage(receivedMsgSgnl);
+					receiver.addReceivedMessage(receivedMsgSgnl);
 				}
 
 				// WAIT

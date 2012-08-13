@@ -1,6 +1,9 @@
 package tests;
 
 import static org.junit.Assert.*;
+
+import java.awt.Dimension;
+
 import entity.BotEntity;
 import entity.Entity;
 import game.Settings;
@@ -10,15 +13,16 @@ import game.Team;
 import org.junit.Before;
 import org.junit.Test;
 
-import ca.camosun.jwill392.datatypes.grid2d.RectGrid;
-import ca.camosun.jwill392.datatypes.grid2d.point.AbsPos;
+import teampg.grid2d.RectGrid;
+import teampg.grid2d.point.AbsPos;
 
 import brain.BotBrain;
 import brain.BrainCommand;
 import brain.BrainInfo;
+import brain.Vision;
 
 
-import action.cmd.ActionCmd;
+import action.ActionCmd;
 import action.cmd.Wait;
 
 public class TeamTest {
@@ -55,20 +59,20 @@ public class TeamTest {
 	public void testSimpleDecideAction() {
 
 		BotEntity bot = Entity.getNewBot(1, 0);
-		RectGrid<Entity> entData = new RectGrid<>(3, 3);
-		entData.set(new AbsPos(0, 0), (Entity) Entity.getNewFood(1));
-		entData.set(new AbsPos(1, 0), (Entity) Entity.getNewEmpty());
-		entData.set(new AbsPos(2, 0), (Entity) Entity.getNewEmpty());
-		
-		entData.set(new AbsPos(0, 0), (Entity) Entity.getNewBot(1, 1));
-		entData.set(new AbsPos(1, 0), (Entity) bot);
-		entData.set(new AbsPos(2, 0), (Entity) Entity.getNewBot(1, 0));
-		
-		entData.set(new AbsPos(0, 0), (Entity) Entity.getNewEmpty());
-		entData.set(new AbsPos(1, 0), (Entity) Entity.getNewWall());
-		entData.set(new AbsPos(2, 0), (Entity) Entity.getNewEmpty());
+		RectGrid<Entity> entData = new RectGrid<>(new Dimension(3, 3));
+		entData.set(AbsPos.of(0, 0), Entity.getNewFood(1));
+		entData.set(AbsPos.of(1, 0), Entity.getNewEmpty());
+		entData.set(AbsPos.of(2, 0), Entity.getNewEmpty());
 
-		BrainInfo fakeInfo = new BrainInfo(bot, entData);
+		entData.set(AbsPos.of(0, 0), Entity.getNewBot(1, 1));
+		entData.set(AbsPos.of(1, 0), bot);
+		entData.set(AbsPos.of(2, 0), Entity.getNewBot(1, 0));
+
+		entData.set(AbsPos.of(0, 0), Entity.getNewEmpty());
+		entData.set(AbsPos.of(1, 0), Entity.getNewWall());
+		entData.set(AbsPos.of(2, 0), Entity.getNewEmpty());
+
+		BrainInfo fakeInfo = new BrainInfo(bot, new Vision(entData, //TODO points, AbsPos.of(1, 0)));
 		BrainCommand cmd = aTeam.decideAction(fakeInfo,
 				bot.getID());
 
@@ -89,7 +93,7 @@ public class TeamTest {
 
 	@Test
 	public void testIterator() {
-		/*		
+		/*
 		fail("test removing bots, see if iterator still works as expected");
 		final int TEAM_A = 48;
 		final int TEAM_B = 94;
@@ -99,19 +103,19 @@ public class TeamTest {
 		grid.addNewEntity(new Point(0,1), dBot);
 		BotEntity eBot = Entity.getNewBot(1, TEAM_A);
 		grid.addNewEntity(new Point(0,2), eBot);
-		
+
 		BotEntity fBot = Entity.getNewBot(1, TEAM_B);
 		grid.addNewEntity(new Point(1,0), fBot);
 		BotEntity gBot = Entity.getNewBot(1, TEAM_B);
 		grid.addNewEntity(new Point(1,1), gBot);
 		BotEntity hBot = Entity.getNewBot(1, TEAM_B);
 		grid.addNewEntity(new Point(1,2), hBot);
-		
+
 		System.out.println("-------------");
 		System.out.println("cBot id " + cBot.getID());
 		System.out.println("dBot id " + dBot.getID());
 		System.out.println("eBot id " + eBot.getID());
-		
+
 		//count number of times team iterator gives us each bot
 		//for team 1
 		Map<Integer, Integer> botCount = new HashMap<Integer, Integer>();
@@ -121,21 +125,21 @@ public class TeamTest {
 		botCount.put(fBot.getID(), 0);
 		botCount.put(gBot.getID(), 0);
 		botCount.put(hBot.getID(), 0);
-		
+
 		for (int botID : grid.getTeamBots(TEAM_A)) {
 			assertTrue(botCount.containsKey(botID));
-			
-			int timesIteratedOverThisBot = botCount.get(botID); 
+
+			int timesIteratedOverThisBot = botCount.get(botID);
 			botCount.put(botID, timesIteratedOverThisBot + 1);
 		}
-		
+
 		assertTrue(botCount.get(cBot.getID()) == 1);
 		assertTrue(botCount.get(dBot.getID()) == 1);
 		assertTrue(botCount.get(eBot.getID()) == 1);
 		assertTrue(botCount.get(fBot.getID()) == 0);
 		assertTrue(botCount.get(gBot.getID()) == 0);
 		assertTrue(botCount.get(hBot.getID()) == 0);
-		
+
 		//------------------------------------
 		//again, but for other team
 		botCount = new HashMap<Integer, Integer>();
@@ -145,14 +149,14 @@ public class TeamTest {
 		botCount.put(fBot.getID(), 0);
 		botCount.put(gBot.getID(), 0);
 		botCount.put(hBot.getID(), 0);
-		
+
 		for (int botID : grid.getTeamBots(TEAM_B)) {
 			assertTrue(botCount.containsKey(botID));
-			
-			int timesIteratedOverThisBot = botCount.get(botID); 
+
+			int timesIteratedOverThisBot = botCount.get(botID);
 			botCount.put(botID, timesIteratedOverThisBot + 1);
 		}
-		
+
 		assertTrue(botCount.get(cBot.getID()) == 0);
 		assertTrue(botCount.get(dBot.getID()) == 0);
 		assertTrue(botCount.get(eBot.getID()) == 0);

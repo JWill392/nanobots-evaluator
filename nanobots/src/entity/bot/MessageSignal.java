@@ -3,8 +3,8 @@ package entity.bot;
 import game.Settings;
 
 public class MessageSignal {
-	private Message contents;
-	private int signalStrength;
+	private final Message contents;
+	private final int signalStrength;
 
 	public MessageSignal(Message inData, int inSignalStrength) {
 		assert (inSignalStrength <= Settings.getMessageRange());
@@ -13,8 +13,8 @@ public class MessageSignal {
 		signalStrength = inSignalStrength;
 	}
 
-	public static MessageSignal newInstance(MessageSignal toCopy) {
-		return toCopy;  // read only, so no need to make new instance
+	public MessageSignal(int messageData, int signalStrength) {
+		this(new Message(messageData), signalStrength);
 	}
 
 	public Message getMessage() {

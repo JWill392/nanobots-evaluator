@@ -1,13 +1,13 @@
 package tests;
 
 import static org.junit.Assert.*;
-
-import java.util.Arrays;
+import static org.mockito.Mockito.mock;
 
 import entity.BotEntity;
 import entity.Entity;
 import entity.bot.*;
 import game.Settings;
+import game.Team;
 
 
 import org.junit.Before;
@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 
 public class BotEntityTest {
 	BotEntity aBot;
+	Team mockTeam;
 
 	@Before
 	public void setUp() throws Exception {
@@ -27,116 +28,61 @@ public class BotEntityTest {
 		Settings.setBotMaxEnergy(10);
 		Settings.lock();
 
-		aBot = BotEntity.getNewBotEntity(10, 1);
+		mockTeam = mock(Team.class);
+
+		aBot = Entity.getNewBot(10, mockTeam);
 	}
 
 	@Test
 	public void testNewInstance() {
 		assertTrue(aBot.getEnergy() == 10);
-		assertTrue(aBot.getTeamID() == 1);
-
-		boolean[] memoryContents = aBot.getMemory().getBits(0, 3);
-		boolean[] expectedMemory =
-			{
-					false, false, false
-			};
-		assertTrue(Arrays.equals(memoryContents, expectedMemory));
-
-		ImmutableList<MessageSignal> initialValues = aBot.getReceivedMessages();
-		assertTrue(initialValues.size() == 0);
+		assertTrue(aBot.getTeam() == mockTeam);
+		assertEquals(0, aBot.getMemory().getAll());
+		assertEquals(0, aBot.getReceivedMessages().size());
 	}
 
 	@Test
 	public void testSetEnergy() {
 		aBot.addEnergy(-1);
-		assertTrue(aBot.getEnergy() == 9);
+		assertEquals(9, aBot.getEnergy());
 
 		aBot.addEnergy(10);
-		assertTrue(aBot.getEnergy() == 10);
+		assertEquals(10, aBot.getEnergy());
 
 		aBot.addEnergy(-15);
-		assertTrue(aBot.getEnergy() == -5);
+		assertEquals(-5, aBot.getEnergy());
 	}
 
 	@Test
 	public void testGetMemoryDoesNotReference() {
 		Memory memCopy = aBot.getMemory();
+		assertNotSame(memCopy, aBot.getMemory());
 
-		assertTrue(!(memCopy == aBot.getMemory()));
-
-		assertTrue(aBot.getMemory().getBit(1) == false);
-		memCopy.storeBit(1, true);
-		assertTrue(aBot.getMemory().getBit(1) == false);
-	}
-
-	@Test
-	public void testSetMemory() {
-		Memory newMem = new Memory();
-		newMem.storeBit(0, true);
-
-		assertTrue(aBot.getMemory().getBit(0) == false);
-		aBot.setMemory(newMem);
-		assertTrue(aBot.getMemory().getBit(0) == true);
-
-		// not copied by reference
-		newMem.storeBit(0, false);
-		assertTrue(aBot.getMemory().getBit(0) == true);
-
+		// changing copy does not change original
+		assertEquals(false, aBot.getMemory().getBit(1));
+		memCopy.setBit(1, true);
+		assertEquals(false, aBot.getMemory().getBit(1));
 	}
 
 	@Test
 	public void testTeamsEqual() {
-		BotEntity notOnABotsTeam = Entity.getNewBot(1, 42);
+		BotEntity notOnABotsTeam = Entity.getNewBot(10, mock(Team.class));
 
-		assertTrue(BotEntity.areAllies(aBot, notOnABotsTeam) == false);
+		assertFalse(BotEntity.areAllies(aBot, notOnABotsTeam));
 	}
 
 	@Test
 	public void testAddReceivedMessage() {
-		boolean[] msgData =
-			{
-					true, false, false
-			};
-		MessageSignal aMsgSgnl = getMessageSignalInstance(msgData, 3);
+		MessageSignal aMockMsg = mock(MessageSignal.class);
+		aBot.addReceivedMessage(aMockMsg);
 
-		aBot.addReceivedMessage(aMsgSgnl);
-		
-		
+		MessageSignal bMockMsg = mock(MessageSignal.class);
+		aBot.addReceivedMessage(bMockMsg);
+
 		ImmutableList<MessageSignal> botInbox = aBot.getReceivedMessages();
-		assertTrue(botInbox.size() == 1);
-
-		assertTrue(messageSignalEqual(aMsgSgnl, botInbox.get(0)));
+		assertTrue(botInbox.size() == 2);
+		assertTrue(botInbox.contains(aMockMsg));
+		assertTrue(botInbox.contains(bMockMsg));
 	}
 
-	/* ---------------------------- */
-
-	private boolean messageSignalEqual(MessageSignal a, MessageSignal b) {
-		if (a.getSignalStrength() != b.getSignalStrength()) {
-			return false;
-		}
-
-		Message msgA = a.getMessage();
-		Message msgB = b.getMessage();
-
-		if (!messageEqual(msgA, msgB)) {
-			return false;
-		}
-
-		return true;
-	}
-
-	private boolean messageEqual(Message a, Message b) {
-		boolean[] aContents = a.getBits(0, Settings.getMessageLength());
-		boolean[] bContents = b.getBits(0, Settings.getMessageLength());
-
-		return Arrays.equals(aContents, bContents);
-	}
-
-	private MessageSignal getMessageSignalInstance(boolean[] contents,
-			int strength) {
-		Message msg = new Message(contents);
-		MessageSignal ret = new MessageSignal(msg, strength);
-
-		return ret;
-	}
 }

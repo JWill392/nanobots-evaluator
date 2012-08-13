@@ -12,7 +12,6 @@ import java.util.Map;
 import com.google.common.base.Objects;
 
 import teampg.grid2d.GridInterface.Entry;
-import teampg.grid2d.ReadGrid;
 import teampg.grid2d.point.AbsPos;
 import teampg.grid2d.point.RelPos;
 
@@ -21,6 +20,7 @@ import entity.EmptyEntity;
 import entity.Entity;
 import entity.FoodEntity;
 import entity.WallEntity;
+import game.world.World;
 
 public class Vision implements Iterable<Entry<Character>> {
 	public static char FRIENDLY_BOT = 'b';
@@ -32,15 +32,15 @@ public class Vision implements Iterable<Entry<Character>> {
 	private final Map<AbsPos, Character> vis;
 	private final AbsPos observerPos;
 
-	public Vision(ReadGrid<Entity> map, Collection<AbsPos> visible, AbsPos observerPos) {
-		checkArgument(map.get(observerPos) instanceof BotEntity);
+	public Vision(World world, Collection<AbsPos> visible, AbsPos observerPos) {
+		checkArgument(world.get(observerPos) instanceof BotEntity);
 
 		vis = new HashMap<>();
 		this.observerPos = observerPos;
-		BotEntity observer = (BotEntity) map.get(observerPos);
+		BotEntity observer = (BotEntity) world.get(observerPos);
 
 		for (AbsPos visibleCell : visible) {
-			Character symbolForEnt = getSymbolForEntity(map.get(visibleCell), observer);
+			Character symbolForEnt = getSymbolForEntity(world.get(visibleCell), observer);
 			vis.put(visibleCell, symbolForEnt);
 		}
 	}

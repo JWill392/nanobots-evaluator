@@ -1,5 +1,5 @@
 package entity;
 
-public interface DynamicEntity {
-	public void tick();
+public abstract class DynamicEntity extends Entity{
+	public abstract void tick();
 }

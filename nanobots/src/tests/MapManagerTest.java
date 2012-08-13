@@ -6,14 +6,14 @@ import static tests.Util.*;
 import entity.BotEntity;
 import entity.Entity;
 import entity.FoodEntity;
-import game.World;
 import game.Settings;
+import game.world.World;
 
 
 import org.junit.Before;
 import org.junit.Test;
 
-import ca.camosun.jwill392.datatypes.grid2d.point.AbsPos;
+import teampg.grid2d.point.AbsPos;
 
 import brain.BrainInfo;
 
@@ -52,7 +52,7 @@ public class MapManagerTest {
 	public void testLoad() {
 		/*		Charset charset = Charset.forName("US-ASCII");
 				Path file = Paths.get(fileName);
-				
+
 				try (BufferedWriter writer = Files.newBufferedWriter(file, charset)) {
 				} catch (IOException x) {
 					System.err.format("IOException: %s%n", x);
@@ -65,29 +65,29 @@ public class MapManagerTest {
 
 	@Test
 	public void testGrid() {
-		assertIsEntityType(grid.get(new AbsPos(0, 0)), Util.EMPTY);
-		assertIsEntityType(grid.get(new AbsPos(0, 1)), Util.EMPTY);
-		assertIsEntityType(grid.get(new AbsPos(0, 2)), Util.EMPTY);
-		assertIsEntityType(grid.get(new AbsPos(1, 0)), Util.EMPTY);
-		assertIsEntityType(grid.get(new AbsPos(1, 1)), Util.EMPTY);
-		assertIsEntityType(grid.get(new AbsPos(1, 2)), Util.EMPTY);
-		assertIsEntityType(grid.get(new AbsPos(2, 0)), Util.EMPTY);
-		assertIsEntityType(grid.get(new AbsPos(2, 1)), Util.EMPTY);
-		assertIsEntityType(grid.get(new AbsPos(2, 2)), Util.EMPTY);
-		assertIsEntityType(grid.get(new AbsPos(3, 0)), Util.EMPTY);
-		assertIsEntityType(grid.get(new AbsPos(3, 1)), Util.EMPTY);
-		assertIsEntityType(grid.get(new AbsPos(3, 2)), Util.EMPTY);
+		assertIsEntityType(grid.get(AbsPos.of(0, 0)), Util.EMPTY);
+		assertIsEntityType(grid.get(AbsPos.of(0, 1)), Util.EMPTY);
+		assertIsEntityType(grid.get(AbsPos.of(0, 2)), Util.EMPTY);
+		assertIsEntityType(grid.get(AbsPos.of(1, 0)), Util.EMPTY);
+		assertIsEntityType(grid.get(AbsPos.of(1, 1)), Util.EMPTY);
+		assertIsEntityType(grid.get(AbsPos.of(1, 2)), Util.EMPTY);
+		assertIsEntityType(grid.get(AbsPos.of(2, 0)), Util.EMPTY);
+		assertIsEntityType(grid.get(AbsPos.of(2, 1)), Util.EMPTY);
+		assertIsEntityType(grid.get(AbsPos.of(2, 2)), Util.EMPTY);
+		assertIsEntityType(grid.get(AbsPos.of(3, 0)), Util.EMPTY);
+		assertIsEntityType(grid.get(AbsPos.of(3, 1)), Util.EMPTY);
+		assertIsEntityType(grid.get(AbsPos.of(3, 2)), Util.EMPTY);
 
 		// co-ordinates out of grid are wall
-		assertIsEntityType(grid.get(new AbsPos(-1, 0)), Util.WALL);
-		assertIsEntityType(grid.get(new AbsPos(0, -1)), Util.WALL);
-		assertIsEntityType(grid.get(new AbsPos(4, 0)), Util.WALL);
-		assertIsEntityType(grid.get(new AbsPos(0, 3)), Util.WALL);
+		assertIsEntityType(grid.get(AbsPos.of(-1, 0)), Util.WALL);
+		assertIsEntityType(grid.get(AbsPos.of(0, -1)), Util.WALL);
+		assertIsEntityType(grid.get(AbsPos.of(4, 0)), Util.WALL);
+		assertIsEntityType(grid.get(AbsPos.of(0, 3)), Util.WALL);
 	}
 
 	@Test
 	public void testAddNewEntity() {
-		AbsPos foodPos = new AbsPos(0, 2);
+		AbsPos foodPos = AbsPos.of(0, 2);
 		grid.addNewEntity(foodPos, aFood);
 
 		assertTrue(grid.get(foodPos) == aFood);
@@ -95,21 +95,21 @@ public class MapManagerTest {
 
 	@Test
 	public void testAddNewBots() {
-		AbsPos aBotPos = new AbsPos(2, 1);
+		AbsPos aBotPos = AbsPos.of(2, 1);
 		grid.addNewEntity(aBotPos, aBot);
 		assertTrue(grid.get(aBotPos) == aBot);
 
-		AbsPos bBotPos = new AbsPos(3, 1);
+		AbsPos bBotPos = AbsPos.of(3, 1);
 		grid.addNewEntity(bBotPos, bBot);
 		assertTrue(grid.get(bBotPos) == bBot);
 	}
 
 	@Test
 	public void testGetBotPosition() {
-		AbsPos aBotPos = new AbsPos(2, 1);
+		AbsPos aBotPos = AbsPos.of(2, 1);
 		grid.addNewEntity(aBotPos, aBot);
 
-		AbsPos bBotPos = new AbsPos(3, 1);
+		AbsPos bBotPos = AbsPos.of(3, 1);
 		grid.addNewEntity(bBotPos, bBot);
 
 		int aBotID = aBot.getID();
@@ -138,7 +138,7 @@ public class MapManagerTest {
 	public void testGetBotInfo() {
 		BotEntity someBot = Entity.getNewBot(5, 0);
 		int someID = someBot.getID();
-		AbsPos somePos = new AbsPos(2, 1);
+		AbsPos somePos = AbsPos.of(2, 1);
 
 		grid.addNewEntity(somePos, someBot);
 		BrainInfo nfo = grid.getBotInfo(someID);
@@ -149,11 +149,11 @@ public class MapManagerTest {
 
 	@Test
 	public void testMoveOnce() {
-		AbsPos start = new AbsPos(2, 1);
+		AbsPos start = AbsPos.of(2, 1);
 		grid.addNewEntity(start, aBot);
 
 		int botID = aBot.getID();
-		AbsPos destination = new AbsPos(2, 2);
+		AbsPos destination = AbsPos.of(2, 2);
 		grid.move(botID, destination);
 
 		AbsPos botPosByID = grid.getBotPosition(botID);
@@ -168,11 +168,11 @@ public class MapManagerTest {
 
 	@Test
 	public void testMoveMany() {
-		AbsPos start = new AbsPos(3, 2);
+		AbsPos start = AbsPos.of(3, 2);
 		grid.addNewEntity(start, bBot);
 
 		int botID = bBot.getID();
-		AbsPos destination = new AbsPos(0, 0);
+		AbsPos destination = AbsPos.of(0, 0);
 		grid.move(botID, destination);
 
 		AbsPos botPosByID = grid.getBotPosition(botID);
@@ -185,9 +185,9 @@ public class MapManagerTest {
 		assertIsEntityType(atStart, Util.EMPTY);
 
 		// moving a second time works?
-		start = new AbsPos(0, 0);
+		start = AbsPos.of(0, 0);
 
-		destination = new AbsPos(2, 2);
+		destination = AbsPos.of(2, 2);
 		grid.move(botID, destination);
 
 		botPosByID = grid.getBotPosition(botID);
@@ -202,7 +202,7 @@ public class MapManagerTest {
 
 	@Test
 	public void testClear() {
-		AbsPos botPos = new AbsPos(2, 1);
+		AbsPos botPos = AbsPos.of(2, 1);
 		grid.addNewEntity(botPos, aBot);
 
 		assertTrue(grid.get(botPos) == aBot);
@@ -220,7 +220,7 @@ public class MapManagerTest {
 	public void testProxBots() {
 		fail("Test not yet implemented");
 	}
-	
+
 	/*
 	 * TODO move these tests into GridInterface
 	 * @Test
@@ -235,9 +235,9 @@ public class MapManagerTest {
 		 *   *---*---*---*
 		 *   | w |   |   |
 		 *   *---*---*---*
-		 
-		Entity centerBot = grid.get(new AbsPos(0, 0));
-		Entity[][] proxGrid = grid.getProximate(new AbsPos(0, 0), 1);
+
+		Entity centerBot = grid.get(AbsPos.of(0, 0));
+		Entity[][] proxGrid = grid.getProximate(AbsPos.of(0, 0), 1);
 
 		// correct dimensions
 		assertTrue(proxGrid.length == 3);
@@ -278,9 +278,9 @@ public class MapManagerTest {
 		 * 4 | w | w | w | w | w |
 		 *   *---*---*---*---*---*
 		 * y
-		 
-		Entity centerBot = grid.get(new AbsPos(2, 1));
-		Entity[][] proxGrid = grid.getProximate(new AbsPos(2, 1), 2);
+
+		Entity centerBot = grid.get(AbsPos.of(2, 1));
+		Entity[][] proxGrid = grid.getProximate(AbsPos.of(2, 1), 2);
 
 		// correct dimensions
 		assertTrue(proxGrid.length == 5);
@@ -296,8 +296,8 @@ public class MapManagerTest {
 		 "  22w\n" +
 		 "wf1 w\n" +
 		 "wwwww\n"
-		 
-		 
+
+
 
 		// every Entity in proximate grid is as expected
 		assertIsEntityType(proxGrid[0][0], Util.WALL);
@@ -342,19 +342,19 @@ public class MapManagerTest {
 		 * 2 | w | f | 1 |   |
 		 *   *---*---*---*---*
 		 * y
-		 * 
+		 *
 		 */
 	/*
-		grid.addNewEntity(new AbsPos(0, 0), Entity.getNewBot(1, 1));
-		grid.addNewEntity(new AbsPos(1, 0), Entity.getNewFood(1));
-		grid.addNewEntity(new AbsPos(2, 0), Entity.getNewWall());
+		grid.addNewEntity(AbsPos.of(0, 0), Entity.getNewBot(1, 1));
+		grid.addNewEntity(AbsPos.of(1, 0), Entity.getNewFood(1));
+		grid.addNewEntity(AbsPos.of(2, 0), Entity.getNewWall());
 
-		grid.addNewEntity(new AbsPos(2, 1), Entity.getNewBot(1, 2));
-		grid.addNewEntity(new AbsPos(3, 1), Entity.getNewBot(1, 2));
+		grid.addNewEntity(AbsPos.of(2, 1), Entity.getNewBot(1, 2));
+		grid.addNewEntity(AbsPos.of(3, 1), Entity.getNewBot(1, 2));
 
-		grid.addNewEntity(new AbsPos(0, 2), Entity.getNewWall());
-		grid.addNewEntity(new AbsPos(1, 2), Entity.getNewFood(1));
-		grid.addNewEntity(new AbsPos(2, 2), Entity.getNewBot(1, 1));
+		grid.addNewEntity(AbsPos.of(0, 2), Entity.getNewWall());
+		grid.addNewEntity(AbsPos.of(1, 2), Entity.getNewFood(1));
+		grid.addNewEntity(AbsPos.of(2, 2), Entity.getNewBot(1, 1));
 	}*/
 
 }
