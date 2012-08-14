@@ -1,7 +1,9 @@
 package entity;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.google.common.collect.ImmutableList;
 import entity.bot.Memory;
 import entity.bot.MessageSignal;
@@ -19,7 +21,7 @@ public class BotEntity extends MortalEntity implements MobileEntity{
 
 	private int energy;
 	private ArrayList<MessageSignal> inbox;
-	private final Collection<RunningAction> runningActions;
+	private final Map<Class<? extends RunningAction>, RunningAction> runningActions;
 
 	static BotEntity getNewBotEntity(int energy, Team team) {
 		int botIDToUse = botIDCounter;
@@ -39,19 +41,28 @@ public class BotEntity extends MortalEntity implements MobileEntity{
 
 		inbox = new ArrayList<MessageSignal>();
 		memory = new Memory();
-		runningActions = new ArrayList<>();
+		runningActions = new HashMap<>(10);
 	}
 
 
 
 	public void addRunningAction(RunningAction action) {
-		runningActions.add(action);
+		if (runningActions.get(action.getClass()) != null) {
+			// TODO fail action
+			return;
+		}
+
+		runningActions.put(action.getClass(), action);
 	}
 	public void removeRunningAction(RunningAction action) {
-		runningActions.remove(action);
+		runningActions.remove(action.getClass());
 	}
-	public ImmutableList<RunningAction> getRunningActions() {
-		return ImmutableList.copyOf(runningActions);
+	@SuppressWarnings("unchecked")
+	public <T extends RunningAction> T getRunningAction(Class<T> ofType) {
+		return (T) runningActions.get(ofType);
+	}
+	public boolean hasRunningAction(Class<? extends RunningAction> ofType) {
+		return runningActions.containsKey(ofType);
 	}
 
 
@@ -100,5 +111,10 @@ public class BotEntity extends MortalEntity implements MobileEntity{
 
 	public ImmutableList<MessageSignal> getReceivedMessages() {
 		return ImmutableList.copyOf(inbox);
+	}
+
+	@Override
+	public String toString() {
+		return "BotE " + hashCode();
 	}
 }

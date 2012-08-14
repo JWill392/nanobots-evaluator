@@ -34,4 +34,9 @@ public class FoodEntity extends MortalEntity {
 	public void tick() {
 	}
 
+	@Override
+	public String toString() {
+		return "FoodE " + hashCode();
+	}
+
 }

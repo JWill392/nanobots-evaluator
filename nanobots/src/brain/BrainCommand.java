@@ -13,6 +13,11 @@ public class BrainCommand {
 		mem = toSetMem;
 	}
 
+	public BrainCommand(ActionCmd actToTake) {
+		act = (RunningAction) actToTake;
+		mem = null;
+	}
+
 	public Memory getMemory() {
 		return mem;
 	}

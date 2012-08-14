@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -76,8 +77,7 @@ public class Vision implements Iterable<Entry<Character>> {
 			visionSymbol = WALL;
 
 		} else {
-			// above should cover every type
-			assert (false);
+			throw new IllegalStateException();
 		}
 
 		return visionSymbol;
@@ -106,6 +106,10 @@ public class Vision implements Iterable<Entry<Character>> {
 		};
 	}
 
+	/**
+	 * List of positions of every type c in vision, sorted by magnitude --
+	 * smaller is better.
+	 */
 	public List<RelPos> indexOf(char c) {
 		ArrayList<RelPos> found = new ArrayList<>();
 
@@ -116,14 +120,13 @@ public class Vision implements Iterable<Entry<Character>> {
 			}
 		}
 
+		Collections.sort(found, RelPos.byMagnitude());
 		return found;
 	}
 
 	@Override
 	public String toString() {
-		return Objects.toStringHelper(this)
-				.add("Mid", observerPos)
-				.add("VisionGrid", vis)
+		return Objects.toStringHelper(this).add("Mid", observerPos).add("VisionGrid", vis)
 				.toString();
 	}
 }
