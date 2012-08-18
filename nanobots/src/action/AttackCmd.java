@@ -1,5 +1,7 @@
 package action;
 
+import java.util.List;
+
 import entity.BotEntity;
 import entity.Entity;
 import game.Settings;
@@ -12,9 +14,10 @@ public class AttackCmd extends TargettedAction {
 	}
 
 	@Override
-	public void executeAll(World world, Iterable<BotEntity> actors) {
-		for (BotEntity bot : actors) {
+	public final void executeAll(World world, List<BotEntity> actors) {
+		super.executeAll(world, actors); //remove obviously illegal actions
 
+		for (BotEntity bot : actors) {
 			AttackCmd action = bot.getRunningAction(this.getClass());
 			Entity targetEnt = world.get(action.target);
 
@@ -24,14 +27,13 @@ public class AttackCmd extends TargettedAction {
 				continue;
 			}
 
-			// can't afford
-			if (!action.exactCost(bot)) {
-				bot.removeRunningAction(action);
-				continue;
-			}
-
+			action.exactCostAndRemoveFrom(bot);
 			((BotEntity) targetEnt).addEnergy(-Settings.getAttackDamage());
-			bot.removeRunningAction(action);
 		}
+	}
+
+	@Override
+	protected int getCost() {
+		return Settings.getActionCost(this.getClass());
 	}
 }

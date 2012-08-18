@@ -1,10 +1,8 @@
 package action;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 import entity.BotEntity;
 import entity.EmptyEntity;
-import entity.bot.Memory;
 import game.Game;
 import game.Settings;
 import game.Team;
@@ -22,8 +20,6 @@ import teampg.grid2d.point.Pos2D;
 import teampg.grid2d.point.RelPos;
 
 import brain.BotBrain;
-import brain.BrainCommand;
-import brain.BrainInfo;
 
 public class _AttackCmdTest {
 	private static final int ATTACK_COST = 1;
@@ -34,81 +30,67 @@ public class _AttackCmdTest {
 	World world;
 	Game game;
 
-	//basic tests
-	BotEntity basicAttacker;
-	BotEntity basicDefender;
-
 	@Before
 	public void setUp() throws Exception {
 		Settings.load();
 		Settings.setNewbornEnergy(NEWBORN);
 		Settings.setAttackDamage(ATTACK_DAMAGE);
 		Settings.setActionCost(AttackCmd.class, ATTACK_COST);
+		Settings.setActionCost(WaitCmd.class, 0);
 		Settings.setActionRange(AttackCmd.class, 1);
 		Settings.lock();
 	}
 
-	private final void setUpBasicTest(RelPos attackTarget, String mapString) {
-		attackTeam = getRelativeAttackerTeam(attackTarget);
-		defenceTeam = getMockTeam(new WaitCmd());
+	private final void setUpBasicTest(String mapString) {
+		//attackTeam bots always try to attack right
+		attackTeam = new Team(new BotBrain() {
+			@Override
+			protected ActionCmd brainDecideAction() throws Exception {
+				return new AttackCmd(Pos2D.offset(position, RelPos.RIGHT));
+			}
+		}, "attackTeam");
+		defenceTeam = _MoveCmdTest.getMockTeam(); //defenceTeam always waits
 		ImmutableList<Team> teams = ImmutableList.of(attackTeam, defenceTeam);
 
 		world = MapLoader.load(mapString, teams);
 		game = new Game(world, teams);
-
-		basicAttacker = (BotEntity) world.get(AbsPos.of(1, 0));
-		basicDefender = (BotEntity) world.get(AbsPos.of(1, 1));
-		assertEquals(NEWBORN, basicAttacker.getEnergy());
-		assertEquals(NEWBORN, basicDefender.getEnergy());
 	}
 
 	@Test
 	public final void testBasicValidTarget() {
-		setUpBasicTest(RelPos.DOWN,
-				".0.\n"+
-				".1.");
+		setUpBasicTest("01");
+
+		AbsPos attackerPos = AbsPos.of(0, 0);
+		BotEntity attackerBot = (BotEntity) world.get(attackerPos);
+		assertEquals(NEWBORN, attackerBot.getEnergy());
+
+		AbsPos defenderPos = AbsPos.of(1, 0);
+		BotEntity defenderBot = (BotEntity) world.get(defenderPos);
+		assertEquals(NEWBORN, defenderBot.getEnergy());
 
 		// TURN 0
 
 		game.runNextTurn();
-		assertEquals(NEWBORN - ATTACK_COST, basicAttacker.getEnergy());
-		assertEquals(NEWBORN - ATTACK_DAMAGE, basicDefender.getEnergy());
+		assertEquals(NEWBORN - ATTACK_COST, attackerBot.getEnergy());
+		assertEquals(NEWBORN - ATTACK_DAMAGE, defenderBot.getEnergy());
 
 		game.runNextTurn(); //run defender turn
 		game.runNextTurn();
-		assertEquals(NEWBORN - ATTACK_COST * 2, basicAttacker.getEnergy());
-		assertTrue(world.get(AbsPos.of(1, 1)) instanceof EmptyEntity);
+		assertEquals(NEWBORN - ATTACK_COST * 2, attackerBot.getEnergy());
+		assertTrue(world.get(defenderPos) instanceof EmptyEntity); //defender died
 	}
 
 	@Test
 	public final void testBasicIllegalTarget() {
-		setUpBasicTest(RelPos.RIGHT,
-				".0.\n"+
-				".1.");
+		setUpBasicTest("0.");
+
+		AbsPos attackPos = AbsPos.of(0, 0);
+		BotEntity basicAttacker = (BotEntity) world.get(attackPos);
+		assertEquals(NEWBORN, basicAttacker.getEnergy());
 
 		// TURN 0
 
 		game.runNextTurn();
 		assertEquals(NEWBORN, basicAttacker.getEnergy());
-		assertEquals(NEWBORN, basicDefender.getEnergy());
-	}
-
-	public static Team getMockTeam(ActionCmd actionToAlwaysTake) {
-		Team retTeam = mock(Team.class);
-		when(retTeam.decideAction(any(BrainInfo.class)))
-		.thenReturn(new BrainCommand(
-				actionToAlwaysTake, mock(Memory.class)));
-
-		return retTeam;
-	}
-
-	//TODO eliminate copy/pasted code
-	public static Team getRelativeAttackerTeam(final RelPos attackDir) {
-		return new Team(new BotBrain() {
-			@Override
-			protected BrainCommand brainDecideAction() throws Exception {
-				return new BrainCommand(new AttackCmd(Pos2D.offset(position, attackDir)), new Memory());
-			}
-		}, "Attacker");
 	}
 }

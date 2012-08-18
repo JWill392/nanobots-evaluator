@@ -1,6 +1,11 @@
 package brain;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import teampg.grid2d.point.AbsPos;
+
+import action.ActionCmd;
+import action.RunningAction;
+import action.WaitCmd;
 
 import com.google.common.collect.ImmutableList;
 
@@ -18,7 +23,7 @@ public abstract class BotBrain {
 	public BotBrain() {
 	}
 
-	public BrainCommand decideAction(BrainInfo info) {
+	public BrainActionAndMemory decideAction(BrainInfo info) {
 		energy = info.getEnergy();
 		mem = info.getMemory();
 		vision = info.getVision();
@@ -26,19 +31,35 @@ public abstract class BotBrain {
 		msgs = info.getMessages();
 
 		// TODO-DESIGN Sandbox
-		BrainCommand brainAction;
+		BrainActionAndMemory brainAction;
 
 		try {
-			brainAction = brainDecideAction();
+			brainAction = new BrainActionAndMemory(mem, brainDecideAction());
+			checkNotNull(brainAction.cmd);
+			checkNotNull(mem);
 		} catch (Exception e) {
 			//TODO make BotBrain errors visible
 			e.printStackTrace(System.err);
-			brainAction = new BrainCommand(null, null);
+			// NOTE, undoes any changes to memory made by brain
+			brainAction = new BrainActionAndMemory(info.getMemory(), new WaitCmd());
 		}
 
 		return brainAction;
 	}
 
-	protected abstract BrainCommand brainDecideAction()
+	/**
+	 * super.mem will save changes to the bot's memory.
+	 */
+	protected abstract ActionCmd brainDecideAction()
 			throws Exception;
+
+	public static class BrainActionAndMemory {
+		public final Memory mem;
+		public final RunningAction cmd;
+
+		private BrainActionAndMemory(Memory mem, ActionCmd cmd) {
+			this.mem = mem;
+			this.cmd = (RunningAction) cmd;
+		}
+	}
 }

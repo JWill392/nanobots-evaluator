@@ -1,5 +1,6 @@
 package entity.bot;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import teampg.datatypes.BitStr;
 import teampg.datatypes.BitStrInterface;
 import game.Settings;
@@ -15,8 +16,13 @@ public class Memory implements BitStrInterface {
 		contents = new BitStr(Settings.getMemorySize());
 	}
 
-	private Memory(BitStr contents) {
+	public Memory(BitStr contents) {
+		checkArgument(contents.size() == Settings.getMemorySize());
 		this.contents = (BitStr) contents.clone();
+	}
+
+	public Memory(int contents) {
+		this.contents = new BitStr(Settings.getMemorySize(), contents);
 	}
 
 	@Override

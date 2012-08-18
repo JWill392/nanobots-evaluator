@@ -14,6 +14,7 @@ import com.google.common.base.Objects;
 
 import teampg.grid2d.GridInterface.Entry;
 import teampg.grid2d.point.AbsPos;
+import teampg.grid2d.point.Pos2D;
 import teampg.grid2d.point.RelPos;
 
 import entity.BotEntity;
@@ -46,13 +47,17 @@ public class Vision implements Iterable<Entry<Character>> {
 		}
 	}
 
-	public char get(RelPos at) {
-		AbsPos fromMid = RelPos.offset(observerPos, at);
-		if (!vis.containsKey(fromMid)) {
+	public char get(AbsPos at) {
+		if (!vis.containsKey(at)) {
 			throw new IndexOutOfBoundsException("Position outside vision");
 		}
 
-		return vis.get(fromMid);
+		return vis.get(at);
+	}
+
+	public char get(RelPos at) {
+		AbsPos fromMid = RelPos.offset(observerPos, at);
+		return get(fromMid);
 	}
 
 	private static char getSymbolForEntity(Entity e, BotEntity beholder) {
@@ -110,19 +115,20 @@ public class Vision implements Iterable<Entry<Character>> {
 	 * List of positions of every type c in vision, sorted by magnitude --
 	 * smaller is better.
 	 */
-	public List<RelPos> indexOf(char c) {
-		ArrayList<RelPos> found = new ArrayList<>();
+	public List<AbsPos> indexOf(char c) {
+		ArrayList<AbsPos> found = new ArrayList<>();
 
 		for (Map.Entry<AbsPos, Character> entry : vis.entrySet()) {
 			if (entry.getValue().equals(c)) {
-				RelPos relPoint = RelPos.offsetVector(observerPos, entry.getKey());
-				found.add(relPoint);
+				found.add(entry.getKey());
 			}
 		}
 
-		Collections.sort(found, RelPos.byMagnitude());
+		Collections.sort(found, new Pos2D.DistanceComparator(observerPos));
 		return found;
 	}
+
+
 
 	@Override
 	public String toString() {

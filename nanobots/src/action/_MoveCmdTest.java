@@ -1,10 +1,6 @@
 package action;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -12,8 +8,6 @@ import teampg.grid2d.point.AbsPos;
 import teampg.grid2d.point.Pos2D;
 import teampg.grid2d.point.RelPos;
 import brain.BotBrain;
-import brain.BrainCommand;
-import brain.BrainInfo;
 import brain.Vision;
 
 import com.google.common.collect.ImmutableList;
@@ -36,6 +30,7 @@ public class _MoveCmdTest {
 	@Before
 	public void setUp() throws Exception {
 		Settings.load();
+		Settings.setBotMaxEnergy(100);
 		Settings.setNewbornEnergy(NEWBORN);
 		Settings.setActionCost(MoveCmd.class, MOVE_COST);
 		Settings.setActionRange(MoveCmd.class, 1);
@@ -116,14 +111,14 @@ public class _MoveCmdTest {
 		attackTeam = new Team(new BotBrain() {
 
 			@Override
-			protected BrainCommand brainDecideAction() throws Exception {
+			protected ActionCmd brainDecideAction() throws Exception {
 				if (vision.get(RelPos.RIGHT) == Vision.FRIENDLY_BOT) {
-					return new BrainCommand(new MoveCmd(Pos2D.offset(position, RelPos.RIGHT)));
+					return new MoveCmd(Pos2D.offset(position, RelPos.RIGHT));
 				}
 				if (vision.get(RelPos.LEFT) == Vision.FRIENDLY_BOT) {
-					return new BrainCommand(new MoveCmd(Pos2D.offset(position, RelPos.LEFT)));
+					return new MoveCmd(Pos2D.offset(position, RelPos.LEFT));
 				}
-				return new BrainCommand(new WaitCmd());
+				return new WaitCmd();
 			}
 		}, "attackTeam");
 		defenceTeam = getMockTeam();
@@ -141,10 +136,13 @@ public class _MoveCmdTest {
 	}
 
 	public static Team getMockTeam() {
-		Team retTeam = mock(Team.class);
-		when(retTeam.decideAction(any(BrainInfo.class)))
-		.thenReturn(new BrainCommand(
-				new WaitCmd()));
+		Team retTeam = new Team(new BotBrain() {
+			@Override
+			protected ActionCmd brainDecideAction() throws Exception {
+				// TODO Auto-generated method stub
+				return new WaitCmd();
+			}
+		}, "MockTeam");
 
 		return retTeam;
 	}
@@ -152,8 +150,8 @@ public class _MoveCmdTest {
 	public static Team getRelativeMoverTeam(final RelPos attackDir) {
 		return new Team(new BotBrain() {
 			@Override
-			protected BrainCommand brainDecideAction() throws Exception {
-				return new BrainCommand(new MoveCmd(Pos2D.offset(position, attackDir)));
+			protected ActionCmd brainDecideAction() throws Exception {
+				return new MoveCmd(Pos2D.offset(position, attackDir));
 			}
 		}, "Mover");
 	}

@@ -130,17 +130,16 @@ public class World {
 	}
 
 	// TODO move to util
-	public Collection<Entry<BotEntity>> getProxBots(AbsPos near, int radius) {
-		Collection<Entry<BotEntity>> ret = new ArrayList<>();
+	public Iterable<BotEntity> getProxBots(AbsPos near, int radius, Team team) {
+		List<BotEntity> ret = new ArrayList<>();
 
 		Collection<AbsPos> proxCells =
 				Pos2D.getDiamondNear(near, radius);
 		for (AbsPos cell : proxCells) {
 			Entity proxEntity = get(cell);
-			if (proxEntity instanceof BotEntity) {
-				BotEntity proxBot = (BotEntity) proxEntity;
-
-				ret.add(new Entry<BotEntity>(cell, proxBot));
+			if (proxEntity instanceof BotEntity &&
+					((BotEntity) proxEntity).getTeam().equals(team)) {
+				ret.add((BotEntity) proxEntity);
 			}
 		}
 

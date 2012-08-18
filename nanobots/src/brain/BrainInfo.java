@@ -34,7 +34,8 @@ public class BrainInfo {
 	}
 
 	public Memory getMemory() {
-		return mem;
+		// memory is mutable
+		return (Memory) mem.clone();
 	}
 
 	public Vision getVision() {

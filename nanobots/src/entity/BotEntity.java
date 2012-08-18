@@ -23,20 +23,20 @@ public class BotEntity extends MortalEntity implements MobileEntity{
 	private ArrayList<MessageSignal> inbox;
 	private final Map<Class<? extends RunningAction>, RunningAction> runningActions;
 
-	static BotEntity getNewBotEntity(int energy, Team team) {
+	static BotEntity getNewBotEntity(Team team) {
 		int botIDToUse = botIDCounter;
 		botIDCounter++;
 
-		return new BotEntity(energy, team, botIDToUse);
+		return new BotEntity(team, botIDToUse);
 	}
 
 	public static boolean areAllies(BotEntity a, BotEntity b) {
 		return a.team.equals(b.team);
 	}
 
-	private BotEntity(int inEnergy, Team team, int botID) {
+	private BotEntity(Team team, int botID) {
 		this.botID = botID;
-		addEnergy(inEnergy);
+		energy = Settings.getNewbornEnergy();
 		this.team = team;
 
 		inbox = new ArrayList<MessageSignal>();
@@ -70,6 +70,12 @@ public class BotEntity extends MortalEntity implements MobileEntity{
 	@Override
 	public void tick() {
 		inbox = new ArrayList<MessageSignal>();
+
+		// TODO tweak
+		if (energy > Settings.getBotMaxEnergy()) {
+			int overMax = energy - Settings.getBotMaxEnergy();
+			energy = Settings.getBotMaxEnergy() + Math.round(overMax*Settings.getOverchargeDrain());
+		}
 	}
 
 	public int getID() {
@@ -85,10 +91,6 @@ public class BotEntity extends MortalEntity implements MobileEntity{
 		int newEnergy = energy + inEnergy;
 
 		//TODO if energy is zero, die?  Or is that in tick?
-
-		if (newEnergy > Settings.getBotMaxEnergy()) {
-			newEnergy = Settings.getBotMaxEnergy();
-		}
 
 		energy = newEnergy;
 	}
@@ -117,4 +119,6 @@ public class BotEntity extends MortalEntity implements MobileEntity{
 	public String toString() {
 		return "BotE " + hashCode();
 	}
+
+
 }

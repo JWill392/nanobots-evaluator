@@ -68,9 +68,9 @@ public class MapLoader {
 		case "#":
 			return Entity.getNewWall();
 		case "0":
-			return Entity.getNewBot(Settings.getNewbornEnergy(), teams.get(0));
+			return Entity.getNewBot(teams.get(0));
 		case "1":
-			return Entity.getNewBot(Settings.getNewbornEnergy(), teams.get(1));
+			return Entity.getNewBot(teams.get(1));
 		case "F":
 			return Entity.getNewFood(Settings.getFoodEnergy());
 		default:

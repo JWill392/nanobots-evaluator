@@ -25,6 +25,7 @@ public class Settings {
 	private int MESSAGE_RANGE = 8;
 
 	private int BOT_MAX_ENERGY = 100;
+	private float OVERCHARGE_DRAIN = 0.8f;
 	private int VISION_RAD = 2;
 	private int HARVEST_ENERGY = 20;
 	private int BOT_NEWBORN_ENERGY = 50;
@@ -38,6 +39,7 @@ public class Settings {
 	private final List<RunningAction> ACTION_EXECUTION_ORDER;
 
 	private boolean locked = false;
+
 
 	/**
 	 * Loads default settings
@@ -64,7 +66,7 @@ public class Settings {
 		ACTION_COSTS.put(AttackCmd.class, 10);
 		ACTION_COSTS.put(HarvestCmd.class, 0);
 		ACTION_COSTS.put(MoveCmd.class, 0);
-		ACTION_COSTS.put(ReproduceCmd.class, 75);
+		ACTION_COSTS.put(ReproduceCmd.class, 150);
 		ACTION_COSTS.put(TransmitCmd.class, 10);
 		ACTION_COSTS.put(WaitCmd.class, 0);
 
@@ -79,7 +81,7 @@ public class Settings {
 		ACTION_EXECUTION_ORDER.add(new MoveCmd(null));
 		ACTION_EXECUTION_ORDER.add(new HarvestCmd(null));
 		ACTION_EXECUTION_ORDER.add(new TransmitCmd(null));
-		ACTION_EXECUTION_ORDER.add(new ReproduceCmd(null));
+		ACTION_EXECUTION_ORDER.add(new ReproduceCmd(null, null));
 		ACTION_EXECUTION_ORDER.add(new WaitCmd());
 	}
 
@@ -219,6 +221,17 @@ public class Settings {
 			return;
 		}
 		inst.START_FOOD_ENERGY = foodEnergy;
+	}
+
+	public static float getOverchargeDrain() {
+		return inst.OVERCHARGE_DRAIN;
+	}
+
+	public static void setOverchargeDrain(float drain) {
+		if (inst.locked) {
+			return;
+		}
+		inst.OVERCHARGE_DRAIN = drain;
 	}
 
 }

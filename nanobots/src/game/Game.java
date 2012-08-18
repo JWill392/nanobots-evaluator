@@ -1,15 +1,17 @@
 package game;
+import java.util.List;
+
 import entity.BotEntity;
-import entity.bot.Memory;
 import game.world.World;
 
 import action.RunningAction;
-import brain.BrainCommand;
 import brain.BrainInfo;
+import brain.BotBrain.BrainActionAndMemory;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 public class Game {
 	private final World world;
@@ -29,19 +31,17 @@ public class Game {
 		//get actions from brain
 		for (BotEntity bot : teamBots) {
 			BrainInfo info = world.getBotInfo(bot.getID());
-			BrainCommand decidedOutcome = currTeam.decideAction(info);
+			BrainActionAndMemory decidedOutcome = currTeam.decideAction(info);
 
-			Memory desiredNewMem = decidedOutcome.getMemory();
-			if (desiredNewMem != null) {
-				bot.setMemory(desiredNewMem);
-			}
-			bot.addRunningAction(decidedOutcome.getAction());
+			bot.setMemory(decidedOutcome.mem);
+			bot.addRunningAction(decidedOutcome.cmd);
 		}
 
 		//execute running actions
 		for (final RunningAction actionType : Settings.getActionExecutionOrder()) {
-			Iterable<BotEntity> botsWithRunningActionType =
-					Iterables.filter(teamBots, new HasRunningAction(actionType.getClass()));
+			List<BotEntity> botsWithRunningActionType =
+					Lists.newLinkedList(
+							Iterables.filter(teamBots, new HasRunningAction(actionType.getClass())));
 
 			actionType.executeAll(world, botsWithRunningActionType);
 		}

@@ -1,6 +1,8 @@
 package action;
 
-import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
 import action.move.MoveSim;
 import action.move.Simulade;
 import action.move.Simulade.MoveState;
@@ -8,8 +10,8 @@ import action.move.Simulade.MoveState;
 import entity.BotEntity;
 import entity.EmptyEntity;
 import entity.Entity;
+import game.Settings;
 import game.world.World;
-import teampg.datatypes.BufferedCollection;
 import teampg.grid2d.point.AbsPos;
 
 public class MoveCmd extends TargettedAction {
@@ -18,22 +20,42 @@ public class MoveCmd extends TargettedAction {
 	}
 
 	@Override
-	public void executeAll(World world, Iterable<BotEntity> actors) {
-		BufferedCollection<BotEntity> validActors = new BufferedCollection<>(actors);
+	public final void executeAll(World world, List<BotEntity> actors) {
+		super.executeAll(world, actors); //remove obviously illegal actions
 
-		// Basic validation - remove obviously invalid MoveCmds from their actors
-		for (BotEntity actor : validActors) {
-			MoveCmd action = actor.getRunningAction(MoveCmd.class);
+		// BASIC VALIDATION
+		for (Iterator<BotEntity> iter = actors.iterator(); iter.hasNext();) {
+			BotEntity bot = iter.next();
+			MoveCmd action = bot.getRunningAction(MoveCmd.class);
 
-			AbsPos actorPos = world.getBotPosition(actor.getID());
-			if (action.targetIllegal(actor, actorPos, world.get(action.target))) {
-				removeAction(actor, action, validActors);
+			AbsPos startPos = world.getBotPosition(bot.getID());
+			Entity targetEnt = world.get(action.target);
+
+			// target is start
+			if (startPos.equals(action.target)) {
+				bot.removeRunningAction(action);
+				iter.remove();
 				continue;
 			}
-		}
-		validActors.mergeRemoveBuffer();
 
-		// Group validation (check two bots don't move into same spot)
+			// at target is bot NOT planning to move
+			if (targetEnt instanceof BotEntity
+					&& ((BotEntity)targetEnt).hasRunningAction(MoveCmd.class) == false) {
+				bot.removeRunningAction(action);
+				iter.remove();
+				continue;
+			}
+
+			// at target is static entity (eg wall)
+			if (!(targetEnt instanceof BotEntity) && !(targetEnt instanceof EmptyEntity)) {
+				bot.removeRunningAction(action);
+				iter.remove();
+				continue;
+			}
+
+		}
+
+		// GROUP VALIDATION
 		{
 			MoveSim moveSim = new MoveSim(world);
 
@@ -45,74 +67,32 @@ public class MoveCmd extends TargettedAction {
 					BotEntity moveFailedBot = (BotEntity) simulade.simulatedEntity;
 					MoveCmd failedCmd = moveFailedBot.getRunningAction(MoveCmd.class);
 
-					removeAction(moveFailedBot, failedCmd, validActors);
+					moveFailedBot.removeRunningAction(failedCmd);
+					actors.remove(moveFailedBot);
 				}
 			}
 		}
-		validActors.mergeRemoveBuffer();
 
-		// Execution
-		for (BotEntity actor : validActors) {
-			MoveCmd action = actor.getRunningAction(MoveCmd.class);
-			AbsPos currPos = world.getBotPosition(actor.getID());
+		// EXECUTE
+		for (BotEntity validBot : actors) {
+			MoveCmd action = validBot.getRunningAction(MoveCmd.class);
+			AbsPos currPos = world.getBotPosition(validBot.getID());
 			AbsPos goal = action.target;
 
-			action.exactCost(actor);
 			world.swap(currPos, goal);
-			actor.removeRunningAction(action);
+			action.exactCostAndRemoveFrom(validBot);
 		}
 
-	}
-
-	private static void removeAction(BotEntity actorBot, MoveCmd action,
-			Collection<BotEntity> validActors) {
-		validActors.remove(actorBot);
-		actorBot.removeRunningAction(action);
-	}
-
-
-	public boolean targetIllegal(BotEntity actor, AbsPos startPos, Entity targetEnt) {
-		// can't afford
-		if (!canAfford(actor)) {
-			return true;
-		}
-
-		// dist too far
-		if (!validRange(startPos)) {
-			return true;
-		}
-
-		// target is start
-		if (startPos.equals(target)) {
-			return true;
-		}
-
-		// TODO remove.  Hypothesize we don't need this check because getting outside world returns wall.  And we check for moving into wall.
-		// out of bounds
-		//if (!world.isInBounds(targetPos)) {
-		//	return true;
-		//}
-
-		// ent@target pos
-		{
-			// bot planning to move is fine
-			if (targetEnt instanceof BotEntity
-					&& ((BotEntity)targetEnt).hasRunningAction(MoveCmd.class) == false) {
-				return true;
-			}
-
-			// static entity (eg wall) bad
-			if (!(targetEnt instanceof BotEntity) && !(targetEnt instanceof EmptyEntity)) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	@Override
 	public String toString() {
 		return "MoveCmd [target=" + target + ", hashCode=" + hashCode() + "]";
+	}
+
+	@Override
+	protected int getCost() {
+		return Settings.getActionCost(this.getClass());
 	}
 
 }

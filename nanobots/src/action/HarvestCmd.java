@@ -1,6 +1,7 @@
 package action;
 
 import java.util.Collection;
+import java.util.List;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -17,13 +18,14 @@ public class HarvestCmd extends TargettedAction {
 	}
 
 	@Override
-	public void executeAll(World world, Iterable<BotEntity> actors) {
+	public final void executeAll(World world, List<BotEntity> actors) {
+		super.executeAll(world, actors); //remove obviously illegal actions
+
 		// All bots harvesting one FoodEntity are in one harvest group.
-		Multimap<AbsPos, BotEntity> harvestGroups = HashMultimap.create(1000, 3);
+		Multimap<AbsPos, BotEntity> harvestGroups = HashMultimap.create(500, 3);
 
-		// VALIDATE
+		// VALIDATE, GROUP
 		for (BotEntity bot : actors) {
-
 			HarvestCmd action = bot.getRunningAction(this.getClass());
 			AbsPos targetPos = action.target;
 			Entity targetEnt = world.get(targetPos);
@@ -34,14 +36,7 @@ public class HarvestCmd extends TargettedAction {
 				continue;
 			}
 
-			// can't afford
-			if (!action.exactCost(bot)) {
-				bot.removeRunningAction(action);
-				continue;
-			}
-
 			harvestGroups.put(targetPos, bot);
-			bot.removeRunningAction(action);
 		}
 
 		// EXECUTE
@@ -56,8 +51,16 @@ public class HarvestCmd extends TargettedAction {
 			int fractionForEachHarvester = amountTakenFromFood/harvesters.size();
 
 			for (BotEntity bot : harvesters) {
+				HarvestCmd action = bot.getRunningAction(HarvestCmd.class);
+
+				action.exactCostAndRemoveFrom(bot);
 				bot.addEnergy(fractionForEachHarvester);
 			}
 		}
+	}
+
+	@Override
+	protected int getCost() {
+		return Settings.getActionCost(this.getClass());
 	}
 }

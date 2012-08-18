@@ -16,8 +16,8 @@ public abstract class Entity {
 		return new FoodEntity(energy);
 	}
 
-	public static BotEntity getNewBot(int energy, Team team) {
-		return BotEntity.getNewBotEntity(energy, team);
+	public static BotEntity getNewBot(Team team) {
+		return BotEntity.getNewBotEntity(team);
 	}
 
 	public static WallEntity getNewWall() {
