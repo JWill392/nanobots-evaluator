@@ -10,6 +10,8 @@ import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
 
+import action.AttackCmd;
+import action.HarvestCmd;
 import action.MoveCmd;
 import action.ReproduceCmd;
 import action._MoveCmdTest;
@@ -26,12 +28,16 @@ public class _GameTest {
 	@Before
 	public void setUp() throws Exception {
 		Settings.load();
-		Settings.setNewbornEnergy(10);
+		Settings.setNewbornEnergy(5);
+		Settings.setActionCost(ReproduceCmd.class, 10);
+		Settings.setActionCost(AttackCmd.class, 0);
+		Settings.setActionRange(AttackCmd.class, 1);
+		Settings.setActionCost(HarvestCmd.class, 0);
+		Settings.setActionRange(HarvestCmd.class, 1);
 		Settings.setActionCost(MoveCmd.class, 0);
 		Settings.setActionRange(MoveCmd.class, 1);
 		Settings.setAttackDamage(1);
-		Settings.setBotMaxEnergy(20);
-		Settings.setActionCost(ReproduceCmd.class, 20);
+		Settings.setBotMaxEnergy(5);
 		Settings.setVisionRadius(2);
 		Settings.lock();
 

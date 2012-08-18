@@ -117,7 +117,7 @@ public class BotEntity extends MortalEntity implements MobileEntity{
 
 	@Override
 	public String toString() {
-		return "BotE " + hashCode();
+		return "Bot " + getID();
 	}
 
 

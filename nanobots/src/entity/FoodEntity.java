@@ -36,7 +36,7 @@ public class FoodEntity extends MortalEntity {
 
 	@Override
 	public String toString() {
-		return "FoodE " + hashCode();
+		return "Food  ";
 	}
 
 }

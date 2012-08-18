@@ -22,7 +22,7 @@ public class HarvestCmd extends TargettedAction {
 		super.executeAll(world, actors); //remove obviously illegal actions
 
 		// All bots harvesting one FoodEntity are in one harvest group.
-		Multimap<AbsPos, BotEntity> harvestGroups = HashMultimap.create(500, 3);
+		Multimap<AbsPos, BotEntity> harvestGroups = HashMultimap.create(100, 3);
 
 		// VALIDATE, GROUP
 		for (BotEntity bot : actors) {
@@ -41,7 +41,7 @@ public class HarvestCmd extends TargettedAction {
 
 		// EXECUTE
 		// Each group harvests from its FoodEntity once.
-		for (AbsPos target : harvestGroups.keys()) {
+		for (AbsPos target : harvestGroups.keySet()) {
 			Collection<BotEntity> harvesters = harvestGroups.get(target);
 			FoodEntity food = (FoodEntity) world.get(target);
 
@@ -51,6 +51,7 @@ public class HarvestCmd extends TargettedAction {
 			int fractionForEachHarvester = amountTakenFromFood/harvesters.size();
 
 			for (BotEntity bot : harvesters) {
+
 				HarvestCmd action = bot.getRunningAction(HarvestCmd.class);
 
 				action.exactCostAndRemoveFrom(bot);

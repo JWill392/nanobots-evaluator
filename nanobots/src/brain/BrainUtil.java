@@ -1,5 +1,6 @@
 package brain;
 
+
 import teampg.grid2d.point.AbsPos;
 import teampg.grid2d.point.Pos2D;
 import teampg.grid2d.point.RelPos;
