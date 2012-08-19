@@ -6,8 +6,6 @@ import java.util.Scanner;
 
 
 import org.junit.Before;
-import org.junit.Test;
-
 import com.google.common.collect.ImmutableList;
 
 import action.AttackCmd;
@@ -55,7 +53,6 @@ public class _GameTest {
 		game = new Game(world, ImmutableList.of(teamA, teamB));
 	}
 
-	@Test
 	public final void test() {
 		try(Scanner continueListener = new Scanner(System.in)){
 			while(true) {

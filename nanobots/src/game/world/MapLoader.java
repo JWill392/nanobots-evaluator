@@ -37,6 +37,7 @@ public class MapLoader {
 
 		// fill map with specified entities
 		loadMapEntities(mapString, map, teams);
+		map.tick(); //flush add queue
 
 		return map;
 	}

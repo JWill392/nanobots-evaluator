@@ -1,5 +1,7 @@
 package entity;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,7 +57,11 @@ public class BotEntity extends MortalEntity implements MobileEntity{
 		runningActions.put(action.getClass(), action);
 	}
 	public void removeRunningAction(RunningAction action) {
-		runningActions.remove(action.getClass());
+		removeRunningAction(action.getClass());
+	}
+	public void removeRunningAction(Class<? extends RunningAction> type) {
+		checkArgument(runningActions.containsKey(type));
+		runningActions.remove(type);
 	}
 	@SuppressWarnings("unchecked")
 	public <T extends RunningAction> T getRunningAction(Class<T> ofType) {

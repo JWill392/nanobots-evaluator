@@ -13,6 +13,7 @@ import brain.BotBrain;
 import com.google.common.collect.ImmutableList;
 
 import entity.BotEntity;
+import entity.EmptyEntity;
 import entity.FoodEntity;
 import entity.bot.Memory;
 import game.Game;
@@ -24,7 +25,7 @@ import game.world.World;
 public class _ReproduceCmdTest {
 	private static final int REPRODUCE_COST = 1;
 	private static final int NEWBORN = 3;
-	Team testTeam;
+	Team collisionTeam;
 	World world;
 	Game game;
 
@@ -39,14 +40,14 @@ public class _ReproduceCmdTest {
 	}
 
 	private final void setUpBasicTest(String mapString) {
-		testTeam = new Team(new BotBrain() {
+		collisionTeam = new Team(new BotBrain() {
 
 			@Override
 			protected ActionCmd brainDecideAction() throws Exception {
 				return new ReproduceCmd(Pos2D.offset(position, RelPos.RIGHT), new Memory(0b1));
 			}
 		}, "ReproduceTestTeam");
-		ImmutableList<Team> teams = ImmutableList.of(testTeam);
+		ImmutableList<Team> teams = ImmutableList.of(collisionTeam);
 
 		world = MapLoader.load(mapString, teams);
 		game = new Game(world, teams);
@@ -77,5 +78,32 @@ public class _ReproduceCmdTest {
 		assertEquals(NEWBORN, reproducerBot.getEnergy());
 
 		assertTrue(world.get(AbsPos.of(1, 0)) instanceof FoodEntity);
+	}
+
+	@Test
+	public final void testOverlappingTargetsFail() {
+		final AbsPos target = AbsPos.of(1, 0);
+
+		collisionTeam = new Team(new BotBrain() {
+			@Override
+			protected ActionCmd brainDecideAction() throws Exception {
+				return new ReproduceCmd(target, new Memory(0b1));
+			}
+		}, "ReproduceTestTeam");
+		ImmutableList<Team> teams = ImmutableList.of(collisionTeam);
+
+		world = MapLoader.load("0.0\n.0.", teams);
+		game = new Game(world, teams);
+
+		BotEntity leftReproducerBot = (BotEntity) world.get(AbsPos.of(0, 0));
+		BotEntity rightReproducerBot = (BotEntity) world.get(AbsPos.of(2, 0));
+		BotEntity bottomReproducerBot = (BotEntity) world.get(AbsPos.of(1, 1));
+
+		game.runNextTurn();
+		assertEquals(NEWBORN, leftReproducerBot.getEnergy());
+		assertEquals(NEWBORN, rightReproducerBot.getEnergy());
+		assertEquals(NEWBORN, bottomReproducerBot.getEnergy());
+
+		assertTrue(world.get(target) instanceof EmptyEntity);
 	}
 }

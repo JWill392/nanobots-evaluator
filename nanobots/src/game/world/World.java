@@ -4,8 +4,10 @@ import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import com.google.common.collect.Iterables;
 
 import teampg.grid2d.GridInterface;
@@ -19,11 +21,11 @@ import entity.DynamicEntity;
 import entity.EmptyEntity;
 import entity.Entity;
 import entity.MortalEntity;
+import entity.PendingAddEntity;
 import game.Settings;
 import game.Team;
 import brain.BrainInfo;
 import brain.Vision;
-
 
 /**
  * World is the Entity manager. It keeps track of Entity positions. It is the
@@ -37,9 +39,14 @@ public class World {
 	private final Map<Integer, AbsPos> botIndex;
 	private final Entity TO_APPEAR_OUTSIDE_GRID = Entity.getNewWall();
 
+	private final Queue<Entity> removeBuffer;
+	private final Queue<Entry<Entity>> addBuffer;
+
 	// TODO consider making private and including a static method to load from a
 	// map
 	public World(int width, int height) {
+		removeBuffer = new LinkedList<>();
+		addBuffer = new LinkedList<>();
 		grid = new RectGrid<Entity>(new Dimension(width, height));
 
 		botIndex = new HashMap<Integer, AbsPos>();
@@ -87,9 +94,11 @@ public class World {
 		BotEntity observer = get(botID);
 		AbsPos observerPos = getBotPosition(botID);
 
-		Collection<AbsPos> visPoints = Pos2D.getDiamondNear(observerPos, Settings.getVisionRadius());
+		Collection<AbsPos> visPoints = Pos2D
+				.getDiamondNear(observerPos, Settings.getVisionRadius());
 
-		BrainInfo info = new BrainInfo(observer, observerPos, new Vision(this, visPoints, observerPos));
+		BrainInfo info = new BrainInfo(observer, observerPos, new Vision(this, visPoints,
+				observerPos));
 		return info;
 	}
 
@@ -133,12 +142,10 @@ public class World {
 	public Iterable<BotEntity> getProxBots(AbsPos near, int radius, Team team) {
 		List<BotEntity> ret = new ArrayList<>();
 
-		Collection<AbsPos> proxCells =
-				Pos2D.getDiamondNear(near, radius);
+		Collection<AbsPos> proxCells = Pos2D.getDiamondNear(near, radius);
 		for (AbsPos cell : proxCells) {
 			Entity proxEntity = get(cell);
-			if (proxEntity instanceof BotEntity &&
-					((BotEntity) proxEntity).getTeam().equals(team)) {
+			if (proxEntity instanceof BotEntity && ((BotEntity) proxEntity).getTeam().equals(team)) {
 				ret.add((BotEntity) proxEntity);
 			}
 		}
@@ -154,16 +161,17 @@ public class World {
 	 * @param toAdd
 	 *            New entity to add into grid. Must not already be in grid.
 	 */
+	/*TODO should only happen in tick phase...
+	 * Otherwise two bots could validly reproduce into same cell...
+	 * one would succeed and the other would not.
+	 * Or would kill the newborn or something.  Bad.
+	 */
 	public void addNewEntity(AbsPos target, Entity toAdd) {
 		// target position for new entity should be empty
 		assert (grid.get(target) instanceof EmptyEntity);
 
-		if (toAdd instanceof BotEntity) {
-			BotEntity newBot = (BotEntity) toAdd;
-			botIndex.put(newBot.getID(), target);
-		}
-
-		grid.set(target, toAdd);
+		grid.set(target, new PendingAddEntity());
+		addBuffer.add(new Entry<Entity>(target, toAdd));
 	}
 
 	public void swap(AbsPos a, AbsPos b) {
@@ -187,21 +195,45 @@ public class World {
 	 *
 	 * @param i
 	 */
-	public void destroy(MortalEntity mortEnt) {
-		Entry<Entity> entry = grid.get(mortEnt);
-		AbsPos pos = entry.getPosition();
-		MortalEntity entToDie = (MortalEntity) entry.getContents();
+	public void destroy(Entity mortEnt) {
+		removeBuffer.add(mortEnt);
+	}
 
-		if (entToDie instanceof BotEntity) {
-			BotEntity botToDie = ((BotEntity) entToDie);
-			botIndex.remove(botToDie.getID());
+	private void flushRemoveBuffer() {
+		while (!removeBuffer.isEmpty()) {
+			Entity fakeEntToDie = removeBuffer.remove();
+
+			Entry<Entity> entry = grid.get(fakeEntToDie);
+			AbsPos pos = entry.getPosition();
+			Entity entToDie = entry.getContents();
+
+			if (entToDie instanceof BotEntity) {
+				BotEntity botToDie = ((BotEntity) entToDie);
+				botIndex.remove(botToDie.getID());
+			}
+
+			grid.set(pos, Entity.getNewEmpty());
 		}
+	}
 
-		grid.set(pos, Entity.getNewEmpty());
+	private void flushAddBuffer() {
+		while (!addBuffer.isEmpty()) {
+			Entry<Entity> entry = addBuffer.remove();
+			Entity toAdd = entry.getContents();
+			AbsPos addPos = entry.getPosition();
+
+			assert(grid.get(addPos) instanceof PendingAddEntity);
+
+			if (toAdd instanceof BotEntity) {
+				BotEntity newBot = (BotEntity) toAdd;
+				botIndex.put(newBot.getID(), addPos);
+			}
+
+			grid.set(addPos, toAdd);
+		}
 	}
 
 	public void tick() {
-
 		for (DynamicEntity dynEnt : Iterables.filter(grid, DynamicEntity.class)) {
 			dynEnt.tick();
 		}
@@ -211,7 +243,11 @@ public class World {
 				destroy(mortEnt);
 			}
 		}
+
+		flushRemoveBuffer();
+		flushAddBuffer();
 	}
+
 
 	public boolean isInBounds(AbsPos pos) {
 		return grid.isInBounds(pos);

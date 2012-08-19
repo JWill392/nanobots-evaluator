@@ -1,6 +1,10 @@
 package action;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import entity.BotEntity;
 import entity.EmptyEntity;
@@ -27,17 +31,42 @@ public class ReproduceCmd extends TargettedAction {
 	public final void executeAll(World world, List<BotEntity> actors) {
 		super.executeAll(world, actors);
 
+		// bots cannot reproduce into same cell as others... so keep track of targets to know which overlap
+		Map<AbsPos, BotEntity> targets = new HashMap<>();
+		Set<BotEntity> illegalActors = new HashSet<>();
+
+		// VALIDATE
 		for (BotEntity bot : actors) {
 			ReproduceCmd action = bot.getRunningAction(ReproduceCmd.class);
 			Entity targetEnt = world.get(action.target);
 
 			if (!(targetEnt instanceof EmptyEntity)) {
-				bot.removeRunningAction(action);
+				illegalActors.add(bot);
 				continue;
 			}
 
-			action.exactCostAndRemoveFrom(bot);
-			BotEntity newborn = Entity.getNewBot(bot.getTeam());
+			// more than one seemingly legal actors are targetting one position -- all are illegal
+			if (targets.containsKey(action.target)) {
+				BotEntity collidingActor = targets.get(action.target);
+				illegalActors.add(collidingActor);
+				illegalActors.add(bot);
+				continue;
+			}
+			targets.put(action.target, bot);
+		}
+
+		// Clean up illegals
+		for (BotEntity invalidBot : illegalActors) {
+			invalidBot.removeRunningAction(ReproduceCmd.class);
+		}
+		actors.removeAll(illegalActors);
+
+		// EXECUTE remaining legals
+		for (BotEntity legalBot : actors) {
+			ReproduceCmd action = legalBot.getRunningAction(ReproduceCmd.class);
+
+			action.exactCostAndRemoveFrom(legalBot);
+			BotEntity newborn = Entity.getNewBot(legalBot.getTeam());
 			newborn.setMemory(action.getNewbornMemory());
 			world.addNewEntity(action.target, newborn);
 		}

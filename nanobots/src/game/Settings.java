@@ -80,12 +80,12 @@ public class Settings {
 
 		ACTION_EXECUTION_ORDER = new ArrayList<>(10);
 		ACTION_EXECUTION_ORDER.add(new TransferCmd(null, 0));
-		ACTION_EXECUTION_ORDER.add(new AttackCmd(null));
 		ACTION_EXECUTION_ORDER.add(new MoveCmd(null));
 		ACTION_EXECUTION_ORDER.add(new HarvestCmd(null));
 		ACTION_EXECUTION_ORDER.add(new TransmitCmd(null));
-		ACTION_EXECUTION_ORDER.add(new ReproduceCmd(null, null));
 		ACTION_EXECUTION_ORDER.add(new WaitCmd());
+		ACTION_EXECUTION_ORDER.add(new AttackCmd(null));
+		ACTION_EXECUTION_ORDER.add(new ReproduceCmd(null, null));
 	}
 
 	// ACTION EXECUTION ORDER
