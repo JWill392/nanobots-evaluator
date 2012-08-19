@@ -14,7 +14,6 @@ import action.AttackCmd;
 import action.HarvestCmd;
 import action.MoveCmd;
 import action.ReproduceCmd;
-import action._MoveCmdTest;
 import brain.demo.BasicBrain;
 
 
@@ -44,7 +43,7 @@ public class _GameTest {
 
 		teamA = new Team(new BasicBrain(), "teamA");
 
-		teamB = _MoveCmdTest.getMockTeam();
+		teamB = new Team(new BasicBrain(), "teamB");
 
 		ImmutableList<Team> teamList = ImmutableList.of(teamA, teamB);
 		String mapString =

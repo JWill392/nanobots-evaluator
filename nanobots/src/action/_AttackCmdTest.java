@@ -84,13 +84,34 @@ public class _AttackCmdTest {
 	public final void testBasicIllegalTarget() {
 		setUpBasicTest("0.");
 
-		AbsPos attackPos = AbsPos.of(0, 0);
-		BotEntity basicAttacker = (BotEntity) world.get(attackPos);
+		AbsPos attackerPos = AbsPos.of(0, 0);
+		BotEntity basicAttacker = (BotEntity) world.get(attackerPos);
 		assertEquals(NEWBORN, basicAttacker.getEnergy());
 
 		// TURN 0
 
 		game.runNextTurn();
 		assertEquals(NEWBORN, basicAttacker.getEnergy());
+	}
+
+	@Test
+	public final void testAttackTeammateFails() {
+		setUpBasicTest("00");
+
+		game.runNextTurn();
+
+		// attack fails
+		{
+			AbsPos teammateAttackerPos = AbsPos.of(0, 0);
+			BotEntity teammateAttacker = (BotEntity) world.get(teammateAttackerPos);
+			assertEquals(NEWBORN, teammateAttacker.getEnergy());
+		}
+
+		// attack target not damaged
+		{
+			AbsPos attackTarget = AbsPos.of(1, 0);
+			BotEntity attackTargetBot = (BotEntity) world.get(attackTarget);
+			assertEquals(NEWBORN, attackTargetBot.getEnergy());
+		}
 	}
 }

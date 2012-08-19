@@ -12,6 +12,7 @@ import action.AttackCmd;
 import action.HarvestCmd;
 import action.MoveCmd;
 import action.ReproduceCmd;
+import action.TransferCmd;
 import action.TransmitCmd;
 import action.WaitCmd;
 import action.TargettedAction;
@@ -71,12 +72,14 @@ public class Settings {
 		ACTION_COSTS.put(WaitCmd.class, 0);
 
 		ACTION_RANGES = new HashMap<Class<? extends TargettedAction>, Integer>(10);
+		ACTION_RANGES.put(TransferCmd.class, 1);
 		ACTION_RANGES.put(AttackCmd.class, 2);
 		ACTION_RANGES.put(HarvestCmd.class, 1);
 		ACTION_RANGES.put(MoveCmd.class, 2);
 		ACTION_RANGES.put(ReproduceCmd.class, 1);
 
 		ACTION_EXECUTION_ORDER = new ArrayList<>(10);
+		ACTION_EXECUTION_ORDER.add(new TransferCmd(null, 0));
 		ACTION_EXECUTION_ORDER.add(new AttackCmd(null));
 		ACTION_EXECUTION_ORDER.add(new MoveCmd(null));
 		ACTION_EXECUTION_ORDER.add(new HarvestCmd(null));

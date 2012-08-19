@@ -5,6 +5,7 @@ import java.util.List;
 import entity.BotEntity;
 import entity.Entity;
 import game.Settings;
+import game.Team;
 import game.world.World;
 import teampg.grid2d.point.AbsPos;
 
@@ -28,6 +29,7 @@ public class TransferCmd extends TargettedAction {
 		for (BotEntity actor : actors) {
 			TransferCmd cmd = actor.getRunningAction(TransferCmd.class);
 
+			// must be bot
 			Entity targetEnt = world.get(cmd.target);
 			if(!(targetEnt instanceof BotEntity)) {
 				actor.removeRunningAction(cmd);
@@ -35,7 +37,11 @@ public class TransferCmd extends TargettedAction {
 			}
 
 			BotEntity targetBot = (BotEntity) targetEnt;
-			if (!(targetBot.getTeam().equals(actor.getTeam()))) {
+
+			// must be on same team
+			Team targetTeam = targetBot.getTeam();
+			Team actorTeam = actor.getTeam();
+			if (targetTeam != actorTeam) {
 				actor.removeRunningAction(cmd);
 				continue;
 			}
