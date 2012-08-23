@@ -2,7 +2,6 @@ package tests;
 
 import static org.junit.Assert.*;
 import entity.BotEntity;
-import entity.EmptyEntity;
 import entity.Entity;
 import entity.FoodEntity;
 import entity.WallEntity;
@@ -11,7 +10,6 @@ import entity.WallEntity;
 public class Util {
 	public static final Class<? extends Entity> WALL = WallEntity.class;
 	public static final Class<? extends Entity> FOOD = FoodEntity.class;
-	public static final Class<? extends Entity> EMPTY = EmptyEntity.class;
 	public static final Class<? extends Entity> BOT = BotEntity.class;
 
 	public static void assertIsEntityType(Entity e, Class<? extends Entity> type) {
