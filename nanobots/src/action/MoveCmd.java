@@ -8,7 +8,6 @@ import action.move.Simulade;
 import action.move.Simulade.MoveState;
 
 import entity.BotEntity;
-import entity.EmptyEntity;
 import entity.Entity;
 import game.Settings;
 import game.world.World;
@@ -47,7 +46,7 @@ public class MoveCmd extends TargettedAction {
 			}
 
 			// at target is static entity (eg wall)
-			if (!(targetEnt instanceof BotEntity) && !(targetEnt instanceof EmptyEntity)) {
+			if (!(targetEnt instanceof BotEntity) && !(targetEnt == null)) {
 				bot.removeRunningAction(action);
 				iter.remove();
 				continue;

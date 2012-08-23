@@ -6,7 +6,6 @@ import game.Team;
 public abstract class Entity {
 	public static final Class<? extends Entity> WALL = WallEntity.class;
 	public static final Class<? extends Entity> FOOD = FoodEntity.class;
-	public static final Class<? extends Entity> EMPTY = EmptyEntity.class;
 	public static final Class<? extends Entity> BOT = BotEntity.class;
 
 	protected Replay.Entity.Builder data;
@@ -21,10 +20,6 @@ public abstract class Entity {
 	}
 
 	public abstract Replay.Entity.Type getType();
-
-	public static EmptyEntity getNewEmpty() {
-		return new EmptyEntity();
-	}
 
 	public static FoodEntity getNewFood(int energy) {
 		return new FoodEntity(energy);

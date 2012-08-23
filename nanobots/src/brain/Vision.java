@@ -18,7 +18,6 @@ import teampg.grid2d.point.Pos2D;
 import teampg.grid2d.point.RelPos;
 
 import entity.BotEntity;
-import entity.EmptyEntity;
 import entity.Entity;
 import entity.FoodEntity;
 import entity.WallEntity;
@@ -75,7 +74,7 @@ public class Vision implements Iterable<Entry<Character>> {
 		} else if (e instanceof FoodEntity) {
 			visionSymbol = FOOD;
 
-		} else if (e instanceof EmptyEntity) {
+		} else if (e == null) {
 			visionSymbol = EMPTY;
 
 		} else if (e instanceof WallEntity) {

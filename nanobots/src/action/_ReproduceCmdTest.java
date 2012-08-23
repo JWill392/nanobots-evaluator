@@ -13,7 +13,6 @@ import brain.BotBrain;
 import com.google.common.collect.ImmutableList;
 
 import entity.BotEntity;
-import entity.EmptyEntity;
 import entity.FoodEntity;
 import entity.bot.Memory;
 import game.Game;
@@ -104,6 +103,6 @@ public class _ReproduceCmdTest {
 		assertEquals(NEWBORN, rightReproducerBot.getEnergy());
 		assertEquals(NEWBORN, bottomReproducerBot.getEnergy());
 
-		assertTrue(world.get(target) instanceof EmptyEntity);
+		assertTrue(world.get(target) == null);
 	}
 }

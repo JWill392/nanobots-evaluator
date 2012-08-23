@@ -7,7 +7,6 @@ import com.google.common.collect.PeekingIterator;
 
 import action.move.Simulade.MoveState;
 
-import entity.EmptyEntity;
 import entity.Entity;
 
 import game.world.World;
@@ -27,7 +26,7 @@ public class MoveSim implements Iterable<Simulade> {
 			Entity entity = entry.getContents();
 			AbsPos position = entry.getPosition();
 
-			if (entity instanceof EmptyEntity) {
+			if (entity == null) {
 				continue;
 			}
 

@@ -2,7 +2,6 @@ package action;
 
 import static org.junit.Assert.*;
 import entity.BotEntity;
-import entity.EmptyEntity;
 import game.Game;
 import game.Settings;
 import game.Team;
@@ -77,7 +76,7 @@ public class _AttackCmdTest {
 		game.runNextTurn(); //run defender turn
 		game.runNextTurn();
 		assertEquals(NEWBORN - ATTACK_COST * 2, attackerBot.getEnergy());
-		assertTrue(world.get(defenderPos) instanceof EmptyEntity); //defender died
+		assertTrue(world.get(defenderPos) == null); //defender died
 	}
 
 	@Test

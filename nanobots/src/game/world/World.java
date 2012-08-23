@@ -21,10 +21,8 @@ import teampg.grid2d.point.Pos2D;
 
 import entity.BotEntity;
 import entity.DynamicEntity;
-import entity.EmptyEntity;
 import entity.Entity;
 import entity.MortalEntity;
-import entity.PendingAddEntity;
 import game.Settings;
 import game.Team;
 import brain.BrainInfo;
@@ -42,6 +40,9 @@ public class World {
 	private final Map<Integer, AbsPos> botIndex;
 	private final Entity TO_APPEAR_OUTSIDE_GRID = Entity.getNewWall();
 
+	// TODO removeme
+	private final Entity DEBUG_PENDING_CHANGE_PLACEHOLDER = Entity.getNewWall();
+
 	private final Queue<Entity> removeBuffer;
 	private final Queue<Entry<Entity>> addBuffer;
 
@@ -53,8 +54,6 @@ public class World {
 		grid = new RectGrid<Entity>(new Dimension(width, height));
 
 		botIndex = new HashMap<Integer, AbsPos>();
-
-		grid.fill(Entity.getNewEmpty());
 	}
 
 	/**
@@ -171,9 +170,10 @@ public class World {
 	 */
 	public void addNewEntity(AbsPos target, Entity toAdd) {
 		// target position for new entity should be empty
-		assert (grid.get(target) instanceof EmptyEntity);
+		assert (grid.get(target) != DEBUG_PENDING_CHANGE_PLACEHOLDER);
+		assert (grid.get(target) == null);
 
-		grid.set(target, new PendingAddEntity());
+		grid.set(target, DEBUG_PENDING_CHANGE_PLACEHOLDER); // TODO removeme; pending new ent; don't want anything else to happen here
 		addBuffer.add(new Entry<Entity>(target, toAdd));
 	}
 
@@ -215,7 +215,7 @@ public class World {
 				botIndex.remove(botToDie.getID());
 			}
 
-			grid.set(pos, Entity.getNewEmpty());
+			grid.set(pos, null);
 
 			MatchLog.removeEntity(entToDie);
 		}
@@ -227,7 +227,7 @@ public class World {
 			Entity toAdd = entry.getContents();
 			AbsPos addPos = entry.getPosition();
 
-			assert(grid.get(addPos) instanceof PendingAddEntity);
+			assert(grid.get(addPos) == DEBUG_PENDING_CHANGE_PLACEHOLDER);
 
 			if (toAdd instanceof BotEntity) {
 				BotEntity newBot = (BotEntity) toAdd;

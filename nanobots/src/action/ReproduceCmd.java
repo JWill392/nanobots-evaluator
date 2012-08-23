@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 
 import entity.BotEntity;
-import entity.EmptyEntity;
 import entity.Entity;
 import entity.bot.Memory;
 import game.Settings;
@@ -40,7 +39,7 @@ public class ReproduceCmd extends TargettedAction {
 			ReproduceCmd action = bot.getRunningAction(ReproduceCmd.class);
 			Entity targetEnt = world.get(action.target);
 
-			if (!(targetEnt instanceof EmptyEntity)) {
+			if (!(targetEnt == null)) {
 				illegalActors.add(bot);
 				continue;
 			}

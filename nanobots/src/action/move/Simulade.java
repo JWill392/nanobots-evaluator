@@ -6,7 +6,6 @@ import action.MoveCmd;
 import teampg.grid2d.GridInterface.Entry;
 import teampg.grid2d.point.AbsPos;
 import entity.BotEntity;
-import entity.EmptyEntity;
 import entity.Entity;
 
 public class Simulade {
@@ -25,7 +24,7 @@ public class Simulade {
 	}
 
 	public Simulade(Entry<Entity> entEntry) {
-		checkArgument(!(entEntry.getContents() instanceof EmptyEntity));
+		checkArgument(!(entEntry.getContents() == null));
 
 		Entity ent = entEntry.getContents();
 		AbsPos pos = entEntry.getPosition();
