@@ -2,6 +2,8 @@ package game;
 import java.util.List;
 
 import entity.BotEntity;
+import game.world.GameMap;
+import game.world.MapLoader;
 import game.world.World;
 
 import action.RunningAction;
@@ -14,14 +16,28 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 public class Game {
+	private final GameMap map;
 	private final World world;
 	private final ImmutableList<Team> teams;
 	private int currentTeam;
 
-	public Game(World world, ImmutableList<Team> teams) {
-		this.world = world;
+	public Game(GameMap map, ImmutableList<Team> teams) {
+		world = MapLoader.load(map, teams);
+		this.map = map;
 		this.teams = teams;
 		currentTeam = 0;
+	}
+
+	public List<Team> getTeams() {
+		return teams;
+	}
+
+	public GameMap getMap() {
+		return map;
+	}
+
+	public World getWorld() {
+		return world;
 	}
 
 	public void runNextTurn() {
@@ -49,7 +65,7 @@ public class Game {
 		//tick all dynamic ents
 		world.tick();
 
-		//TODO check lose/win condition
+		//TODO check lose/win condition, end
 
 		currentTeam = (currentTeam + 1) % (teams.size());
 	}

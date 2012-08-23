@@ -23,6 +23,10 @@ public class Team {
 		return cmd;
 	}
 
+	public BotBrain getBrain() {
+		return brain;
+	}
+
 	public String getName() {
 		return name;
 	}

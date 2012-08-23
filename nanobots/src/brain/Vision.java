@@ -115,7 +115,7 @@ public class Vision implements Iterable<Entry<Character>> {
 	 * List of positions of every type c in vision, sorted by magnitude --
 	 * smaller is better.
 	 */
-	public List<AbsPos> indexOf(char c) {
+	public List<AbsPos> getPositions(char c) {
 		ArrayList<AbsPos> found = new ArrayList<>();
 
 		for (Map.Entry<AbsPos, Character> entry : vis.entrySet()) {

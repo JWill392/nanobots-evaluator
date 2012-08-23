@@ -16,7 +16,7 @@ import entity.BotEntity;
 import game.Game;
 import game.Settings;
 import game.Team;
-import game.world.MapLoader;
+import game.world.GameMap;
 import game.world.World;
 
 public class _MoveCmdTest {
@@ -42,8 +42,8 @@ public class _MoveCmdTest {
 		defenceTeam = getMockTeam();
 		ImmutableList<Team> teams = ImmutableList.of(attackTeam, defenceTeam);
 
-		world = MapLoader.load(mapString, teams);
-		game = new Game(world, teams);
+		game = new Game(new GameMap("PLACEHOLDER", mapString), teams);
+		world = game.getWorld();
 	}
 
 	@Test
@@ -124,8 +124,8 @@ public class _MoveCmdTest {
 		defenceTeam = getMockTeam();
 		ImmutableList<Team> teams = ImmutableList.of(attackTeam, defenceTeam);
 
-		world = MapLoader.load(".00.", teams);
-		game = new Game(world, teams);
+		game = new Game(new GameMap("PLACEHOLDER", ".00."), teams);
+		world = game.getWorld();
 
 		BotEntity left = (BotEntity) world.get(AbsPos.of(1, 0));
 		BotEntity right = (BotEntity) world.get(AbsPos.of(2, 0));

@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import replay.ReplayProto.Replay;
+import replay.ReplayProto.Replay.Entity.Type;
+
 import com.google.common.collect.ImmutableList;
 import entity.bot.Memory;
 import entity.bot.MessageSignal;
@@ -15,6 +18,7 @@ import game.Team;
 import action.RunningAction;
 
 public class BotEntity extends MortalEntity implements MobileEntity{
+	private static final Replay.Entity.Type TYPE = Type.BOT;
 	private static int botIDCounter = 0;
 
 	private final int botID;
@@ -30,6 +34,11 @@ public class BotEntity extends MortalEntity implements MobileEntity{
 		botIDCounter++;
 
 		return new BotEntity(team, botIDToUse);
+	}
+
+	@Override
+	public Type getType() {
+		return TYPE;
 	}
 
 	public static boolean areAllies(BotEntity a, BotEntity b) {
@@ -110,7 +119,8 @@ public class BotEntity extends MortalEntity implements MobileEntity{
 	}
 
 	public void setMemory(Memory inMem) {
-		memory.fill(inMem.getAll());
+		int newMemVal = inMem.getAll();
+		memory.fill(newMemVal);
 	}
 
 	public void addReceivedMessage(MessageSignal msg) {
@@ -123,8 +133,6 @@ public class BotEntity extends MortalEntity implements MobileEntity{
 
 	@Override
 	public String toString() {
-		return "Bot " + getID();
+		return "BotEntity [botID=" + botID + "]";
 	}
-
-
 }

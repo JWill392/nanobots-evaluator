@@ -86,13 +86,13 @@ public class MoveCmd extends TargettedAction {
 	}
 
 	@Override
-	public String toString() {
-		return "MoveCmd [target=" + target + ", hashCode=" + hashCode() + "]";
+	protected int getCost() {
+		return Settings.getActionCost(this.getClass());
 	}
 
 	@Override
-	protected int getCost() {
-		return Settings.getActionCost(this.getClass());
+	public String toString() {
+		return "MoveCmd [target=" + target + "]";
 	}
 
 }

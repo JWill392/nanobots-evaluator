@@ -3,8 +3,11 @@ package game.world;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.List;
 import java.util.Scanner;
 
+import teampg.grid2d.GridInterface.Entry;
+import teampg.grid2d.RectGrid;
 import teampg.grid2d.point.AbsPos;
 
 import com.google.common.base.Splitter;
@@ -21,29 +24,30 @@ public class MapLoader {
 			loadedMapFile.useDelimiter("\\A");
 
 			String text = loadedMapFile.next();
-			return load(text, teams);
+			return load(new GameMap("PLACEHOLDER_NAME", text), teams);
 		}
 	}
 
-	public static World load(String mapString, ImmutableList<Team> teams) {
-
-		// initialize map
-		World map;
-		{
-			Dimension size = findMapStringDimensions(mapString);
-
-			map = new World(size.width, size.height);
-		}
-
+	public static World load(GameMap toLoad, ImmutableList<Team> teams) {
 		// fill map with specified entities
-		loadMapEntities(mapString, map, teams);
-		map.tick(); //flush add queue
+		RectGrid<Entity> ents = readMapEntities(toLoad, teams);
 
-		return map;
+		//TODO load into world
+		World world = new World(ents.getSize().width, ents.getSize().height);
+		for (Entry<Entity> entry : ents.getEntries()) {
+			world.addNewEntity(entry.getPosition(), entry.getContents());
+		}
+		world.tick(); //flush add queue
+
+		return world;
 	}
 
-	static void loadMapEntities(String mapString, World world, ImmutableList<Team> teams) {
-			int y = 0;
+	public static RectGrid<Entity> readMapEntities(GameMap map, List<Team> teams) {
+		String mapString = map.contents;
+		Dimension mapSize = findMapStringDimensions(map);
+		RectGrid<Entity> ret = new RectGrid<>(mapSize);
+
+		int y = 0;
 			Iterable<String> allRows = Splitter.on("\n").trimResults().split(mapString);
 			for (String row : allRows) {
 
@@ -54,18 +58,19 @@ public class MapLoader {
 
 					Entity fromCell = getEntityForSymbol(cellSymbol, teams);
 
-					world.addNewEntity(cellPos, fromCell);
+					ret.set(cellPos, fromCell);
 					x++;
 				}
 
 				y++;
 			}
+		return ret;
 	}
 
-	static Entity getEntityForSymbol(String cellSymbol, ImmutableList<Team> teams) {
+	static Entity getEntityForSymbol(String cellSymbol, List<Team> teams) {
 		switch (cellSymbol) {
 		case ".":
-			return Entity.getNewEmpty();
+			return null;
 		case "#":
 			return Entity.getNewWall();
 		case "0":
@@ -81,7 +86,9 @@ public class MapLoader {
 	}
 
 	// returns null if invalid
-	static Dimension findMapStringDimensions(String mapString) {
+	static Dimension findMapStringDimensions(GameMap map) {
+		String mapString = map.contents;
+
 		try (Scanner rowScanner = new Scanner(mapString)) {
 			Iterable<String> allLines = Splitter.on("\n")
 					.omitEmptyStrings()

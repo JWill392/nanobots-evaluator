@@ -20,7 +20,7 @@ import entity.FoodEntity;
 import game.Game;
 import game.Settings;
 import game.Team;
-import game.world.MapLoader;
+import game.world.GameMap;
 import game.world.World;
 
 public class _HarvestCmdTest {
@@ -51,7 +51,7 @@ public class _HarvestCmdTest {
 			//If near food, eat.  Else eat whatever is to left (illegal).
 			@Override
 			protected ActionCmd brainDecideAction() throws Exception {
-				List<AbsPos> allFoodPositions = vision.indexOf(Vision.FOOD);
+				List<AbsPos> allFoodPositions = vision.getPositions(Vision.FOOD);
 				if (!allFoodPositions.isEmpty()) {
 					AbsPos closestFoodPos = allFoodPositions.get(0);
 					return new HarvestCmd(closestFoodPos);
@@ -61,9 +61,8 @@ public class _HarvestCmdTest {
 			}
 		}, "eatTestTeam");
 		ImmutableList<Team> teams = ImmutableList.of(testTeam);
-
-		world = MapLoader.load(mapString, teams);
-		game = new Game(world, teams);
+		game = new Game(new GameMap("PLACEHOLDER", mapString), teams);
+		world = game.getWorld();
 	}
 
 	@Test

@@ -26,11 +26,12 @@ public class BotEntityTest {
 		Settings.setMemorySize(3);
 		Settings.setMessageLength(3);
 		Settings.setBotMaxEnergy(10);
+		Settings.setNewbornEnergy(10);
 		Settings.lock();
 
 		mockTeam = mock(Team.class);
 
-		aBot = Entity.getNewBot(10, mockTeam);
+		aBot = Entity.getNewBot(mockTeam);
 	}
 
 	@Test
@@ -47,10 +48,15 @@ public class BotEntityTest {
 		assertEquals(9, aBot.getEnergy());
 
 		aBot.addEnergy(10);
-		assertEquals(10, aBot.getEnergy());
+		assertEquals(19, aBot.getEnergy());
 
-		aBot.addEnergy(-15);
-		assertEquals(-5, aBot.getEnergy());
+		aBot.addEnergy(-20);
+		assertEquals(-1, aBot.getEnergy());
+	}
+
+	@Test
+	public void testEnergyOverMaxDecreasesOnTick() {
+		fail("TODO");
 	}
 
 	@Test
@@ -66,7 +72,7 @@ public class BotEntityTest {
 
 	@Test
 	public void testTeamsEqual() {
-		BotEntity notOnABotsTeam = Entity.getNewBot(10, mock(Team.class));
+		BotEntity notOnABotsTeam = Entity.getNewBot(mock(Team.class));
 
 		assertFalse(BotEntity.areAllies(aBot, notOnABotsTeam));
 	}

@@ -1,11 +1,10 @@
 package game;
-import game.world.MapLoader;
+import game.world.GameMap;
 import game.world.World;
 
 import java.util.Scanner;
 
 
-import org.junit.Before;
 import com.google.common.collect.ImmutableList;
 
 import action.AttackCmd;
@@ -22,8 +21,11 @@ public class _GameTest {
 	Team teamA;
 	Team teamB;
 
-	@Before
-	public void setUp() throws Exception {
+	public static void main (String[] args){
+		new _GameTest();
+	}
+
+	public _GameTest() {
 		Settings.load();
 		Settings.setNewbornEnergy(5);
 		Settings.setActionCost(ReproduceCmd.class, 10);
@@ -40,20 +42,21 @@ public class _GameTest {
 
 
 		teamA = new Team(new BasicBrain(), "teamA");
-
 		teamB = new Team(new BasicBrain(), "teamB");
-
 		ImmutableList<Team> teamList = ImmutableList.of(teamA, teamB);
-		String mapString =
+
+		GameMap map = new GameMap("PLACEHOLDER",
 				"00..F\n" +
 				".....\n" +
-				"F..11";
+				"F..11");
 
-		world = MapLoader.load(mapString, teamList);
-		game = new Game(world, ImmutableList.of(teamA, teamB));
+		game = new Game(map, teamList);
+		world = game.getWorld();
+
+		runTest();
 	}
 
-	public final void test() {
+	public void runTest() {
 		try(Scanner continueListener = new Scanner(System.in)){
 			while(true) {
 				game.runNextTurn();

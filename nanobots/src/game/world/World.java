@@ -8,6 +8,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+
+import matchlog.MatchLog;
+
 import com.google.common.collect.Iterables;
 
 import teampg.grid2d.GridInterface;
@@ -213,6 +216,8 @@ public class World {
 			}
 
 			grid.set(pos, Entity.getNewEmpty());
+
+			MatchLog.removeEntity(entToDie);
 		}
 	}
 
@@ -230,6 +235,8 @@ public class World {
 			}
 
 			grid.set(addPos, toAdd);
+
+			MatchLog.addEntity(toAdd, addPos);
 		}
 	}
 

@@ -1,17 +1,32 @@
 package entity;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import replay.ReplayProto.Replay;
+import replay.ReplayProto.Replay.Entity.Type;
 
 public class FoodEntity extends MortalEntity {
+	public static final Replay.Entity.Type TYPE = Type.FOOD;
 	private int energy;
 
 	FoodEntity(int inEnergy) {
-		energy = inEnergy;
+		super();
+
+		setEnergy(inEnergy);
+	}
+
+	@Override
+	public Type getType() {
+		return TYPE;
 	}
 
 	@Override
 	public int getEnergy() {
 		return energy;
+	}
+
+	private void setEnergy(int e) {
+		data.setEnergy(e);
+		energy = e;
 	}
 
 	/**
@@ -22,11 +37,11 @@ public class FoodEntity extends MortalEntity {
 
 		if (amount > energy) {
 			int amountHarvested = energy;
-			energy = 0;
+			setEnergy(0);
 			return amountHarvested;
 		}
 
-		energy -= amount;
+		setEnergy(energy - amount);
 		return amount;
 	}
 
@@ -36,7 +51,7 @@ public class FoodEntity extends MortalEntity {
 
 	@Override
 	public String toString() {
-		return "Food  ";
+		return "FoodEntity [energy=" + energy + "]";
 	}
 
 }

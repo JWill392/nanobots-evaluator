@@ -16,7 +16,7 @@ import entity.BotEntity;
 import game.Game;
 import game.Settings;
 import game.Team;
-import game.world.MapLoader;
+import game.world.GameMap;
 import game.world.World;
 
 public class _TransferCmdTest {
@@ -50,8 +50,8 @@ public class _TransferCmdTest {
 		otherTeam = _MoveCmdTest.getMockTeam(); //always waits
 		ImmutableList<Team> teams = ImmutableList.of(transferTeam, otherTeam);
 
-		world = MapLoader.load(mapString, teams);
-		game = new Game(world, teams);
+		game = new Game(new GameMap("PLACEHOLDER", mapString), teams);
+		world = game.getWorld();
 	}
 
 	@Test

@@ -19,7 +19,7 @@ import entity.bot.Memory;
 import game.Game;
 import game.Settings;
 import game.Team;
-import game.world.MapLoader;
+import game.world.GameMap;
 import game.world.World;
 
 public class _ReproduceCmdTest {
@@ -49,8 +49,8 @@ public class _ReproduceCmdTest {
 		}, "ReproduceTestTeam");
 		ImmutableList<Team> teams = ImmutableList.of(collisionTeam);
 
-		world = MapLoader.load(mapString, teams);
-		game = new Game(world, teams);
+		game = new Game(new GameMap("PLACEHOLDER", mapString), teams);
+		world = game.getWorld();
 	}
 
 	@Test
@@ -92,8 +92,8 @@ public class _ReproduceCmdTest {
 		}, "ReproduceTestTeam");
 		ImmutableList<Team> teams = ImmutableList.of(collisionTeam);
 
-		world = MapLoader.load("0.0\n.0.", teams);
-		game = new Game(world, teams);
+		game = new Game(new GameMap("PLACEHOLDER", "0.0\n.0."), teams);
+		world = game.getWorld();
 
 		BotEntity leftReproducerBot = (BotEntity) world.get(AbsPos.of(0, 0));
 		BotEntity rightReproducerBot = (BotEntity) world.get(AbsPos.of(2, 0));

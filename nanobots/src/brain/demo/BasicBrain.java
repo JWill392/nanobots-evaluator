@@ -23,7 +23,7 @@ public class BasicBrain extends BotBrain {
 	protected ActionCmd brainDecideAction() throws Exception {
 		// Reproduce
 		if (energy >= Settings.getActionCost(ReproduceCmd.class)) {
-			List<AbsPos> emptyCells = vision.indexOf(Vision.EMPTY);
+			List<AbsPos> emptyCells = vision.getPositions(Vision.EMPTY);
 			if (!(emptyCells.isEmpty())) {
 				AbsPos target = emptyCells.get(0);
 				if(RelPos.offsetVector(position, target).squareMagnitude() <= Settings.getActionRange(ReproduceCmd.class)) {
@@ -33,7 +33,7 @@ public class BasicBrain extends BotBrain {
 		}
 
 		// Kill
-		List<AbsPos> enemyPos = vision.indexOf(Vision.ENEMY_BOT);
+		List<AbsPos> enemyPos = vision.getPositions(Vision.ENEMY_BOT);
 		if (!enemyPos.isEmpty()) {
 			AbsPos bestEnemyPos = enemyPos.get(0);
 			RelPos relEnemyPos = RelPos.offsetVector(position, bestEnemyPos);
@@ -52,7 +52,7 @@ public class BasicBrain extends BotBrain {
 
 
 		// Eat
-		List<AbsPos> foodPos = vision.indexOf(Vision.FOOD);
+		List<AbsPos> foodPos = vision.getPositions(Vision.FOOD);
 		if (!foodPos.isEmpty()) {
 			AbsPos bestFoodPos = foodPos.get(0);
 			RelPos relFoodPos = RelPos.offsetVector(position, bestFoodPos);
