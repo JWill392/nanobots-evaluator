@@ -11,8 +11,8 @@ import java.util.Queue;
 
 import matchlog.MatchLog;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
-
 import teampg.grid2d.GridInterface;
 import teampg.grid2d.GridInterface.Entry;
 import teampg.grid2d.RectGrid;
@@ -136,8 +136,16 @@ public class World {
 		return ret;
 	}
 
+	/**
+	 * Skips nulls
+	 */
 	public Iterable<Entry<Entity>> getEntries() {
-		return grid.getEntries();
+		return Iterables.filter(grid.getEntries(), new Predicate<Entry<Entity>>() {
+			@Override
+			public boolean apply(Entry<Entity> input) {
+				return input.getContents() != null;
+			};
+		});
 	}
 
 	// TODO move to util

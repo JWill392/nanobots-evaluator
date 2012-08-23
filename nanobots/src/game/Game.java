@@ -1,6 +1,8 @@
 package game;
 import java.util.List;
 
+import matchlog.MatchLog;
+
 import entity.BotEntity;
 import game.world.GameMap;
 import game.world.MapLoader;
@@ -26,6 +28,8 @@ public class Game {
 		this.map = map;
 		this.teams = teams;
 		currentTeam = 0;
+
+		MatchLog.startMatch(this);
 	}
 
 	public List<Team> getTeams() {
@@ -66,6 +70,7 @@ public class Game {
 		world.tick();
 
 		//TODO check lose/win condition, end
+		MatchLog.endTurn();
 
 		currentTeam = (currentTeam + 1) % (teams.size());
 	}

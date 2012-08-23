@@ -1,5 +1,6 @@
 package game;
 
+import replay.ReplayProto.Replay;
 import brain.BotBrain;
 import brain.BotBrain.BrainActionAndMemory;
 import brain.BrainInfo;
@@ -11,11 +12,19 @@ public class Team {
 	private boolean hasLost;
 	private final String name;
 
+	private final Replay.Team.Builder data;
+
 	public Team(BotBrain inBrain, String inName) {
 		brain = inBrain;
 		name = inName;
 
 		hasLost = false;
+		data = Replay.Team.newBuilder()
+				.setName(name);
+	}
+
+	public Replay.Team getData(int tid) {
+		return data.setTid(tid).build();
 	}
 
 	public BrainActionAndMemory decideAction(BrainInfo info) {

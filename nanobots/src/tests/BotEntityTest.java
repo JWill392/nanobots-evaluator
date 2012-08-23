@@ -13,6 +13,8 @@ import game.Team;
 import org.junit.Before;
 import org.junit.Test;
 
+import teampg.grid2d.point.AbsPos;
+
 import com.google.common.collect.ImmutableList;
 
 
@@ -79,10 +81,10 @@ public class BotEntityTest {
 
 	@Test
 	public void testAddReceivedMessage() {
-		MessageSignal aMockMsg = mock(MessageSignal.class);
+		MessageSignal aMockMsg = new MessageSignal(new Message(1), AbsPos.of(0, 0));
 		aBot.addReceivedMessage(aMockMsg);
 
-		MessageSignal bMockMsg = mock(MessageSignal.class);
+		MessageSignal bMockMsg = new MessageSignal(new Message(2), AbsPos.of(0, 0));
 		aBot.addReceivedMessage(bMockMsg);
 
 		ImmutableList<MessageSignal> botInbox = aBot.getReceivedMessages();

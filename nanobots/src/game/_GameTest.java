@@ -4,6 +4,7 @@ import game.world.World;
 
 import java.util.Scanner;
 
+import matchlog.MatchLog;
 
 import com.google.common.collect.ImmutableList;
 
@@ -60,9 +61,12 @@ public class _GameTest {
 		try(Scanner continueListener = new Scanner(System.in)){
 			while(true) {
 				game.runNextTurn();
-				System.out.println(world);
 				System.out.println("\n------------\n");
-				continueListener.nextLine();
+				System.out.println(world);
+				String line = continueListener.nextLine();
+				if (line.equals("done")) {
+					MatchLog.endMatch();
+				}
 			}
 		}
 	}

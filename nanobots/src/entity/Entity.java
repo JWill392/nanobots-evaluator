@@ -1,6 +1,7 @@
 package entity;
 
 import replay.ReplayProto.Replay;
+import teampg.grid2d.point.AbsPos;
 import game.Team;
 
 public abstract class Entity {
@@ -15,8 +16,17 @@ public abstract class Entity {
 				.setType(getType());
 	}
 
-	public Replay.Entity getData() {
-		return data.build();
+	public Replay.Entity getData(AbsPos entPos, int eid) {
+		return data.setPos(replay.Util.of(entPos))
+				.setEid(eid)
+				.build();
+	}
+
+	public Replay.Entity getData(AbsPos entPos, int eid, int tid) {
+		return data.setPos(replay.Util.of(entPos))
+				.setEid(eid)
+				.setTid(tid)
+				.build();
 	}
 
 	public abstract Replay.Entity.Type getType();

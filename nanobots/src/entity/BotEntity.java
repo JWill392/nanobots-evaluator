@@ -8,6 +8,7 @@ import java.util.Map;
 
 import replay.ReplayProto.Replay;
 import replay.ReplayProto.Replay.Entity.Type;
+import teampg.grid2d.point.AbsPos;
 
 import com.google.common.collect.ImmutableList;
 import entity.bot.Memory;
@@ -47,11 +48,14 @@ public class BotEntity extends MortalEntity implements MobileEntity{
 
 	private BotEntity(Team team, int botID) {
 		this.botID = botID;
-		energy = Settings.getNewbornEnergy();
 		this.team = team;
-
 		inbox = new ArrayList<MessageSignal>();
+
+		setEnergy(Settings.getNewbornEnergy());
+
 		memory = new Memory();
+		setMemory(memory); // update data object
+
 		runningActions = new HashMap<>(10);
 	}
 
@@ -102,12 +106,13 @@ public class BotEntity extends MortalEntity implements MobileEntity{
 		return energy;
 	}
 
+	private void setEnergy(int e) {
+		energy = e;
+		data.setEnergy(e);
+	}
+
 	public void addEnergy(int inEnergy) {
-		int newEnergy = energy + inEnergy;
-
-		//TODO if energy is zero, die?  Or is that in tick?
-
-		energy = newEnergy;
+		setEnergy(inEnergy + energy);
 	}
 
 	public Team getTeam() {
@@ -121,10 +126,13 @@ public class BotEntity extends MortalEntity implements MobileEntity{
 	public void setMemory(Memory inMem) {
 		int newMemVal = inMem.getAll();
 		memory.fill(newMemVal);
+
+		data.setMemory(newMemVal);
 	}
 
 	public void addReceivedMessage(MessageSignal msg) {
 		inbox.add(msg);
+		data.addInbox(msg.getData());
 	}
 
 	public ImmutableList<MessageSignal> getReceivedMessages() {
