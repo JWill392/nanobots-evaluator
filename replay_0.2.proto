@@ -1,0 +1,91 @@
+package nanobotsreplay;
+
+option java_package = "replay";
+option java_outer_classname = "ReplayProto";
+
+message Replay {
+	message Team {
+		required string name = 1;
+		required uint32 tid = 2;
+	}
+	message Entity {
+		enum Type {
+			BOT = 0;
+			FOOD = 1;
+			WALL = 2;
+		}
+		message ReceivedMessage {
+			required uint32 body = 1;
+			required Point origin = 2;
+		}
+		message ActionTypeCooldown {
+			required Action.Type type = 1;
+			required uint32 turn_cooldown_has_ended = 2;
+		}
+	
+		required Point pos = 1;
+		required Type type = 2;
+		required uint32 eid = 3;
+		optional uint32 energy = 4;
+		repeated ReceivedMessage inbox = 5;
+		optional uint32 memory = 6;
+		optional uint32 tid = 7;
+		repeated ActionTypeCooldown action_cooldowns = 8;
+	}
+	message TurnInfo {
+		repeated Entity ents = 2;
+	}
+	message Action {
+		enum Type {
+			ALL = 0;
+			ATTACK = 1;
+			HARVEST = 2;
+			MOVE = 3;
+			REPRODUCE = 4;
+			TRANSFER = 5;
+			BROADCAST = 6;
+		}
+	}
+	
+	required Dimension map_size = 1;
+	repeated Team teams = 2;
+	repeated TurnInfo turns = 3;
+}
+
+message Settings {
+	optional uint32 bot_birth_energy = 1;
+	optional uint32 bot_max_energy = 2;
+	optional uint32 bot_vision_range = 3;
+	optional uint32 bot_memory_length = 4;
+	optional uint32 bot_message_length = 5;
+	optional double bot_overcharge_drain = 6;
+	
+	optional uint32 food_birth_energy = 101;
+	
+	repeated ActionSettings actions = 200; //action order is execution order
+	optional uint32 attack_damage = 201;
+	optional uint32 harvest_amount = 202;
+	
+	message ActionSettings {
+		enum Type {
+			ATTACK = 0;
+			MOVE = 1;
+			HARVEST = 2;
+			REPRODUCE = 3;
+			TRANSFER = 4;
+			TRANSMIT = 5;
+			WAIT = 6;
+		}
+		required Type type = 1;
+		required uint32 cost = 2;
+		optional uint32 range = 3;
+	}
+}
+message Point {
+	required int32 x = 1;
+	required int32 y = 2;
+}
+message Dimension {
+	required uint32 width = 1;
+	required uint32 height = 2;
+}
