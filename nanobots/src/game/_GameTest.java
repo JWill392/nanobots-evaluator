@@ -41,7 +41,6 @@ public class _GameTest {
 		Settings.setVisionRadius(2);
 		Settings.lock();
 
-
 		teamA = new Team(new BasicBrain(), "teamA");
 		teamB = new Team(new BasicBrain(), "teamB");
 		ImmutableList<Team> teamList = ImmutableList.of(teamA, teamB);

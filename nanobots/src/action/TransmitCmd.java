@@ -2,6 +2,8 @@ package action;
 
 import java.util.List;
 
+import replay.ReplayProto.Replay;
+import replay.ReplayProto.Replay.Action.Type;
 import teampg.grid2d.point.AbsPos;
 
 import entity.BotEntity;
@@ -22,7 +24,7 @@ public class TransmitCmd extends RunningAction{
 		super.executeAll(world, actors);
 
 		for (BotEntity actor : actors) {
-			TransmitCmd action = actor.getRunningAction(TransmitCmd.class);
+			TransmitCmd action = (TransmitCmd) actor.getRunningAction();
 			AbsPos origin = world.getBotPosition(actor.getID());
 
 			Iterable<BotEntity> teamBotsInMessageRange =
@@ -39,5 +41,10 @@ public class TransmitCmd extends RunningAction{
 	@Override
 	protected int getCost() {
 		return Settings.getActionCost(this.getClass());
+	}
+
+	@Override
+	public Type getType() {
+		return Replay.Action.Type.BROADCAST;
 	}
 }

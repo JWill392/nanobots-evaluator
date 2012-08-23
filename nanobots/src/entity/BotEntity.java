@@ -1,15 +1,11 @@
 package entity;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import replay.ReplayProto.Replay;
 import replay.ReplayProto.Replay.Entity.Type;
-import teampg.grid2d.point.AbsPos;
-
 import com.google.common.collect.ImmutableList;
 import entity.bot.Memory;
 import entity.bot.MessageSignal;
@@ -28,7 +24,8 @@ public class BotEntity extends MortalEntity implements MobileEntity{
 
 	private int energy;
 	private ArrayList<MessageSignal> inbox;
-	private final Map<Class<? extends RunningAction>, RunningAction> runningActions;
+	private RunningAction runningAction;
+	private final Map<Class<? extends RunningAction>, Integer> actionCooldowns;
 
 	static BotEntity getNewBotEntity(Team team) {
 		int botIDToUse = botIDCounter;
@@ -56,32 +53,22 @@ public class BotEntity extends MortalEntity implements MobileEntity{
 		memory = new Memory();
 		setMemory(memory); // update data object
 
-		runningActions = new HashMap<>(10);
+		actionCooldowns = new HashMap<>();
+		runningAction = null;
 	}
 
 
-
-	public void addRunningAction(RunningAction action) {
-		if (runningActions.get(action.getClass()) != null) {
-			// TODO fail action
-			return;
-		}
-
-		runningActions.put(action.getClass(), action);
+	public void setRunningAction(RunningAction action) {
+		runningAction = action;
+		data.setRunningAction(replay.Util.of(action));
 	}
-	public void removeRunningAction(RunningAction action) {
-		removeRunningAction(action.getClass());
+	public RunningAction getRunningAction() {
+		return runningAction;
 	}
-	public void removeRunningAction(Class<? extends RunningAction> type) {
-		checkArgument(runningActions.containsKey(type));
-		runningActions.remove(type);
-	}
-	@SuppressWarnings("unchecked")
-	public <T extends RunningAction> T getRunningAction(Class<T> ofType) {
-		return (T) runningActions.get(ofType);
-	}
-	public boolean hasRunningAction(Class<? extends RunningAction> ofType) {
-		return runningActions.containsKey(ofType);
+	public void destroyRunningAction() {
+		//TODO say if success or failure?
+		runningAction = null;
+		data.clearRunningAction();
 	}
 
 

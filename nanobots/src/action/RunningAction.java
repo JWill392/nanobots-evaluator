@@ -5,10 +5,15 @@ import static com.google.common.base.Preconditions.checkArgument;
 import java.util.Iterator;
 import java.util.List;
 
+import replay.ReplayProto.Replay.Action.Type;
+
 import entity.BotEntity;
 import game.world.World;
 
 public abstract class RunningAction implements ActionCmd {
+	private boolean dieOnNextTick = false;
+	private BotEntity actor = null;
+
 	/**
 	 * Removes unaffordable actions from <i>actors</i>
 	 */
@@ -16,11 +21,11 @@ public abstract class RunningAction implements ActionCmd {
 		for (Iterator<BotEntity> iter = actors.iterator(); iter.hasNext();) {
 			BotEntity bot = iter.next();
 
-			RunningAction action = bot.getRunningAction(this.getClass());
+			RunningAction action = bot.getRunningAction();
 
 			// can't afford
 			if (!action.canAfford(bot)) {
-				bot.removeRunningAction(action);
+				remove(bot);
 				iter.remove();
 				continue;
 			}
@@ -34,11 +39,25 @@ public abstract class RunningAction implements ActionCmd {
 	public final void exactCostAndRemoveFrom(BotEntity actor) {
 		checkArgument(canAfford(actor));
 		actor.addEnergy(-getCost());
-		actor.removeRunningAction(this);
+		remove(actor);
 	}
 
 	/**
 	 * Amount bot is required to pay to execute this action.  Should be positive.
 	 */
 	protected abstract int getCost();
+
+	public abstract Type getType();
+
+	protected void remove(BotEntity actor) {
+		dieOnNextTick = true;
+		this.actor = actor;
+	}
+
+	public void tick() {
+		if (dieOnNextTick) {
+			assert(actor.getRunningAction() == this);
+			actor.destroyRunningAction();
+		}
+	}
 }

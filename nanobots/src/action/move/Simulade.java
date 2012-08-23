@@ -1,7 +1,5 @@
 package action.move;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import action.MoveCmd;
 import teampg.grid2d.GridInterface.Entry;
 import teampg.grid2d.point.AbsPos;
@@ -23,8 +21,8 @@ public class Simulade {
 		STATIC; // only state for not-ever-planning-to-move-this-turn entities
 	}
 
-	public Simulade(Entry<Entity> entEntry) {
-		checkArgument(!(entEntry.getContents() == null));
+	public Simulade(Entry<Entity> entEntry, boolean potentiallyValidMover) {
+		assert(!(entEntry.getContents() == null));
 
 		Entity ent = entEntry.getContents();
 		AbsPos pos = entEntry.getPosition();
@@ -33,13 +31,13 @@ public class Simulade {
 			BotEntity bot = (BotEntity) ent;
 
 			// moving simulade
-			if (bot.hasRunningAction(MoveCmd.class)) {
-				MoveCmd moveCmd = bot.getRunningAction(MoveCmd.class);
+			if (potentiallyValidMover) {
+				MoveCmd moveCmd = (MoveCmd) bot.getRunningAction();
 
 				AbsPos start = pos;
 				AbsPos goal = moveCmd.target;
 
-				checkArgument(!start.equals(goal));
+				assert(!start.equals(goal));
 
 				simulatedEntity = bot;
 				moveState = MoveState.READY_AT_START;

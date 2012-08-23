@@ -11,6 +11,8 @@ import entity.Entity;
 import entity.bot.Memory;
 import game.Settings;
 import game.world.World;
+import replay.ReplayProto.Replay;
+import replay.ReplayProto.Replay.Action.Type;
 import teampg.grid2d.point.AbsPos;
 
 public class ReproduceCmd extends TargettedAction {
@@ -36,7 +38,7 @@ public class ReproduceCmd extends TargettedAction {
 
 		// VALIDATE
 		for (BotEntity bot : actors) {
-			ReproduceCmd action = bot.getRunningAction(ReproduceCmd.class);
+			ReproduceCmd action = (ReproduceCmd) bot.getRunningAction();
 			Entity targetEnt = world.get(action.target);
 
 			if (!(targetEnt == null)) {
@@ -56,13 +58,14 @@ public class ReproduceCmd extends TargettedAction {
 
 		// Clean up illegals
 		for (BotEntity invalidBot : illegalActors) {
-			invalidBot.removeRunningAction(ReproduceCmd.class);
+			ReproduceCmd failedReproduce = (ReproduceCmd) invalidBot.getRunningAction();
+			failedReproduce.remove(invalidBot);
 		}
 		actors.removeAll(illegalActors);
 
 		// EXECUTE remaining legals
 		for (BotEntity legalBot : actors) {
-			ReproduceCmd action = legalBot.getRunningAction(ReproduceCmd.class);
+			ReproduceCmd action = (ReproduceCmd) legalBot.getRunningAction();
 
 			action.exactCostAndRemoveFrom(legalBot);
 			BotEntity newborn = Entity.getNewBot(legalBot.getTeam());
@@ -74,5 +77,10 @@ public class ReproduceCmd extends TargettedAction {
 	@Override
 	protected int getCost() {
 		return Settings.getActionCost(this.getClass());
+	}
+
+	@Override
+	public Type getType() {
+		return Replay.Action.Type.REPRODUCE;
 	}
 }

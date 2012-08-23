@@ -10,6 +10,8 @@ import entity.Entity;
 import entity.FoodEntity;
 import game.Settings;
 import game.world.World;
+import replay.ReplayProto.Replay;
+import replay.ReplayProto.Replay.Action.Type;
 import teampg.grid2d.point.AbsPos;
 
 public class HarvestCmd extends TargettedAction {
@@ -26,13 +28,13 @@ public class HarvestCmd extends TargettedAction {
 
 		// VALIDATE, GROUP
 		for (BotEntity bot : actors) {
-			HarvestCmd action = bot.getRunningAction(this.getClass());
+			HarvestCmd action = (HarvestCmd) bot.getRunningAction();
 			AbsPos targetPos = action.target;
 			Entity targetEnt = world.get(targetPos);
 
 			// target illegal
 			if (!(targetEnt instanceof FoodEntity)) {
-				bot.removeRunningAction(action);
+				action.remove(bot);
 				continue;
 			}
 
@@ -51,8 +53,7 @@ public class HarvestCmd extends TargettedAction {
 			int fractionForEachHarvester = amountTakenFromFood/harvesters.size();
 
 			for (BotEntity bot : harvesters) {
-
-				HarvestCmd action = bot.getRunningAction(HarvestCmd.class);
+				HarvestCmd action = (HarvestCmd) bot.getRunningAction();
 
 				action.exactCostAndRemoveFrom(bot);
 				bot.addEnergy(fractionForEachHarvester);
@@ -63,5 +64,10 @@ public class HarvestCmd extends TargettedAction {
 	@Override
 	protected int getCost() {
 		return Settings.getActionCost(this.getClass());
+	}
+
+	@Override
+	public Type getType() {
+		return Replay.Action.Type.HARVEST;
 	}
 }

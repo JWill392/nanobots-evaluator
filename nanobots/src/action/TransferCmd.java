@@ -7,6 +7,8 @@ import entity.Entity;
 import game.Settings;
 import game.Team;
 import game.world.World;
+import replay.ReplayProto.Replay;
+import replay.ReplayProto.Replay.Action.Type;
 import teampg.grid2d.point.AbsPos;
 
 public class TransferCmd extends TargettedAction {
@@ -27,12 +29,12 @@ public class TransferCmd extends TargettedAction {
 		super.executeAll(world, actors);
 
 		for (BotEntity actor : actors) {
-			TransferCmd cmd = actor.getRunningAction(TransferCmd.class);
+			TransferCmd cmd = (TransferCmd) actor.getRunningAction();
 
 			// must be bot
 			Entity targetEnt = world.get(cmd.target);
 			if(!(targetEnt instanceof BotEntity)) {
-				actor.removeRunningAction(cmd);
+				cmd.remove(actor);
 				continue;
 			}
 
@@ -42,12 +44,17 @@ public class TransferCmd extends TargettedAction {
 			Team targetTeam = targetBot.getTeam();
 			Team actorTeam = actor.getTeam();
 			if (targetTeam != actorTeam) {
-				actor.removeRunningAction(cmd);
+				cmd.remove(actor);
 				continue;
 			}
 
 			cmd.exactCostAndRemoveFrom(actor);
 			targetBot.addEnergy(cmd.amount);
 		}
+	}
+
+	@Override
+	public Type getType() {
+		return Replay.Action.Type.TRANSFER;
 	}
 }

@@ -18,7 +18,7 @@ import teampg.grid2d.point.AbsPos;
 import com.google.common.collect.ImmutableList;
 
 
-public class BotEntityTest {
+public class _BotEntityTest {
 	BotEntity aBot;
 	Team mockTeam;
 

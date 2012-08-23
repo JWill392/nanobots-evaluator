@@ -31,12 +31,12 @@ public abstract class TargettedAction extends RunningAction {
 		for (Iterator<BotEntity> iter = actors.iterator(); iter.hasNext();) {
 			BotEntity bot = iter.next();
 
-			TargettedAction action = bot.getRunningAction(this.getClass());
+			TargettedAction action = (TargettedAction) bot.getRunningAction();
 			AbsPos actorPos = world.getBotPosition(bot.getID());
 
 			// out of range
 			if (!action.validRange(actorPos)) {
-				bot.removeRunningAction(action);
+				action.remove(bot);
 				iter.remove();
 				continue;
 			}

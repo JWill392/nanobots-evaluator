@@ -54,36 +54,44 @@ public class Game {
 			BrainActionAndMemory decidedOutcome = currTeam.decideAction(info);
 
 			bot.setMemory(decidedOutcome.mem);
-			bot.addRunningAction(decidedOutcome.cmd);
+			if (decidedOutcome.cmd != null) {
+				bot.setRunningAction(decidedOutcome.cmd);
+			}
 		}
 
 		//execute running actions
 		for (final RunningAction actionType : Settings.getActionExecutionOrder()) {
 			List<BotEntity> botsWithRunningActionType =
 					Lists.newLinkedList(
-							Iterables.filter(teamBots, new HasRunningAction(actionType.getClass())));
+							Iterables.filter(teamBots, new HasRunningActionOfType(actionType.getClass())));
 
 			actionType.executeAll(world, botsWithRunningActionType);
 		}
 
+		//TODO check lose/win condition, end
+		MatchLog.endTurn();
+
 		//tick all dynamic ents
 		world.tick();
 
-		//TODO check lose/win condition, end
-		MatchLog.endTurn();
 
 		currentTeam = (currentTeam + 1) % (teams.size());
 	}
 
-	private static final class HasRunningAction implements Predicate<BotEntity> {
+	private static final class HasRunningActionOfType implements Predicate<BotEntity> {
 		private final Class<? extends RunningAction> actionType;
-		public HasRunningAction(Class<? extends RunningAction> actionType) {
+		public HasRunningActionOfType(Class<? extends RunningAction> actionType) {
 			this.actionType = actionType;
 		}
 
 		@Override
 		public boolean apply(BotEntity bot) {
-			return bot.hasRunningAction(actionType);
+			RunningAction runningAction = bot.getRunningAction();
+			if (runningAction == null) {
+				return false;
+			}
+
+			return runningAction.getClass().equals(actionType);
 		}
 	}
 }

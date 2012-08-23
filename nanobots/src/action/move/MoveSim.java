@@ -1,12 +1,14 @@
 package action.move;
 
 import java.util.Iterator;
+import java.util.Set;
 
 import com.google.common.collect.Iterators;
 import com.google.common.collect.PeekingIterator;
 
 import action.move.Simulade.MoveState;
 
+import entity.BotEntity;
 import entity.Entity;
 
 import game.world.World;
@@ -18,7 +20,7 @@ import teampg.grid2d.point.AbsPos;
 public class MoveSim implements Iterable<Simulade> {
 	private final GridInterface<Simulade> grid;
 
-	public MoveSim(World world) {
+	public MoveSim(World world, Set<BotEntity> potentiallyValidActors) {
 		grid = new RectGrid<>(world.getSize());
 
 		// fill in with simulades
@@ -30,7 +32,8 @@ public class MoveSim implements Iterable<Simulade> {
 				continue;
 			}
 
-			grid.set(position, new Simulade(entry));
+			boolean potentiallyValidMover = potentiallyValidActors.contains(entity);
+			grid.set(position, new Simulade(entry, potentiallyValidMover));
 		}
 
 		//TODO run simulation

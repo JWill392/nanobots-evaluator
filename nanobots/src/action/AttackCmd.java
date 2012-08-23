@@ -7,6 +7,8 @@ import entity.Entity;
 import game.Settings;
 import game.Team;
 import game.world.World;
+import replay.ReplayProto.Replay;
+import replay.ReplayProto.Replay.Action.Type;
 import teampg.grid2d.point.AbsPos;
 
 public class AttackCmd extends TargettedAction {
@@ -19,12 +21,12 @@ public class AttackCmd extends TargettedAction {
 		super.executeAll(world, actors); //remove obviously illegal actions
 
 		for (BotEntity bot : actors) {
-			AttackCmd action = bot.getRunningAction(this.getClass());
+			AttackCmd action = (AttackCmd) bot.getRunningAction();
 			Entity targetEnt = world.get(action.target);
 
 			// target must be bot
 			if (!(targetEnt instanceof BotEntity)) {
-				bot.removeRunningAction(action);
+				action.remove(bot);
 				continue;
 			}
 
@@ -32,7 +34,7 @@ public class AttackCmd extends TargettedAction {
 			BotEntity targetBot = (BotEntity) targetEnt;
 			Team actorTeam = bot.getTeam();
 			if (targetBot.getTeam() == actorTeam) {
-				bot.removeRunningAction(action);
+				action.remove(bot);
 				continue;
 			}
 
@@ -44,5 +46,10 @@ public class AttackCmd extends TargettedAction {
 	@Override
 	protected int getCost() {
 		return Settings.getActionCost(this.getClass());
+	}
+
+	@Override
+	public Type getType() {
+		return Replay.Action.Type.ATTACK;
 	}
 }
