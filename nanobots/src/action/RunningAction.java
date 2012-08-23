@@ -12,7 +12,7 @@ import game.world.World;
 
 public abstract class RunningAction implements ActionCmd {
 	private boolean dieOnNextTick = false;
-	private BotEntity actor = null;
+	private final BotEntity actor = null;
 
 	/**
 	 * Removes unaffordable actions from <i>actors</i>
@@ -25,7 +25,7 @@ public abstract class RunningAction implements ActionCmd {
 
 			// can't afford
 			if (!action.canAfford(bot)) {
-				remove(bot);
+				destroy();
 				iter.remove();
 				continue;
 			}
@@ -39,7 +39,7 @@ public abstract class RunningAction implements ActionCmd {
 	public final void exactCostAndRemoveFrom(BotEntity actor) {
 		checkArgument(canAfford(actor));
 		actor.addEnergy(-getCost());
-		remove(actor);
+		destroy();
 	}
 
 	/**
@@ -49,15 +49,11 @@ public abstract class RunningAction implements ActionCmd {
 
 	public abstract Type getType();
 
-	protected void remove(BotEntity actor) {
+	protected void destroy() {
 		dieOnNextTick = true;
-		this.actor = actor;
 	}
 
-	public void tick() {
-		if (dieOnNextTick) {
-			assert(actor.getRunningAction() == this);
-			actor.destroyRunningAction();
-		}
+	public boolean hasDieOnNextTick() {
+		return dieOnNextTick;
 	}
 }

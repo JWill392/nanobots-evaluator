@@ -34,7 +34,7 @@ public class TransferCmd extends TargettedAction {
 			// must be bot
 			Entity targetEnt = world.get(cmd.target);
 			if(!(targetEnt instanceof BotEntity)) {
-				cmd.remove(actor);
+				cmd.destroy();
 				continue;
 			}
 
@@ -44,7 +44,7 @@ public class TransferCmd extends TargettedAction {
 			Team targetTeam = targetBot.getTeam();
 			Team actorTeam = actor.getTeam();
 			if (targetTeam != actorTeam) {
-				cmd.remove(actor);
+				cmd.destroy();
 				continue;
 			}
 

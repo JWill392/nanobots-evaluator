@@ -34,7 +34,7 @@ public class HarvestCmd extends TargettedAction {
 
 			// target illegal
 			if (!(targetEnt instanceof FoodEntity)) {
-				action.remove(bot);
+				action.destroy();
 				continue;
 			}
 

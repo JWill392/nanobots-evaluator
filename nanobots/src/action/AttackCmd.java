@@ -26,7 +26,7 @@ public class AttackCmd extends TargettedAction {
 
 			// target must be bot
 			if (!(targetEnt instanceof BotEntity)) {
-				action.remove(bot);
+				action.destroy();
 				continue;
 			}
 
@@ -34,7 +34,7 @@ public class AttackCmd extends TargettedAction {
 			BotEntity targetBot = (BotEntity) targetEnt;
 			Team actorTeam = bot.getTeam();
 			if (targetBot.getTeam() == actorTeam) {
-				action.remove(bot);
+				action.destroy();
 				continue;
 			}
 

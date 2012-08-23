@@ -59,7 +59,7 @@ public class ReproduceCmd extends TargettedAction {
 		// Clean up illegals
 		for (BotEntity invalidBot : illegalActors) {
 			ReproduceCmd failedReproduce = (ReproduceCmd) invalidBot.getRunningAction();
-			failedReproduce.remove(invalidBot);
+			failedReproduce.destroy();
 		}
 		actors.removeAll(illegalActors);
 

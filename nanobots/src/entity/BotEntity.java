@@ -82,6 +82,12 @@ public class BotEntity extends MortalEntity implements MobileEntity{
 			int overMax = energy - Settings.getBotMaxEnergy();
 			energy = Settings.getBotMaxEnergy() + Math.round(overMax*Settings.getOverchargeDrain());
 		}
+
+		if (runningAction != null) {
+			if (runningAction.hasDieOnNextTick()) {
+				destroyRunningAction();
+			}
+		}
 	}
 
 	public int getID() {

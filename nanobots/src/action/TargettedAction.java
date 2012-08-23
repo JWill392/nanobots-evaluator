@@ -36,7 +36,7 @@ public abstract class TargettedAction extends RunningAction {
 
 			// out of range
 			if (!action.validRange(actorPos)) {
-				action.remove(bot);
+				action.destroy();
 				iter.remove();
 				continue;
 			}

@@ -36,7 +36,7 @@ public class MoveCmd extends TargettedAction {
 
 			// target is start
 			if (startPos.equals(action.target)) {
-				action.remove(bot);
+				action.destroy();
 				iter.remove();
 				continue;
 			}
@@ -45,7 +45,7 @@ public class MoveCmd extends TargettedAction {
 			if (targetEnt instanceof BotEntity) {
 				BotEntity targetBot = (BotEntity)targetEnt;
 				if ((targetBot.getRunningAction() instanceof MoveCmd) == false) {
-					action.remove(bot);
+					action.destroy();
 					iter.remove();
 					continue;
 				}
@@ -53,7 +53,7 @@ public class MoveCmd extends TargettedAction {
 
 			// at target is static entity (eg wall)
 			if (!(targetEnt instanceof BotEntity) && !(targetEnt == null)) {
-				action.remove(bot);
+				action.destroy();
 				iter.remove();
 				continue;
 			}
@@ -72,7 +72,7 @@ public class MoveCmd extends TargettedAction {
 					BotEntity moveFailedBot = (BotEntity) simulade.simulatedEntity;
 					MoveCmd failedCmd = (MoveCmd) moveFailedBot.getRunningAction();
 
-					failedCmd.remove(moveFailedBot);
+					failedCmd.destroy();
 					actors.remove(moveFailedBot);
 				}
 			}
