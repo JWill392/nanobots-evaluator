@@ -12,10 +12,9 @@ A 1v1 swarm AI programming game.
 Two players verus each other by writing code to programming their team's bots
 AI. The goal is to out survive the other team - the last team surviving wins.
 
-Players submit Player-Code. The first team's bots propose their moves using
-their team's Player-Code, then the game applies the moves that do not conflict.
-The red team then does the same. This repeats until there is a winner or until
-a maxium number of turns has passed - this avoids a never ending game.
+Players submit Brains. The first team's bots say what actions they want to take, 
+then the game executes those actions.
+The next team then does the same. This repeats until there is a winner.
 
 
 ### License ###
@@ -35,35 +34,52 @@ than one thing at a time. The outer bounds of the Grid are marked with Walls.
 
 Bots exists within the Grid and move in empty cells. Bots have an integer
 health value. Once a Bot's health value is zero, they die and no longer exists
-in the Grid. Bots belong to either the Blue team or the Red team. Their colours
-reflect their team. The more health a Bot has, the deeper its colour.
+in the Grid. Bots belong to a team.
 
-Bots can:  
-* View their neighbourhood in the Grid  
+
+### Brain ###
+
+Players write the brain each bot on their team will use to decide what action to 
+take.  Each turn, the brain will be given some info about a bot, and be asked 
+what the bot should do.
+
+
+### Bot Actions ###
+
+Each turn, every bot on a team picks the action they want to perform that turn.
+Only one action can be chosen per turn.  The team's Brain will decide for each 
+bot what action they take.
+
+Bot Actions:  
 * Move  
 * Attack  
 * Eat  
 * Broadcast information  
-* Multiply  
+* Reproduce  
+* Transfer energy to a teammate
 
+
+### Brain Input ###
+For each bot a brain is asked to decide for, it is given some information.
+Bot Info:
+* Energy
+* Vision -- what entities are near the bot
+* Position -- Absolute position in the world
+* Memory -- a small number of bits of information that can be retained by that 
+bot between turns.  Brain can set this to whatever it wants.  Useful because 
+Brain cannot remember anything either between turns or between bots in one turn.
+* Received Messages -- Packets of bits (similar to memory) that were Broadcast last turn by allied bots within transmission range
 
 ### Food ###
 
-Food is a mine-able resource found in the Grid. Food has an integer energy
+Food is a mineable resource found in the Grid. Food has an integer energy
 value. Bots mine energy from Food to gain health. Once Food's energy level is
-zero, it no longer exists in the Grid. Food is coloured green. The more energy
-a Food resource has, the deeper its colour.
+zero, it no longer exists in the Grid.
 
 
 ### Wall ###
 
 Walls are stationary and can not be occupied by Bot or Food nor can they be
 destoryed. Walls are not empty. Walls mark the outer bounds of the Grid and can
-also be placed as obstacles anywhere else within the Grid. Walls are black.
-
-
-### Player Code ###
-
-Players submit Player-Code to the game before starting. The Player-Code defines
-bots behaviour. Currently, the Player-Code is written in Python.
+also be placed as obstacles anywhere else within the Grid.
 
