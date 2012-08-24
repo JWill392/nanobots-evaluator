@@ -1,5 +1,6 @@
 package game;
 
+import entity.BotEntity;
 import replay.ReplayProto.Replay;
 import brain.BotBrain;
 import brain.BotBrain.BrainActionAndMemory;
@@ -46,5 +47,9 @@ public class Team {
 
 	public void setLost() {
 		hasLost = true;
+	}
+
+	public static boolean onSameTeam(BotEntity a, BotEntity b) {
+		return a.getTeam().equals(b.getTeam());
 	}
 }

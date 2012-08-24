@@ -32,8 +32,7 @@ public class AttackCmd extends TargettedAction {
 
 			// cannot attack teammates
 			BotEntity targetBot = (BotEntity) targetEnt;
-			Team actorTeam = bot.getTeam();
-			if (targetBot.getTeam() == actorTeam) {
+			if (Team.onSameTeam(bot, targetBot) == true) {
 				action.destroy();
 				continue;
 			}

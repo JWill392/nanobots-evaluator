@@ -86,20 +86,24 @@ public class _MoveCmdTest {
 	@Test
 	public final void testBasicMultipleValid() {
 		setUpBasicTest(RelPos.RIGHT,
-				"0..\n"+
-				"00.");
+				"0..1\n"+
+				"00.#");
 
 		BotEntity top = (BotEntity) world.get(AbsPos.of(0, 0));
 		BotEntity bottomLeft = (BotEntity) world.get(AbsPos.of(0, 1));
 		BotEntity bottomRight = (BotEntity) world.get(AbsPos.of(1, 1));
 
+		System.out.println(world);
 		game.runNextTurn();
 		assertEquals(top, world.get(AbsPos.of(1, 0)));
 		assertEquals(bottomLeft, world.get(AbsPos.of(1, 1)));
 		assertEquals(bottomRight, world.get(AbsPos.of(2, 1)));
 
+		System.out.println(world);
 		game.runNextTurn(); // waiter turn
+		System.out.println(world);
 		game.runNextTurn();
+		System.out.println(world);
 		assertEquals(top, world.get(AbsPos.of(2, 0)));
 		assertEquals(bottomLeft, world.get(AbsPos.of(1, 1)));
 		assertEquals(bottomRight, world.get(AbsPos.of(2, 1)));

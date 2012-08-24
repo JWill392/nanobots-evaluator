@@ -41,9 +41,7 @@ public class TransferCmd extends TargettedAction {
 			BotEntity targetBot = (BotEntity) targetEnt;
 
 			// must be on same team
-			Team targetTeam = targetBot.getTeam();
-			Team actorTeam = actor.getTeam();
-			if (targetTeam != actorTeam) {
+			if (Team.onSameTeam(actor, targetBot) == false) {
 				cmd.destroy();
 				continue;
 			}

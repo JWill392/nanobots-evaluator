@@ -81,7 +81,7 @@ public class _AttackCmdTest {
 
 	@Test
 	public final void testBasicIllegalTarget() {
-		setUpBasicTest("0.");
+		setUpBasicTest("0...1");
 
 		AbsPos attackerPos = AbsPos.of(0, 0);
 		BotEntity basicAttacker = (BotEntity) world.get(attackerPos);
@@ -95,7 +95,7 @@ public class _AttackCmdTest {
 
 	@Test
 	public final void testAttackTeammateFails() {
-		setUpBasicTest("00");
+		setUpBasicTest("00..1");
 
 		game.runNextTurn();
 
