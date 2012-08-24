@@ -2,9 +2,8 @@ package game;
 import game.world.GameMap;
 import game.world.World;
 
+import java.io.File;
 import java.util.Scanner;
-
-import matchlog.MatchLog;
 
 import com.google.common.collect.ImmutableList;
 
@@ -50,7 +49,7 @@ public class _GameTest {
 				".....\n" +
 				"F..11");
 
-		game = new Game(map, teamList);
+		game = new Game(map, teamList, new File("/home/jackson/testreplay"));
 		world = game.getWorld();
 
 		runTest();
@@ -58,15 +57,17 @@ public class _GameTest {
 
 	public void runTest() {
 		try(Scanner continueListener = new Scanner(System.in)){
-			while(true) {
-				game.runNextTurn();
+			while (game.runNextTurn()) {
+				/*
 				System.out.println("\n------------\n");
 				System.out.println(world);
 				String line = continueListener.nextLine();
 				if (line.equals("done")) {
 					MatchLog.endMatch();
 				}
+				*/
 			}
+			System.out.println("Done");
 		}
 	}
 }

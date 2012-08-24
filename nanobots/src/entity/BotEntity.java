@@ -65,7 +65,7 @@ public class BotEntity extends MortalEntity implements MobileEntity{
 	public RunningAction getRunningAction() {
 		return runningAction;
 	}
-	public void destroyRunningAction() {
+	private void destroyRunningAction() {
 		//TODO say if success or failure?
 		runningAction = null;
 		data.clearRunningAction();

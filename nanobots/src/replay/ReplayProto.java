@@ -35,6 +35,10 @@ public final class ReplayProto {
         getTurnsOrBuilderList();
     replay.ReplayProto.Replay.TurnInfoOrBuilder getTurnsOrBuilder(
         int index);
+    
+    // required uint32 winning_team = 4;
+    boolean hasWinningTeam();
+    int getWinningTeam();
   }
   public static final class Replay extends
       com.google.protobuf.GeneratedMessage
@@ -4045,10 +4049,21 @@ public final class ReplayProto {
       return turns_.get(index);
     }
     
+    // required uint32 winning_team = 4;
+    public static final int WINNING_TEAM_FIELD_NUMBER = 4;
+    private int winningTeam_;
+    public boolean hasWinningTeam() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    public int getWinningTeam() {
+      return winningTeam_;
+    }
+    
     private void initFields() {
       mapSize_ = replay.ReplayProto.Dimension.getDefaultInstance();
       teams_ = java.util.Collections.emptyList();
       turns_ = java.util.Collections.emptyList();
+      winningTeam_ = 0;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -4056,6 +4071,10 @@ public final class ReplayProto {
       if (isInitialized != -1) return isInitialized == 1;
       
       if (!hasMapSize()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasWinningTeam()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -4091,6 +4110,9 @@ public final class ReplayProto {
       for (int i = 0; i < turns_.size(); i++) {
         output.writeMessage(3, turns_.get(i));
       }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeUInt32(4, winningTeam_);
+      }
       getUnknownFields().writeTo(output);
     }
     
@@ -4111,6 +4133,10 @@ public final class ReplayProto {
       for (int i = 0; i < turns_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(3, turns_.get(i));
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt32Size(4, winningTeam_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -4257,6 +4283,8 @@ public final class ReplayProto {
         } else {
           turnsBuilder_.clear();
         }
+        winningTeam_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
       
@@ -4321,6 +4349,10 @@ public final class ReplayProto {
         } else {
           result.turns_ = turnsBuilder_.build();
         }
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.winningTeam_ = winningTeam_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -4392,12 +4424,19 @@ public final class ReplayProto {
             }
           }
         }
+        if (other.hasWinningTeam()) {
+          setWinningTeam(other.getWinningTeam());
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
       
       public final boolean isInitialized() {
         if (!hasMapSize()) {
+          
+          return false;
+        }
+        if (!hasWinningTeam()) {
           
           return false;
         }
@@ -4462,6 +4501,11 @@ public final class ReplayProto {
               replay.ReplayProto.Replay.TurnInfo.Builder subBuilder = replay.ReplayProto.Replay.TurnInfo.newBuilder();
               input.readMessage(subBuilder, extensionRegistry);
               addTurns(subBuilder.buildPartial());
+              break;
+            }
+            case 32: {
+              bitField0_ |= 0x00000008;
+              winningTeam_ = input.readUInt32();
               break;
             }
           }
@@ -4930,6 +4974,27 @@ public final class ReplayProto {
           turns_ = null;
         }
         return turnsBuilder_;
+      }
+      
+      // required uint32 winning_team = 4;
+      private int winningTeam_ ;
+      public boolean hasWinningTeam() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      public int getWinningTeam() {
+        return winningTeam_;
+      }
+      public Builder setWinningTeam(int value) {
+        bitField0_ |= 0x00000008;
+        winningTeam_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearWinningTeam() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        winningTeam_ = 0;
+        onChanged();
+        return this;
       }
       
       // @@protoc_insertion_point(builder_scope:nanobotsreplay.Replay)
@@ -7469,47 +7534,47 @@ public final class ReplayProto {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\020replay_0.2.proto\022\016nanobotsreplay\"\306\007\n\006R" +
+      "\n\020replay_0.2.proto\022\016nanobotsreplay\"\334\007\n\006R" +
       "eplay\022+\n\010map_size\030\001 \002(\0132\031.nanobotsreplay" +
       ".Dimension\022*\n\005teams\030\002 \003(\0132\033.nanobotsrepl" +
       "ay.Replay.Team\022.\n\005turns\030\003 \003(\0132\037.nanobots" +
-      "replay.Replay.TurnInfo\032!\n\004Team\022\014\n\004name\030\001" +
-      " \002(\t\022\013\n\003tid\030\002 \002(\r\032\257\004\n\006Entity\022\"\n\003pos\030\001 \002(" +
-      "\0132\025.nanobotsreplay.Point\0220\n\004type\030\002 \002(\0162\"" +
-      ".nanobotsreplay.Replay.Entity.Type\022\013\n\003ei" +
-      "d\030\003 \002(\r\022\016\n\006energy\030\004 \001(\r\022<\n\005inbox\030\005 \003(\0132-" +
-      ".nanobotsreplay.Replay.Entity.ReceivedMe",
-      "ssage\022\016\n\006memory\030\006 \001(\r\022\013\n\003tid\030\007 \001(\r\022J\n\020ac" +
-      "tion_cooldowns\030\010 \003(\01320.nanobotsreplay.Re" +
-      "play.Entity.ActionTypeCooldown\0225\n\016runnin" +
-      "g_action\030\t \001(\0132\035.nanobotsreplay.Replay.A" +
-      "ction\032F\n\017ReceivedMessage\022\014\n\004body\030\001 \002(\r\022%" +
-      "\n\006origin\030\002 \002(\0132\025.nanobotsreplay.Point\032g\n" +
-      "\022ActionTypeCooldown\0220\n\004type\030\001 \002(\0162\".nano" +
-      "botsreplay.Replay.Action.Type\022\037\n\027turn_co" +
-      "oldown_has_ended\030\002 \002(\r\"#\n\004Type\022\007\n\003BOT\020\000\022" +
-      "\010\n\004FOOD\020\001\022\010\n\004WALL\020\002\0327\n\010TurnInfo\022+\n\004ents\030",
-      "\002 \003(\0132\035.nanobotsreplay.Replay.Entity\032\244\001\n" +
-      "\006Action\0220\n\004type\030\001 \002(\0162\".nanobotsreplay.R" +
-      "eplay.Action.Type\"h\n\004Type\022\007\n\003ALL\020\000\022\n\n\006AT" +
-      "TACK\020\001\022\013\n\007HARVEST\020\002\022\010\n\004MOVE\020\003\022\r\n\tREPRODU" +
-      "CE\020\004\022\014\n\010TRANSFER\020\005\022\r\n\tBROADCAST\020\006\022\010\n\004WAI" +
-      "T\020\007\"\376\003\n\010Settings\022\030\n\020bot_birth_energy\030\001 \001" +
-      "(\r\022\026\n\016bot_max_energy\030\002 \001(\r\022\030\n\020bot_vision" +
-      "_range\030\003 \001(\r\022\031\n\021bot_memory_length\030\004 \001(\r\022" +
-      "\032\n\022bot_message_length\030\005 \001(\r\022\034\n\024bot_overc" +
-      "harge_drain\030\006 \001(\001\022\031\n\021food_birth_energy\030e",
-      " \001(\r\0229\n\007actions\030\310\001 \003(\0132\'.nanobotsreplay." +
-      "Settings.ActionSettings\022\026\n\rattack_damage" +
-      "\030\311\001 \001(\r\022\027\n\016harvest_amount\030\312\001 \001(\r\032\311\001\n\016Act" +
-      "ionSettings\022:\n\004type\030\001 \002(\0162,.nanobotsrepl" +
-      "ay.Settings.ActionSettings.Type\022\014\n\004cost\030" +
-      "\002 \002(\r\022\r\n\005range\030\003 \001(\r\"^\n\004Type\022\n\n\006ATTACK\020\000" +
-      "\022\010\n\004MOVE\020\001\022\013\n\007HARVEST\020\002\022\r\n\tREPRODUCE\020\003\022\014" +
-      "\n\010TRANSFER\020\004\022\014\n\010TRANSMIT\020\005\022\010\n\004WAIT\020\006\"\035\n\005" +
-      "Point\022\t\n\001x\030\001 \002(\005\022\t\n\001y\030\002 \002(\005\"*\n\tDimension" +
-      "\022\r\n\005width\030\001 \002(\r\022\016\n\006height\030\002 \002(\rB\025\n\006repla",
-      "yB\013ReplayProto"
+      "replay.Replay.TurnInfo\022\024\n\014winning_team\030\004" +
+      " \002(\r\032!\n\004Team\022\014\n\004name\030\001 \002(\t\022\013\n\003tid\030\002 \002(\r\032" +
+      "\257\004\n\006Entity\022\"\n\003pos\030\001 \002(\0132\025.nanobotsreplay" +
+      ".Point\0220\n\004type\030\002 \002(\0162\".nanobotsreplay.Re" +
+      "play.Entity.Type\022\013\n\003eid\030\003 \002(\r\022\016\n\006energy\030" +
+      "\004 \001(\r\022<\n\005inbox\030\005 \003(\0132-.nanobotsreplay.Re",
+      "play.Entity.ReceivedMessage\022\016\n\006memory\030\006 " +
+      "\001(\r\022\013\n\003tid\030\007 \001(\r\022J\n\020action_cooldowns\030\010 \003" +
+      "(\01320.nanobotsreplay.Replay.Entity.Action" +
+      "TypeCooldown\0225\n\016running_action\030\t \001(\0132\035.n" +
+      "anobotsreplay.Replay.Action\032F\n\017ReceivedM" +
+      "essage\022\014\n\004body\030\001 \002(\r\022%\n\006origin\030\002 \002(\0132\025.n" +
+      "anobotsreplay.Point\032g\n\022ActionTypeCooldow" +
+      "n\0220\n\004type\030\001 \002(\0162\".nanobotsreplay.Replay." +
+      "Action.Type\022\037\n\027turn_cooldown_has_ended\030\002" +
+      " \002(\r\"#\n\004Type\022\007\n\003BOT\020\000\022\010\n\004FOOD\020\001\022\010\n\004WALL\020",
+      "\002\0327\n\010TurnInfo\022+\n\004ents\030\002 \003(\0132\035.nanobotsre" +
+      "play.Replay.Entity\032\244\001\n\006Action\0220\n\004type\030\001 " +
+      "\002(\0162\".nanobotsreplay.Replay.Action.Type\"" +
+      "h\n\004Type\022\007\n\003ALL\020\000\022\n\n\006ATTACK\020\001\022\013\n\007HARVEST\020" +
+      "\002\022\010\n\004MOVE\020\003\022\r\n\tREPRODUCE\020\004\022\014\n\010TRANSFER\020\005" +
+      "\022\r\n\tBROADCAST\020\006\022\010\n\004WAIT\020\007\"\376\003\n\010Settings\022\030" +
+      "\n\020bot_birth_energy\030\001 \001(\r\022\026\n\016bot_max_ener" +
+      "gy\030\002 \001(\r\022\030\n\020bot_vision_range\030\003 \001(\r\022\031\n\021bo" +
+      "t_memory_length\030\004 \001(\r\022\032\n\022bot_message_len" +
+      "gth\030\005 \001(\r\022\034\n\024bot_overcharge_drain\030\006 \001(\001\022",
+      "\031\n\021food_birth_energy\030e \001(\r\0229\n\007actions\030\310\001" +
+      " \003(\0132\'.nanobotsreplay.Settings.ActionSet" +
+      "tings\022\026\n\rattack_damage\030\311\001 \001(\r\022\027\n\016harvest" +
+      "_amount\030\312\001 \001(\r\032\311\001\n\016ActionSettings\022:\n\004typ" +
+      "e\030\001 \002(\0162,.nanobotsreplay.Settings.Action" +
+      "Settings.Type\022\014\n\004cost\030\002 \002(\r\022\r\n\005range\030\003 \001" +
+      "(\r\"^\n\004Type\022\n\n\006ATTACK\020\000\022\010\n\004MOVE\020\001\022\013\n\007HARV" +
+      "EST\020\002\022\r\n\tREPRODUCE\020\003\022\014\n\010TRANSFER\020\004\022\014\n\010TR" +
+      "ANSMIT\020\005\022\010\n\004WAIT\020\006\"\035\n\005Point\022\t\n\001x\030\001 \002(\005\022\t" +
+      "\n\001y\030\002 \002(\005\"*\n\tDimension\022\r\n\005width\030\001 \002(\r\022\016\n",
+      "\006height\030\002 \002(\rB\025\n\006replayB\013ReplayProto"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -7521,7 +7586,7 @@ public final class ReplayProto {
           internal_static_nanobotsreplay_Replay_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_nanobotsreplay_Replay_descriptor,
-              new java.lang.String[] { "MapSize", "Teams", "Turns", },
+              new java.lang.String[] { "MapSize", "Teams", "Turns", "WinningTeam", },
               replay.ReplayProto.Replay.class,
               replay.ReplayProto.Replay.Builder.class);
           internal_static_nanobotsreplay_Replay_Team_descriptor =

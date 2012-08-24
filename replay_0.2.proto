@@ -57,6 +57,7 @@ message Replay {
 	required Dimension map_size = 1;
 	repeated Team teams = 2;
 	repeated TurnInfo turns = 3;
+	required uint32 winning_team = 4;
 }
 
 message Settings {

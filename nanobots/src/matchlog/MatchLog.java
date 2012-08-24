@@ -6,6 +6,10 @@ import game.Game;
 import game.Team;
 import game.world.World;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -55,6 +59,10 @@ public class MatchLog {
 		currTurnBuilder = Replay.TurnInfo.newBuilder();
 	}
 
+	public static int getTurnCount() {
+		return inst.replayBuilder.getTurnsCount();
+	}
+
 	//###############
 	//### CHANGES ###
 	//###############
@@ -84,7 +92,7 @@ public class MatchLog {
 		}*/
 
 	public static void addEntity(Entity newEnt, AbsPos pos) {
-		logger.log(Level.INFO, "addEnt| " + newEnt + " -> " + pos);
+		//logger.log(Level.INFO, "addEnt| " + newEnt + " -> " + pos);
 		//assert(!inst.entIdMap.containsKey(newEnt));
 
 		//TODO needed?  I don't think so.  remove me
@@ -93,7 +101,7 @@ public class MatchLog {
 	}
 
 	public static void removeEntity(Entity ent) {
-		logger.log(Level.INFO, "removeEnt| " + ent);
+		//logger.log(Level.INFO, "removeEnt| " + ent);
 
 		//TODO
 	}
@@ -121,6 +129,10 @@ public class MatchLog {
 	}
 
 	public static void endTurn() {
+		if ((getTurnCount() % 100) == 0) {
+			System.out.println("Turn#" + getTurnCount());
+		}
+
 		World world = inst.game.getWorld();
 		for (Entry<Entity> entry : world.getEntries()) {
 			Entity entity = entry.getContents();
@@ -144,11 +156,18 @@ public class MatchLog {
 		inst.currTurnBuilder.clear();
 	}
 
-	public static void endMatch() {
-		//TODO
-		// old args: Team winner, Path replayDirectory
+	public static void endMatch(Team winner, File outputFile) throws FileNotFoundException, IOException {
+		inst.replayBuilder.setWinningTeam(inst.teamIdMap.get(winner));
+
+		System.out.println("END MATCH, writing replay to " + outputFile.getAbsolutePath());
+		// overwrite
+		if (outputFile.exists()) {
+			if (!outputFile.delete()) {
+				throw new IllegalStateException(); //TODO cleanup
+			}
+		}
 
 		Replay fullGameReplay = inst.replayBuilder.build();
-		System.out.println("The full replay: \n\n" + fullGameReplay);
+		fullGameReplay.writeTo(new FileOutputStream(outputFile));
 	}
 }

@@ -1,4 +1,7 @@
 package game;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 
 import matchlog.MatchLog;
@@ -21,13 +24,20 @@ public class Game {
 	private final GameMap map;
 	private final World world;
 	private final ImmutableList<Team> teams;
-	private int currentTeam;
+	private int currTeamIndex;
+	private final File replayFile;
 
 	public Game(GameMap map, ImmutableList<Team> teams) {
+		this(map, teams, null);
+	}
+
+	public Game(GameMap map, ImmutableList<Team> teams, File replayFile) {
+		this.replayFile = replayFile;
+
 		world = MapLoader.load(map, teams);
 		this.map = map;
 		this.teams = teams;
-		currentTeam = 0;
+		currTeamIndex = 0;
 
 		MatchLog.startMatch(this);
 	}
@@ -44,8 +54,8 @@ public class Game {
 		return world;
 	}
 
-	public void runNextTurn() {
-		Team currTeam = teams.get(currentTeam);
+	public boolean runNextTurn() {
+		Team currTeam = teams.get(currTeamIndex);
 		Iterable<BotEntity> teamBots = world.getTeamBots(currTeam);
 
 		//get actions from brain
@@ -68,14 +78,77 @@ public class Game {
 			actionType.executeAll(world, botsWithRunningActionType);
 		}
 
-		//TODO check lose/win condition, end
 		MatchLog.endTurn();
 
 		//tick all dynamic ents
 		world.tick();
 
+		// check lose condition on team
+		for (Team team : teams) {
+			if (teamHasLivingBots(world, team) == false) {
+				team.setLost();
+			}
+		}
 
-		currentTeam = (currentTeam + 1) % (teams.size());
+		// determine which team gets next turn
+		currTeamIndex = getNextTeam();
+
+		// Game over?
+		if (currTeamIndex == -1) {
+			// write replay
+			if (replayFile != null) {
+				try {
+					MatchLog.endMatch(getWinner(), replayFile);
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			// TODO end
+			//TODO terrible, fix
+			System.out.println("skipping turn since done");
+			return false;
+		}
+
+		return true;
+	}
+
+	private Team getWinner() {
+		Iterable<Team> winnerList = Iterables.filter(teams, new Predicate<Team>() {
+			@Override
+			public boolean apply(Team team) {
+				return !team.hasLost();
+			}
+		});
+
+		if (Iterables.size(winnerList) != 1) {
+			return null;
+		}
+
+		return Iterables.get(winnerList, 0);
+	}
+
+	private static int rotateIndex(int index, int size) {
+		return (index + 1) % size;
+	}
+
+	private int getNextTeam() {
+		int lastTeam = currTeamIndex;
+		int possNextTeam = rotateIndex(currTeamIndex, teams.size());
+		while (true) {
+			if (possNextTeam == lastTeam) {
+				return -1;
+			}
+
+			if (!teams.get(possNextTeam).hasLost()) {
+				return possNextTeam;
+			}
+
+			possNextTeam = rotateIndex(possNextTeam, teams.size());
+		}
 	}
 
 	private static final class HasRunningActionOfType implements Predicate<BotEntity> {
@@ -93,5 +166,9 @@ public class Game {
 
 			return runningAction.getClass().equals(actionType);
 		}
+	}
+
+	private static boolean teamHasLivingBots(World world, Team team) {
+		return Iterables.size(world.getTeamBots(team)) > 0;
 	}
 }
