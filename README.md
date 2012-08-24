@@ -9,12 +9,33 @@ A 1v1 swarm AI programming game.
 
 ### About ###
 
-Two players verus each other by writing code to programming their team's bots
-AI. The goal is to out survive the other team - the last team surviving wins.
+Nanobots is an AI programming game.  Each player has a team consisting of many 
+robots.  Each team wants to destroy the other teams, and be the sole survivor.
 
-Players submit Brains. The first team's bots say what actions they want to take, 
-then the game executes those actions.
-The next team then does the same. This repeats until there is a winner.
+Players write a shared Brain for their team.  A game match is then run, with no 
+input from the players.  The player's team of bots act depending on what their 
+Brain decides to do.  This continues until one team of bots has killed all the
+enemy bots.  This team wins.
+
+
+The interesting part is lies in the limited resources:
+
+* Information is scarce. Each bot's brain is given some input through its 
+"senses" -- vision in a small 
+radius, bot energy.  
+
+* Communication is costly.  The only way teammate bots can communicate is by 
+taking a turn to broadcast a small message -- it is limited to a finite string 
+of bits (size depends on settings; let's say 48 bits).  
+
+* Even memory is limited.  Each bot can store a finite string of bits between turns
+(again, depends on settings; say 24 bits).  Memory is passed into the brain
+each turn along with vision.  It can be modified at no cost, and the modified
+bit string will be passed in next turn.
+
+Players can view replays showing what happened throughout the match, and 
+reprogram their Brains to maintain their winning streak, or beat the current
+winning Brain.
 
 
 ### License ###
@@ -33,47 +54,48 @@ than one thing at a time. The outer bounds of the Grid are marked with Walls.
 ### Bot ###
 
 Bots exists within the Grid and move in empty cells. Bots have an integer
-health value. Once a Bot's health value is zero, they die and no longer exists
+energy value. Once a Bot's energy value is zero, they die and no longer exist
 in the Grid. Bots belong to a team.
 
 
 ### Brain ###
+Players write a Brain function.  It has one input -- information given to the 
+brain so it can decide on an action -- and one output -- the chosen action.
 
-Players write the brain each bot on their team will use to decide what action to 
-take.  Each turn, the brain will be given some info about a bot, and be asked 
-what the bot should do.
+This function is called in isolation by each bot on a Player's team, once per
+turn.  Effectively, each bot has its own separate but identical brain.
 
 
 ### Bot Actions ###
 
-Each turn, every bot on a team picks the action they want to perform that turn.
-Only one action can be chosen per turn.  The team's Brain will decide for each 
-bot what action they take.
+Each turn, every bot's brain on a team picks the action they want to perform 
+that turn. Only one action can be chosen per turn.  Each action has an energy
+cost, and some actions take multiple turns to execute (Reproduce).
+
 
 Bot Actions:  
 * Move  
-* Attack  
+* Attack -- damage energy of enemy bot
 * Eat  
-* Broadcast information  
+* Broadcast information  -- sends a bit string to allied bots within a certain radius
 * Reproduce  
 * Transfer energy to a teammate
 
 
 ### Brain Input ###
-For each bot a brain is asked to decide for, it is given some information.
-Bot Info:
-* Energy
+Each turn when a Brain is asked to decide on an action for some bot, it's
+given some information about that bot:
+* Energy -- health of that bot
 * Vision -- what entities are near the bot
 * Position -- Absolute position in the world
 * Memory -- a small number of bits of information that can be retained by that 
-bot between turns.  Brain can set this to whatever it wants.  Useful because 
-Brain cannot remember anything either between turns or between bots in one turn.
-* Received Messages -- Packets of bits (similar to memory) that were Broadcast last turn by allied bots within transmission range
+bot between turns.
+* Received Messages -- bit strings (similar to memory) that were Broadcast last turn by allied bots within transmission range
 
 ### Food ###
 
 Food is a mineable resource found in the Grid. Food has an integer energy
-value. Bots mine energy from Food to gain health. Once Food's energy level is
+value. Bots mine energy from Food to gain energy. Once Food's energy level is
 zero, it no longer exists in the Grid.
 
 
