@@ -3,6 +3,7 @@ package action;
 import java.util.Iterator;
 import java.util.List;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 
 import action.move.MoveSim;
@@ -15,6 +16,7 @@ import game.Settings;
 import game.world.World;
 import replay.ReplayProto.Replay;
 import replay.ReplayProto.Replay.Action.Type;
+import replay.ReplayProto.Replay.Entity.BotState;
 import teampg.grid2d.point.AbsPos;
 
 public class MoveCmd extends TargettedAction {
@@ -22,21 +24,25 @@ public class MoveCmd extends TargettedAction {
 		super(target);
 	}
 
-	@Override
-	public final void executeAll(World world, List<BotEntity> actors) {
-		super.executeAll(world, actors); //remove obviously illegal actions
+	static void executeAll(World world, List<BotEntity> actors) {
+		filterBasicInvalid(world, actors);
 
 		// BASIC VALIDATION
 		for (Iterator<BotEntity> iter = actors.iterator(); iter.hasNext();) {
 			BotEntity bot = iter.next();
 			MoveCmd action = (MoveCmd) bot.getRunningAction();
 
+			// TODO REMOVE ME
+			if (action.getTarget().equals(AbsPos.of(11, 3))) {
+				System.out.println("######### Potential weird one: " + action);
+			}
+
 			AbsPos startPos = world.getBotPosition(bot.getID());
-			Entity targetEnt = world.get(action.target);
+			Entity targetEnt = world.get(action.getTarget());
 
 			// target is start
-			if (startPos.equals(action.target)) {
-				action.destroy();
+			if (startPos.equals(action.getTarget())) {
+				action.fail(Replay.Action.Outcome.ILLEGAL_TARGET);
 				iter.remove();
 				continue;
 			}
@@ -45,7 +51,7 @@ public class MoveCmd extends TargettedAction {
 			if (targetEnt instanceof BotEntity) {
 				BotEntity targetBot = (BotEntity)targetEnt;
 				if ((targetBot.getRunningAction() instanceof MoveCmd) == false) {
-					action.destroy();
+					action.fail(Replay.Action.Outcome.ILLEGAL_TARGET);
 					iter.remove();
 					continue;
 				}
@@ -53,11 +59,12 @@ public class MoveCmd extends TargettedAction {
 
 			// at target is static entity (eg wall)
 			if (!(targetEnt instanceof BotEntity) && !(targetEnt == null)) {
-				action.destroy();
+				action.fail(Replay.Action.Outcome.ILLEGAL_TARGET);
 				iter.remove();
 				continue;
 			}
 
+			// appears basically valid, move on to group
 		}
 
 		// GROUP VALIDATION
@@ -72,9 +79,13 @@ public class MoveCmd extends TargettedAction {
 					BotEntity moveFailedBot = (BotEntity) simulade.simulatedEntity;
 					MoveCmd failedCmd = (MoveCmd) moveFailedBot.getRunningAction();
 
-					failedCmd.destroy();
-					actors.remove(moveFailedBot);
+					failedCmd.fail(Replay.Action.Outcome.ILLEGAL_TARGET);
+					boolean removed = actors.remove(moveFailedBot);
+					assert removed;
+					continue;
 				}
+
+				// completely valid, will execute
 			}
 		}
 
@@ -82,12 +93,11 @@ public class MoveCmd extends TargettedAction {
 		for (BotEntity validBot : actors) {
 			MoveCmd action = (MoveCmd) validBot.getRunningAction();
 			AbsPos currPos = world.getBotPosition(validBot.getID());
-			AbsPos goal = action.target;
+			AbsPos goal = action.getTarget();
 
 			world.swap(currPos, goal);
-			action.exactCostAndRemoveFrom(validBot);
+			action.succeed(validBot);
 		}
-
 	}
 
 	@Override
@@ -97,11 +107,16 @@ public class MoveCmd extends TargettedAction {
 
 	@Override
 	public String toString() {
-		return "MoveCmd [target=" + target + "]";
+		return "MoveCmd [target=" + getTarget() + "]";
 	}
 
 	@Override
 	public Type getType() {
 		return Replay.Action.Type.MOVE;
+	}
+
+	@Override
+	protected ImmutableList<BotState> getLegalActorStates() {
+		return ImmutableList.of(BotState.NORMAL);
 	}
 }

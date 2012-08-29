@@ -20,4 +20,13 @@ public class MessageSignal {
 	public Replay.Entity.ReceivedMessage getData() {
 		return data;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		MessageSignal other = (MessageSignal) obj;
+
+		return contents.equals(other.contents);
+	}
+
+
 }

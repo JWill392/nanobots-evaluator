@@ -1,11 +1,12 @@
 package entity;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
 import replay.ReplayProto.Replay;
+import replay.ReplayProto.Replay.Action.Outcome;
 import replay.ReplayProto.Replay.Entity.Type;
+import replay.ReplayProto.Replay.Entity.BotState;
+import teampg.grid2d.point.AbsPos;
+
 import com.google.common.collect.ImmutableList;
 import entity.bot.Memory;
 import entity.bot.MessageSignal;
@@ -20,12 +21,9 @@ public class BotEntity extends MortalEntity implements MobileEntity{
 
 	private final int botID;
 	private final Team team;
-	private final Memory memory;
 
-	private int energy;
 	private ArrayList<MessageSignal> inbox;
 	private RunningAction runningAction;
-	private final Map<Class<? extends RunningAction>, Integer> actionCooldowns;
 
 	static BotEntity getNewBotEntity(Team team) {
 		int botIDToUse = botIDCounter;
@@ -50,42 +48,52 @@ public class BotEntity extends MortalEntity implements MobileEntity{
 
 		setEnergy(Settings.getNewbornEnergy());
 
-		memory = new Memory();
-		setMemory(memory); // update data object
-
-		actionCooldowns = new HashMap<>();
 		runningAction = null;
+
+		data.setBotState(Replay.Entity.BotState.NORMAL);
+		data.setMemory(0);
 	}
 
 
 	public void setRunningAction(RunningAction action) {
 		runningAction = action;
-		data.setRunningAction(replay.Util.of(action));
 	}
 	public RunningAction getRunningAction() {
 		return runningAction;
 	}
-	private void destroyRunningAction() {
-		//TODO say if success or failure?
-		runningAction = null;
-		data.clearRunningAction();
-	}
 
+	public Replay.Entity getData(AbsPos entPos, int eid, int tid) {
+		// get up-to-date runningaction data
+		if (runningAction != null) {
+			data.setRunningAction(runningAction.getData());
+		}
+		return (data.clone()).setPos(replay.Util.of(entPos))
+				.setEid(eid)
+				.setTid(tid)
+				.build();
+	}
 
 
 	@Override
 	public void tick() {
+		super.tick();
+
 		inbox = new ArrayList<MessageSignal>();
 
-		// TODO tweak
-		if (energy > Settings.getBotMaxEnergy()) {
-			int overMax = energy - Settings.getBotMaxEnergy();
-			energy = Settings.getBotMaxEnergy() + Math.round(overMax*Settings.getOverchargeDrain());
+		// TODO tweak overcharge dissipation algorithm
+		if (getEnergy() > Settings.getBotMaxEnergy()) {
+			int amountOverMax = getEnergy() - Settings.getBotMaxEnergy();
+			final int reducedEnergyValue = Settings.getBotMaxEnergy() + Math.round(amountOverMax*Settings.getOverchargeDrain());
+			setEnergy(reducedEnergyValue);
 		}
 
-		if (runningAction != null) {
-			if (runningAction.hasDieOnNextTick()) {
-				destroyRunningAction();
+		// exact gestation cost, else fall back to normal state
+		if (data.getBotState() == BotState.GESTATING) {
+			if (getEnergy() > Settings.getGestationUpkeep()) {
+				addEnergy(Settings.getGestationUpkeep());
+				data.setElapsedGestation(data.getElapsedGestation() + 1);
+			} else {
+				setState(BotState.NORMAL);
 			}
 		}
 	}
@@ -96,16 +104,15 @@ public class BotEntity extends MortalEntity implements MobileEntity{
 
 	@Override
 	public int getEnergy() {
-		return energy;
+		return data.getEnergy();
 	}
 
 	private void setEnergy(int e) {
-		energy = e;
 		data.setEnergy(e);
 	}
 
 	public void addEnergy(int inEnergy) {
-		setEnergy(inEnergy + energy);
+		setEnergy(inEnergy + getEnergy());
 	}
 
 	public Team getTeam() {
@@ -113,14 +120,11 @@ public class BotEntity extends MortalEntity implements MobileEntity{
 	}
 
 	public Memory getMemory() {
-		return (Memory) memory.clone();
+		return new Memory(data.getMemory());
 	}
 
 	public void setMemory(Memory inMem) {
-		int newMemVal = inMem.getAll();
-		memory.fill(newMemVal);
-
-		data.setMemory(newMemVal);
+		data.setMemory(inMem.getAll());
 	}
 
 	public void addReceivedMessage(MessageSignal msg) {
@@ -130,6 +134,32 @@ public class BotEntity extends MortalEntity implements MobileEntity{
 
 	public ImmutableList<MessageSignal> getReceivedMessages() {
 		return ImmutableList.copyOf(inbox);
+	}
+
+	public Replay.Entity.BotState getState() {
+		return data.getBotState();
+	}
+	public void setState(Replay.Entity.BotState state) {
+		data.setBotState(state);
+		if (state == Replay.Entity.BotState.GESTATING) {
+			data.setElapsedGestation(0);
+		} else {
+			data.clearElapsedGestation();
+		}
+	}
+	public int getElapsedGestation() {
+		if (data.hasElapsedGestation()) {
+			return data.getElapsedGestation();
+		} else {
+			return -1;
+		}
+	}
+
+	public Outcome getOutcome() {
+		if (runningAction == null) {
+			return null;
+		}
+		return runningAction.debugOutcome;
 	}
 
 	@Override

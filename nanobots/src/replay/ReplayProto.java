@@ -36,7 +36,7 @@ public final class ReplayProto {
     replay.ReplayProto.Replay.TurnInfoOrBuilder getTurnsOrBuilder(
         int index);
     
-    // required uint32 winning_team = 4;
+    // optional uint32 winning_team = 4;
     boolean hasWinningTeam();
     int getWinningTeam();
   }
@@ -554,20 +554,18 @@ public final class ReplayProto {
       boolean hasTid();
       int getTid();
       
-      // repeated .nanobotsreplay.Replay.Entity.ActionTypeCooldown action_cooldowns = 8;
-      java.util.List<replay.ReplayProto.Replay.Entity.ActionTypeCooldown> 
-          getActionCooldownsList();
-      replay.ReplayProto.Replay.Entity.ActionTypeCooldown getActionCooldowns(int index);
-      int getActionCooldownsCount();
-      java.util.List<? extends replay.ReplayProto.Replay.Entity.ActionTypeCooldownOrBuilder> 
-          getActionCooldownsOrBuilderList();
-      replay.ReplayProto.Replay.Entity.ActionTypeCooldownOrBuilder getActionCooldownsOrBuilder(
-          int index);
-      
-      // optional .nanobotsreplay.Replay.Action running_action = 9;
+      // optional .nanobotsreplay.Replay.Action running_action = 8;
       boolean hasRunningAction();
       replay.ReplayProto.Replay.Action getRunningAction();
       replay.ReplayProto.Replay.ActionOrBuilder getRunningActionOrBuilder();
+      
+      // optional .nanobotsreplay.Replay.Entity.BotState bot_state = 9;
+      boolean hasBotState();
+      replay.ReplayProto.Replay.Entity.BotState getBotState();
+      
+      // optional uint32 elapsed_gestation = 10;
+      boolean hasElapsedGestation();
+      int getElapsedGestation();
     }
     public static final class Entity extends
         com.google.protobuf.GeneratedMessage
@@ -667,6 +665,75 @@ public final class ReplayProto {
         }
         
         // @@protoc_insertion_point(enum_scope:nanobotsreplay.Replay.Entity.Type)
+      }
+      
+      public enum BotState
+          implements com.google.protobuf.ProtocolMessageEnum {
+        NORMAL(0, 0),
+        GESTATING(1, 1),
+        ;
+        
+        public static final int NORMAL_VALUE = 0;
+        public static final int GESTATING_VALUE = 1;
+        
+        
+        public final int getNumber() { return value; }
+        
+        public static BotState valueOf(int value) {
+          switch (value) {
+            case 0: return NORMAL;
+            case 1: return GESTATING;
+            default: return null;
+          }
+        }
+        
+        public static com.google.protobuf.Internal.EnumLiteMap<BotState>
+            internalGetValueMap() {
+          return internalValueMap;
+        }
+        private static com.google.protobuf.Internal.EnumLiteMap<BotState>
+            internalValueMap =
+              new com.google.protobuf.Internal.EnumLiteMap<BotState>() {
+                public BotState findValueByNumber(int number) {
+                  return BotState.valueOf(number);
+                }
+              };
+        
+        public final com.google.protobuf.Descriptors.EnumValueDescriptor
+            getValueDescriptor() {
+          return getDescriptor().getValues().get(index);
+        }
+        public final com.google.protobuf.Descriptors.EnumDescriptor
+            getDescriptorForType() {
+          return getDescriptor();
+        }
+        public static final com.google.protobuf.Descriptors.EnumDescriptor
+            getDescriptor() {
+          return replay.ReplayProto.Replay.Entity.getDescriptor().getEnumTypes().get(1);
+        }
+        
+        private static final BotState[] VALUES = {
+          NORMAL, GESTATING, 
+        };
+        
+        public static BotState valueOf(
+            com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+          if (desc.getType() != getDescriptor()) {
+            throw new java.lang.IllegalArgumentException(
+              "EnumValueDescriptor is not for this type.");
+          }
+          return VALUES[desc.getIndex()];
+        }
+        
+        private final int index;
+        private final int value;
+        
+        private BotState(int index, int value) {
+          this.index = index;
+          this.value = value;
+        }
+        
+        // @@protoc_insertion_point(enum_scope:nanobotsreplay.Replay.Entity.BotState)
       }
       
       public interface ReceivedMessageOrBuilder
@@ -1174,426 +1241,6 @@ public final class ReplayProto {
         // @@protoc_insertion_point(class_scope:nanobotsreplay.Replay.Entity.ReceivedMessage)
       }
       
-      public interface ActionTypeCooldownOrBuilder
-          extends com.google.protobuf.MessageOrBuilder {
-        
-        // required .nanobotsreplay.Replay.Action.Type type = 1;
-        boolean hasType();
-        replay.ReplayProto.Replay.Action.Type getType();
-        
-        // required uint32 turn_cooldown_has_ended = 2;
-        boolean hasTurnCooldownHasEnded();
-        int getTurnCooldownHasEnded();
-      }
-      public static final class ActionTypeCooldown extends
-          com.google.protobuf.GeneratedMessage
-          implements ActionTypeCooldownOrBuilder {
-        // Use ActionTypeCooldown.newBuilder() to construct.
-        private ActionTypeCooldown(Builder builder) {
-          super(builder);
-        }
-        private ActionTypeCooldown(boolean noInit) {}
-        
-        private static final ActionTypeCooldown defaultInstance;
-        public static ActionTypeCooldown getDefaultInstance() {
-          return defaultInstance;
-        }
-        
-        public ActionTypeCooldown getDefaultInstanceForType() {
-          return defaultInstance;
-        }
-        
-        public static final com.google.protobuf.Descriptors.Descriptor
-            getDescriptor() {
-          return replay.ReplayProto.internal_static_nanobotsreplay_Replay_Entity_ActionTypeCooldown_descriptor;
-        }
-        
-        protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-            internalGetFieldAccessorTable() {
-          return replay.ReplayProto.internal_static_nanobotsreplay_Replay_Entity_ActionTypeCooldown_fieldAccessorTable;
-        }
-        
-        private int bitField0_;
-        // required .nanobotsreplay.Replay.Action.Type type = 1;
-        public static final int TYPE_FIELD_NUMBER = 1;
-        private replay.ReplayProto.Replay.Action.Type type_;
-        public boolean hasType() {
-          return ((bitField0_ & 0x00000001) == 0x00000001);
-        }
-        public replay.ReplayProto.Replay.Action.Type getType() {
-          return type_;
-        }
-        
-        // required uint32 turn_cooldown_has_ended = 2;
-        public static final int TURN_COOLDOWN_HAS_ENDED_FIELD_NUMBER = 2;
-        private int turnCooldownHasEnded_;
-        public boolean hasTurnCooldownHasEnded() {
-          return ((bitField0_ & 0x00000002) == 0x00000002);
-        }
-        public int getTurnCooldownHasEnded() {
-          return turnCooldownHasEnded_;
-        }
-        
-        private void initFields() {
-          type_ = replay.ReplayProto.Replay.Action.Type.ALL;
-          turnCooldownHasEnded_ = 0;
-        }
-        private byte memoizedIsInitialized = -1;
-        public final boolean isInitialized() {
-          byte isInitialized = memoizedIsInitialized;
-          if (isInitialized != -1) return isInitialized == 1;
-          
-          if (!hasType()) {
-            memoizedIsInitialized = 0;
-            return false;
-          }
-          if (!hasTurnCooldownHasEnded()) {
-            memoizedIsInitialized = 0;
-            return false;
-          }
-          memoizedIsInitialized = 1;
-          return true;
-        }
-        
-        public void writeTo(com.google.protobuf.CodedOutputStream output)
-                            throws java.io.IOException {
-          getSerializedSize();
-          if (((bitField0_ & 0x00000001) == 0x00000001)) {
-            output.writeEnum(1, type_.getNumber());
-          }
-          if (((bitField0_ & 0x00000002) == 0x00000002)) {
-            output.writeUInt32(2, turnCooldownHasEnded_);
-          }
-          getUnknownFields().writeTo(output);
-        }
-        
-        private int memoizedSerializedSize = -1;
-        public int getSerializedSize() {
-          int size = memoizedSerializedSize;
-          if (size != -1) return size;
-        
-          size = 0;
-          if (((bitField0_ & 0x00000001) == 0x00000001)) {
-            size += com.google.protobuf.CodedOutputStream
-              .computeEnumSize(1, type_.getNumber());
-          }
-          if (((bitField0_ & 0x00000002) == 0x00000002)) {
-            size += com.google.protobuf.CodedOutputStream
-              .computeUInt32Size(2, turnCooldownHasEnded_);
-          }
-          size += getUnknownFields().getSerializedSize();
-          memoizedSerializedSize = size;
-          return size;
-        }
-        
-        private static final long serialVersionUID = 0L;
-        @java.lang.Override
-        protected java.lang.Object writeReplace()
-            throws java.io.ObjectStreamException {
-          return super.writeReplace();
-        }
-        
-        public static replay.ReplayProto.Replay.Entity.ActionTypeCooldown parseFrom(
-            com.google.protobuf.ByteString data)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-          return newBuilder().mergeFrom(data).buildParsed();
-        }
-        public static replay.ReplayProto.Replay.Entity.ActionTypeCooldown parseFrom(
-            com.google.protobuf.ByteString data,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-          return newBuilder().mergeFrom(data, extensionRegistry)
-                   .buildParsed();
-        }
-        public static replay.ReplayProto.Replay.Entity.ActionTypeCooldown parseFrom(byte[] data)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-          return newBuilder().mergeFrom(data).buildParsed();
-        }
-        public static replay.ReplayProto.Replay.Entity.ActionTypeCooldown parseFrom(
-            byte[] data,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-          return newBuilder().mergeFrom(data, extensionRegistry)
-                   .buildParsed();
-        }
-        public static replay.ReplayProto.Replay.Entity.ActionTypeCooldown parseFrom(java.io.InputStream input)
-            throws java.io.IOException {
-          return newBuilder().mergeFrom(input).buildParsed();
-        }
-        public static replay.ReplayProto.Replay.Entity.ActionTypeCooldown parseFrom(
-            java.io.InputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws java.io.IOException {
-          return newBuilder().mergeFrom(input, extensionRegistry)
-                   .buildParsed();
-        }
-        public static replay.ReplayProto.Replay.Entity.ActionTypeCooldown parseDelimitedFrom(java.io.InputStream input)
-            throws java.io.IOException {
-          Builder builder = newBuilder();
-          if (builder.mergeDelimitedFrom(input)) {
-            return builder.buildParsed();
-          } else {
-            return null;
-          }
-        }
-        public static replay.ReplayProto.Replay.Entity.ActionTypeCooldown parseDelimitedFrom(
-            java.io.InputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws java.io.IOException {
-          Builder builder = newBuilder();
-          if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
-            return builder.buildParsed();
-          } else {
-            return null;
-          }
-        }
-        public static replay.ReplayProto.Replay.Entity.ActionTypeCooldown parseFrom(
-            com.google.protobuf.CodedInputStream input)
-            throws java.io.IOException {
-          return newBuilder().mergeFrom(input).buildParsed();
-        }
-        public static replay.ReplayProto.Replay.Entity.ActionTypeCooldown parseFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws java.io.IOException {
-          return newBuilder().mergeFrom(input, extensionRegistry)
-                   .buildParsed();
-        }
-        
-        public static Builder newBuilder() { return Builder.create(); }
-        public Builder newBuilderForType() { return newBuilder(); }
-        public static Builder newBuilder(replay.ReplayProto.Replay.Entity.ActionTypeCooldown prototype) {
-          return newBuilder().mergeFrom(prototype);
-        }
-        public Builder toBuilder() { return newBuilder(this); }
-        
-        @java.lang.Override
-        protected Builder newBuilderForType(
-            com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-          Builder builder = new Builder(parent);
-          return builder;
-        }
-        public static final class Builder extends
-            com.google.protobuf.GeneratedMessage.Builder<Builder>
-           implements replay.ReplayProto.Replay.Entity.ActionTypeCooldownOrBuilder {
-          public static final com.google.protobuf.Descriptors.Descriptor
-              getDescriptor() {
-            return replay.ReplayProto.internal_static_nanobotsreplay_Replay_Entity_ActionTypeCooldown_descriptor;
-          }
-          
-          protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-              internalGetFieldAccessorTable() {
-            return replay.ReplayProto.internal_static_nanobotsreplay_Replay_Entity_ActionTypeCooldown_fieldAccessorTable;
-          }
-          
-          // Construct using replay.ReplayProto.Replay.Entity.ActionTypeCooldown.newBuilder()
-          private Builder() {
-            maybeForceBuilderInitialization();
-          }
-          
-          private Builder(BuilderParent parent) {
-            super(parent);
-            maybeForceBuilderInitialization();
-          }
-          private void maybeForceBuilderInitialization() {
-            if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-            }
-          }
-          private static Builder create() {
-            return new Builder();
-          }
-          
-          public Builder clear() {
-            super.clear();
-            type_ = replay.ReplayProto.Replay.Action.Type.ALL;
-            bitField0_ = (bitField0_ & ~0x00000001);
-            turnCooldownHasEnded_ = 0;
-            bitField0_ = (bitField0_ & ~0x00000002);
-            return this;
-          }
-          
-          public Builder clone() {
-            return create().mergeFrom(buildPartial());
-          }
-          
-          public com.google.protobuf.Descriptors.Descriptor
-              getDescriptorForType() {
-            return replay.ReplayProto.Replay.Entity.ActionTypeCooldown.getDescriptor();
-          }
-          
-          public replay.ReplayProto.Replay.Entity.ActionTypeCooldown getDefaultInstanceForType() {
-            return replay.ReplayProto.Replay.Entity.ActionTypeCooldown.getDefaultInstance();
-          }
-          
-          public replay.ReplayProto.Replay.Entity.ActionTypeCooldown build() {
-            replay.ReplayProto.Replay.Entity.ActionTypeCooldown result = buildPartial();
-            if (!result.isInitialized()) {
-              throw newUninitializedMessageException(result);
-            }
-            return result;
-          }
-          
-          private replay.ReplayProto.Replay.Entity.ActionTypeCooldown buildParsed()
-              throws com.google.protobuf.InvalidProtocolBufferException {
-            replay.ReplayProto.Replay.Entity.ActionTypeCooldown result = buildPartial();
-            if (!result.isInitialized()) {
-              throw newUninitializedMessageException(
-                result).asInvalidProtocolBufferException();
-            }
-            return result;
-          }
-          
-          public replay.ReplayProto.Replay.Entity.ActionTypeCooldown buildPartial() {
-            replay.ReplayProto.Replay.Entity.ActionTypeCooldown result = new replay.ReplayProto.Replay.Entity.ActionTypeCooldown(this);
-            int from_bitField0_ = bitField0_;
-            int to_bitField0_ = 0;
-            if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
-              to_bitField0_ |= 0x00000001;
-            }
-            result.type_ = type_;
-            if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
-              to_bitField0_ |= 0x00000002;
-            }
-            result.turnCooldownHasEnded_ = turnCooldownHasEnded_;
-            result.bitField0_ = to_bitField0_;
-            onBuilt();
-            return result;
-          }
-          
-          public Builder mergeFrom(com.google.protobuf.Message other) {
-            if (other instanceof replay.ReplayProto.Replay.Entity.ActionTypeCooldown) {
-              return mergeFrom((replay.ReplayProto.Replay.Entity.ActionTypeCooldown)other);
-            } else {
-              super.mergeFrom(other);
-              return this;
-            }
-          }
-          
-          public Builder mergeFrom(replay.ReplayProto.Replay.Entity.ActionTypeCooldown other) {
-            if (other == replay.ReplayProto.Replay.Entity.ActionTypeCooldown.getDefaultInstance()) return this;
-            if (other.hasType()) {
-              setType(other.getType());
-            }
-            if (other.hasTurnCooldownHasEnded()) {
-              setTurnCooldownHasEnded(other.getTurnCooldownHasEnded());
-            }
-            this.mergeUnknownFields(other.getUnknownFields());
-            return this;
-          }
-          
-          public final boolean isInitialized() {
-            if (!hasType()) {
-              
-              return false;
-            }
-            if (!hasTurnCooldownHasEnded()) {
-              
-              return false;
-            }
-            return true;
-          }
-          
-          public Builder mergeFrom(
-              com.google.protobuf.CodedInputStream input,
-              com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-              throws java.io.IOException {
-            com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-              com.google.protobuf.UnknownFieldSet.newBuilder(
-                this.getUnknownFields());
-            while (true) {
-              int tag = input.readTag();
-              switch (tag) {
-                case 0:
-                  this.setUnknownFields(unknownFields.build());
-                  onChanged();
-                  return this;
-                default: {
-                  if (!parseUnknownField(input, unknownFields,
-                                         extensionRegistry, tag)) {
-                    this.setUnknownFields(unknownFields.build());
-                    onChanged();
-                    return this;
-                  }
-                  break;
-                }
-                case 8: {
-                  int rawValue = input.readEnum();
-                  replay.ReplayProto.Replay.Action.Type value = replay.ReplayProto.Replay.Action.Type.valueOf(rawValue);
-                  if (value == null) {
-                    unknownFields.mergeVarintField(1, rawValue);
-                  } else {
-                    bitField0_ |= 0x00000001;
-                    type_ = value;
-                  }
-                  break;
-                }
-                case 16: {
-                  bitField0_ |= 0x00000002;
-                  turnCooldownHasEnded_ = input.readUInt32();
-                  break;
-                }
-              }
-            }
-          }
-          
-          private int bitField0_;
-          
-          // required .nanobotsreplay.Replay.Action.Type type = 1;
-          private replay.ReplayProto.Replay.Action.Type type_ = replay.ReplayProto.Replay.Action.Type.ALL;
-          public boolean hasType() {
-            return ((bitField0_ & 0x00000001) == 0x00000001);
-          }
-          public replay.ReplayProto.Replay.Action.Type getType() {
-            return type_;
-          }
-          public Builder setType(replay.ReplayProto.Replay.Action.Type value) {
-            if (value == null) {
-              throw new NullPointerException();
-            }
-            bitField0_ |= 0x00000001;
-            type_ = value;
-            onChanged();
-            return this;
-          }
-          public Builder clearType() {
-            bitField0_ = (bitField0_ & ~0x00000001);
-            type_ = replay.ReplayProto.Replay.Action.Type.ALL;
-            onChanged();
-            return this;
-          }
-          
-          // required uint32 turn_cooldown_has_ended = 2;
-          private int turnCooldownHasEnded_ ;
-          public boolean hasTurnCooldownHasEnded() {
-            return ((bitField0_ & 0x00000002) == 0x00000002);
-          }
-          public int getTurnCooldownHasEnded() {
-            return turnCooldownHasEnded_;
-          }
-          public Builder setTurnCooldownHasEnded(int value) {
-            bitField0_ |= 0x00000002;
-            turnCooldownHasEnded_ = value;
-            onChanged();
-            return this;
-          }
-          public Builder clearTurnCooldownHasEnded() {
-            bitField0_ = (bitField0_ & ~0x00000002);
-            turnCooldownHasEnded_ = 0;
-            onChanged();
-            return this;
-          }
-          
-          // @@protoc_insertion_point(builder_scope:nanobotsreplay.Replay.Entity.ActionTypeCooldown)
-        }
-        
-        static {
-          defaultInstance = new ActionTypeCooldown(true);
-          defaultInstance.initFields();
-        }
-        
-        // @@protoc_insertion_point(class_scope:nanobotsreplay.Replay.Entity.ActionTypeCooldown)
-      }
-      
       private int bitField0_;
       // required .nanobotsreplay.Point pos = 1;
       public static final int POS_FIELD_NUMBER = 1;
@@ -1679,29 +1326,8 @@ public final class ReplayProto {
         return tid_;
       }
       
-      // repeated .nanobotsreplay.Replay.Entity.ActionTypeCooldown action_cooldowns = 8;
-      public static final int ACTION_COOLDOWNS_FIELD_NUMBER = 8;
-      private java.util.List<replay.ReplayProto.Replay.Entity.ActionTypeCooldown> actionCooldowns_;
-      public java.util.List<replay.ReplayProto.Replay.Entity.ActionTypeCooldown> getActionCooldownsList() {
-        return actionCooldowns_;
-      }
-      public java.util.List<? extends replay.ReplayProto.Replay.Entity.ActionTypeCooldownOrBuilder> 
-          getActionCooldownsOrBuilderList() {
-        return actionCooldowns_;
-      }
-      public int getActionCooldownsCount() {
-        return actionCooldowns_.size();
-      }
-      public replay.ReplayProto.Replay.Entity.ActionTypeCooldown getActionCooldowns(int index) {
-        return actionCooldowns_.get(index);
-      }
-      public replay.ReplayProto.Replay.Entity.ActionTypeCooldownOrBuilder getActionCooldownsOrBuilder(
-          int index) {
-        return actionCooldowns_.get(index);
-      }
-      
-      // optional .nanobotsreplay.Replay.Action running_action = 9;
-      public static final int RUNNING_ACTION_FIELD_NUMBER = 9;
+      // optional .nanobotsreplay.Replay.Action running_action = 8;
+      public static final int RUNNING_ACTION_FIELD_NUMBER = 8;
       private replay.ReplayProto.Replay.Action runningAction_;
       public boolean hasRunningAction() {
         return ((bitField0_ & 0x00000040) == 0x00000040);
@@ -1713,6 +1339,26 @@ public final class ReplayProto {
         return runningAction_;
       }
       
+      // optional .nanobotsreplay.Replay.Entity.BotState bot_state = 9;
+      public static final int BOT_STATE_FIELD_NUMBER = 9;
+      private replay.ReplayProto.Replay.Entity.BotState botState_;
+      public boolean hasBotState() {
+        return ((bitField0_ & 0x00000080) == 0x00000080);
+      }
+      public replay.ReplayProto.Replay.Entity.BotState getBotState() {
+        return botState_;
+      }
+      
+      // optional uint32 elapsed_gestation = 10;
+      public static final int ELAPSED_GESTATION_FIELD_NUMBER = 10;
+      private int elapsedGestation_;
+      public boolean hasElapsedGestation() {
+        return ((bitField0_ & 0x00000100) == 0x00000100);
+      }
+      public int getElapsedGestation() {
+        return elapsedGestation_;
+      }
+      
       private void initFields() {
         pos_ = replay.ReplayProto.Point.getDefaultInstance();
         type_ = replay.ReplayProto.Replay.Entity.Type.BOT;
@@ -1721,8 +1367,9 @@ public final class ReplayProto {
         inbox_ = java.util.Collections.emptyList();
         memory_ = 0;
         tid_ = 0;
-        actionCooldowns_ = java.util.Collections.emptyList();
         runningAction_ = replay.ReplayProto.Replay.Action.getDefaultInstance();
+        botState_ = replay.ReplayProto.Replay.Entity.BotState.NORMAL;
+        elapsedGestation_ = 0;
       }
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
@@ -1747,12 +1394,6 @@ public final class ReplayProto {
         }
         for (int i = 0; i < getInboxCount(); i++) {
           if (!getInbox(i).isInitialized()) {
-            memoizedIsInitialized = 0;
-            return false;
-          }
-        }
-        for (int i = 0; i < getActionCooldownsCount(); i++) {
-          if (!getActionCooldowns(i).isInitialized()) {
             memoizedIsInitialized = 0;
             return false;
           }
@@ -1791,11 +1432,14 @@ public final class ReplayProto {
         if (((bitField0_ & 0x00000020) == 0x00000020)) {
           output.writeUInt32(7, tid_);
         }
-        for (int i = 0; i < actionCooldowns_.size(); i++) {
-          output.writeMessage(8, actionCooldowns_.get(i));
-        }
         if (((bitField0_ & 0x00000040) == 0x00000040)) {
-          output.writeMessage(9, runningAction_);
+          output.writeMessage(8, runningAction_);
+        }
+        if (((bitField0_ & 0x00000080) == 0x00000080)) {
+          output.writeEnum(9, botState_.getNumber());
+        }
+        if (((bitField0_ & 0x00000100) == 0x00000100)) {
+          output.writeUInt32(10, elapsedGestation_);
         }
         getUnknownFields().writeTo(output);
       }
@@ -1834,13 +1478,17 @@ public final class ReplayProto {
           size += com.google.protobuf.CodedOutputStream
             .computeUInt32Size(7, tid_);
         }
-        for (int i = 0; i < actionCooldowns_.size(); i++) {
-          size += com.google.protobuf.CodedOutputStream
-            .computeMessageSize(8, actionCooldowns_.get(i));
-        }
         if (((bitField0_ & 0x00000040) == 0x00000040)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeMessageSize(9, runningAction_);
+            .computeMessageSize(8, runningAction_);
+        }
+        if (((bitField0_ & 0x00000080) == 0x00000080)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeEnumSize(9, botState_.getNumber());
+        }
+        if (((bitField0_ & 0x00000100) == 0x00000100)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeUInt32Size(10, elapsedGestation_);
         }
         size += getUnknownFields().getSerializedSize();
         memoizedSerializedSize = size;
@@ -1960,7 +1608,6 @@ public final class ReplayProto {
           if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
             getPosFieldBuilder();
             getInboxFieldBuilder();
-            getActionCooldownsFieldBuilder();
             getRunningActionFieldBuilder();
           }
         }
@@ -1992,18 +1639,16 @@ public final class ReplayProto {
           bitField0_ = (bitField0_ & ~0x00000020);
           tid_ = 0;
           bitField0_ = (bitField0_ & ~0x00000040);
-          if (actionCooldownsBuilder_ == null) {
-            actionCooldowns_ = java.util.Collections.emptyList();
-            bitField0_ = (bitField0_ & ~0x00000080);
-          } else {
-            actionCooldownsBuilder_.clear();
-          }
           if (runningActionBuilder_ == null) {
             runningAction_ = replay.ReplayProto.Replay.Action.getDefaultInstance();
           } else {
             runningActionBuilder_.clear();
           }
+          bitField0_ = (bitField0_ & ~0x00000080);
+          botState_ = replay.ReplayProto.Replay.Entity.BotState.NORMAL;
           bitField0_ = (bitField0_ & ~0x00000100);
+          elapsedGestation_ = 0;
+          bitField0_ = (bitField0_ & ~0x00000200);
           return this;
         }
         
@@ -2079,16 +1724,7 @@ public final class ReplayProto {
             to_bitField0_ |= 0x00000020;
           }
           result.tid_ = tid_;
-          if (actionCooldownsBuilder_ == null) {
-            if (((bitField0_ & 0x00000080) == 0x00000080)) {
-              actionCooldowns_ = java.util.Collections.unmodifiableList(actionCooldowns_);
-              bitField0_ = (bitField0_ & ~0x00000080);
-            }
-            result.actionCooldowns_ = actionCooldowns_;
-          } else {
-            result.actionCooldowns_ = actionCooldownsBuilder_.build();
-          }
-          if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
+          if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
             to_bitField0_ |= 0x00000040;
           }
           if (runningActionBuilder_ == null) {
@@ -2096,6 +1732,14 @@ public final class ReplayProto {
           } else {
             result.runningAction_ = runningActionBuilder_.build();
           }
+          if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
+            to_bitField0_ |= 0x00000080;
+          }
+          result.botState_ = botState_;
+          if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
+            to_bitField0_ |= 0x00000100;
+          }
+          result.elapsedGestation_ = elapsedGestation_;
           result.bitField0_ = to_bitField0_;
           onBuilt();
           return result;
@@ -2156,34 +1800,14 @@ public final class ReplayProto {
           if (other.hasTid()) {
             setTid(other.getTid());
           }
-          if (actionCooldownsBuilder_ == null) {
-            if (!other.actionCooldowns_.isEmpty()) {
-              if (actionCooldowns_.isEmpty()) {
-                actionCooldowns_ = other.actionCooldowns_;
-                bitField0_ = (bitField0_ & ~0x00000080);
-              } else {
-                ensureActionCooldownsIsMutable();
-                actionCooldowns_.addAll(other.actionCooldowns_);
-              }
-              onChanged();
-            }
-          } else {
-            if (!other.actionCooldowns_.isEmpty()) {
-              if (actionCooldownsBuilder_.isEmpty()) {
-                actionCooldownsBuilder_.dispose();
-                actionCooldownsBuilder_ = null;
-                actionCooldowns_ = other.actionCooldowns_;
-                bitField0_ = (bitField0_ & ~0x00000080);
-                actionCooldownsBuilder_ = 
-                  com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
-                     getActionCooldownsFieldBuilder() : null;
-              } else {
-                actionCooldownsBuilder_.addAllMessages(other.actionCooldowns_);
-              }
-            }
-          }
           if (other.hasRunningAction()) {
             mergeRunningAction(other.getRunningAction());
+          }
+          if (other.hasBotState()) {
+            setBotState(other.getBotState());
+          }
+          if (other.hasElapsedGestation()) {
+            setElapsedGestation(other.getElapsedGestation());
           }
           this.mergeUnknownFields(other.getUnknownFields());
           return this;
@@ -2208,12 +1832,6 @@ public final class ReplayProto {
           }
           for (int i = 0; i < getInboxCount(); i++) {
             if (!getInbox(i).isInitialized()) {
-              
-              return false;
-            }
-          }
-          for (int i = 0; i < getActionCooldownsCount(); i++) {
-            if (!getActionCooldowns(i).isInitialized()) {
               
               return false;
             }
@@ -2297,18 +1915,28 @@ public final class ReplayProto {
                 break;
               }
               case 66: {
-                replay.ReplayProto.Replay.Entity.ActionTypeCooldown.Builder subBuilder = replay.ReplayProto.Replay.Entity.ActionTypeCooldown.newBuilder();
-                input.readMessage(subBuilder, extensionRegistry);
-                addActionCooldowns(subBuilder.buildPartial());
-                break;
-              }
-              case 74: {
                 replay.ReplayProto.Replay.Action.Builder subBuilder = replay.ReplayProto.Replay.Action.newBuilder();
                 if (hasRunningAction()) {
                   subBuilder.mergeFrom(getRunningAction());
                 }
                 input.readMessage(subBuilder, extensionRegistry);
                 setRunningAction(subBuilder.buildPartial());
+                break;
+              }
+              case 72: {
+                int rawValue = input.readEnum();
+                replay.ReplayProto.Replay.Entity.BotState value = replay.ReplayProto.Replay.Entity.BotState.valueOf(rawValue);
+                if (value == null) {
+                  unknownFields.mergeVarintField(9, rawValue);
+                } else {
+                  bitField0_ |= 0x00000100;
+                  botState_ = value;
+                }
+                break;
+              }
+              case 80: {
+                bitField0_ |= 0x00000200;
+                elapsedGestation_ = input.readUInt32();
                 break;
               }
             }
@@ -2701,198 +2329,12 @@ public final class ReplayProto {
           return this;
         }
         
-        // repeated .nanobotsreplay.Replay.Entity.ActionTypeCooldown action_cooldowns = 8;
-        private java.util.List<replay.ReplayProto.Replay.Entity.ActionTypeCooldown> actionCooldowns_ =
-          java.util.Collections.emptyList();
-        private void ensureActionCooldownsIsMutable() {
-          if (!((bitField0_ & 0x00000080) == 0x00000080)) {
-            actionCooldowns_ = new java.util.ArrayList<replay.ReplayProto.Replay.Entity.ActionTypeCooldown>(actionCooldowns_);
-            bitField0_ |= 0x00000080;
-           }
-        }
-        
-        private com.google.protobuf.RepeatedFieldBuilder<
-            replay.ReplayProto.Replay.Entity.ActionTypeCooldown, replay.ReplayProto.Replay.Entity.ActionTypeCooldown.Builder, replay.ReplayProto.Replay.Entity.ActionTypeCooldownOrBuilder> actionCooldownsBuilder_;
-        
-        public java.util.List<replay.ReplayProto.Replay.Entity.ActionTypeCooldown> getActionCooldownsList() {
-          if (actionCooldownsBuilder_ == null) {
-            return java.util.Collections.unmodifiableList(actionCooldowns_);
-          } else {
-            return actionCooldownsBuilder_.getMessageList();
-          }
-        }
-        public int getActionCooldownsCount() {
-          if (actionCooldownsBuilder_ == null) {
-            return actionCooldowns_.size();
-          } else {
-            return actionCooldownsBuilder_.getCount();
-          }
-        }
-        public replay.ReplayProto.Replay.Entity.ActionTypeCooldown getActionCooldowns(int index) {
-          if (actionCooldownsBuilder_ == null) {
-            return actionCooldowns_.get(index);
-          } else {
-            return actionCooldownsBuilder_.getMessage(index);
-          }
-        }
-        public Builder setActionCooldowns(
-            int index, replay.ReplayProto.Replay.Entity.ActionTypeCooldown value) {
-          if (actionCooldownsBuilder_ == null) {
-            if (value == null) {
-              throw new NullPointerException();
-            }
-            ensureActionCooldownsIsMutable();
-            actionCooldowns_.set(index, value);
-            onChanged();
-          } else {
-            actionCooldownsBuilder_.setMessage(index, value);
-          }
-          return this;
-        }
-        public Builder setActionCooldowns(
-            int index, replay.ReplayProto.Replay.Entity.ActionTypeCooldown.Builder builderForValue) {
-          if (actionCooldownsBuilder_ == null) {
-            ensureActionCooldownsIsMutable();
-            actionCooldowns_.set(index, builderForValue.build());
-            onChanged();
-          } else {
-            actionCooldownsBuilder_.setMessage(index, builderForValue.build());
-          }
-          return this;
-        }
-        public Builder addActionCooldowns(replay.ReplayProto.Replay.Entity.ActionTypeCooldown value) {
-          if (actionCooldownsBuilder_ == null) {
-            if (value == null) {
-              throw new NullPointerException();
-            }
-            ensureActionCooldownsIsMutable();
-            actionCooldowns_.add(value);
-            onChanged();
-          } else {
-            actionCooldownsBuilder_.addMessage(value);
-          }
-          return this;
-        }
-        public Builder addActionCooldowns(
-            int index, replay.ReplayProto.Replay.Entity.ActionTypeCooldown value) {
-          if (actionCooldownsBuilder_ == null) {
-            if (value == null) {
-              throw new NullPointerException();
-            }
-            ensureActionCooldownsIsMutable();
-            actionCooldowns_.add(index, value);
-            onChanged();
-          } else {
-            actionCooldownsBuilder_.addMessage(index, value);
-          }
-          return this;
-        }
-        public Builder addActionCooldowns(
-            replay.ReplayProto.Replay.Entity.ActionTypeCooldown.Builder builderForValue) {
-          if (actionCooldownsBuilder_ == null) {
-            ensureActionCooldownsIsMutable();
-            actionCooldowns_.add(builderForValue.build());
-            onChanged();
-          } else {
-            actionCooldownsBuilder_.addMessage(builderForValue.build());
-          }
-          return this;
-        }
-        public Builder addActionCooldowns(
-            int index, replay.ReplayProto.Replay.Entity.ActionTypeCooldown.Builder builderForValue) {
-          if (actionCooldownsBuilder_ == null) {
-            ensureActionCooldownsIsMutable();
-            actionCooldowns_.add(index, builderForValue.build());
-            onChanged();
-          } else {
-            actionCooldownsBuilder_.addMessage(index, builderForValue.build());
-          }
-          return this;
-        }
-        public Builder addAllActionCooldowns(
-            java.lang.Iterable<? extends replay.ReplayProto.Replay.Entity.ActionTypeCooldown> values) {
-          if (actionCooldownsBuilder_ == null) {
-            ensureActionCooldownsIsMutable();
-            super.addAll(values, actionCooldowns_);
-            onChanged();
-          } else {
-            actionCooldownsBuilder_.addAllMessages(values);
-          }
-          return this;
-        }
-        public Builder clearActionCooldowns() {
-          if (actionCooldownsBuilder_ == null) {
-            actionCooldowns_ = java.util.Collections.emptyList();
-            bitField0_ = (bitField0_ & ~0x00000080);
-            onChanged();
-          } else {
-            actionCooldownsBuilder_.clear();
-          }
-          return this;
-        }
-        public Builder removeActionCooldowns(int index) {
-          if (actionCooldownsBuilder_ == null) {
-            ensureActionCooldownsIsMutable();
-            actionCooldowns_.remove(index);
-            onChanged();
-          } else {
-            actionCooldownsBuilder_.remove(index);
-          }
-          return this;
-        }
-        public replay.ReplayProto.Replay.Entity.ActionTypeCooldown.Builder getActionCooldownsBuilder(
-            int index) {
-          return getActionCooldownsFieldBuilder().getBuilder(index);
-        }
-        public replay.ReplayProto.Replay.Entity.ActionTypeCooldownOrBuilder getActionCooldownsOrBuilder(
-            int index) {
-          if (actionCooldownsBuilder_ == null) {
-            return actionCooldowns_.get(index);  } else {
-            return actionCooldownsBuilder_.getMessageOrBuilder(index);
-          }
-        }
-        public java.util.List<? extends replay.ReplayProto.Replay.Entity.ActionTypeCooldownOrBuilder> 
-             getActionCooldownsOrBuilderList() {
-          if (actionCooldownsBuilder_ != null) {
-            return actionCooldownsBuilder_.getMessageOrBuilderList();
-          } else {
-            return java.util.Collections.unmodifiableList(actionCooldowns_);
-          }
-        }
-        public replay.ReplayProto.Replay.Entity.ActionTypeCooldown.Builder addActionCooldownsBuilder() {
-          return getActionCooldownsFieldBuilder().addBuilder(
-              replay.ReplayProto.Replay.Entity.ActionTypeCooldown.getDefaultInstance());
-        }
-        public replay.ReplayProto.Replay.Entity.ActionTypeCooldown.Builder addActionCooldownsBuilder(
-            int index) {
-          return getActionCooldownsFieldBuilder().addBuilder(
-              index, replay.ReplayProto.Replay.Entity.ActionTypeCooldown.getDefaultInstance());
-        }
-        public java.util.List<replay.ReplayProto.Replay.Entity.ActionTypeCooldown.Builder> 
-             getActionCooldownsBuilderList() {
-          return getActionCooldownsFieldBuilder().getBuilderList();
-        }
-        private com.google.protobuf.RepeatedFieldBuilder<
-            replay.ReplayProto.Replay.Entity.ActionTypeCooldown, replay.ReplayProto.Replay.Entity.ActionTypeCooldown.Builder, replay.ReplayProto.Replay.Entity.ActionTypeCooldownOrBuilder> 
-            getActionCooldownsFieldBuilder() {
-          if (actionCooldownsBuilder_ == null) {
-            actionCooldownsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
-                replay.ReplayProto.Replay.Entity.ActionTypeCooldown, replay.ReplayProto.Replay.Entity.ActionTypeCooldown.Builder, replay.ReplayProto.Replay.Entity.ActionTypeCooldownOrBuilder>(
-                    actionCooldowns_,
-                    ((bitField0_ & 0x00000080) == 0x00000080),
-                    getParentForChildren(),
-                    isClean());
-            actionCooldowns_ = null;
-          }
-          return actionCooldownsBuilder_;
-        }
-        
-        // optional .nanobotsreplay.Replay.Action running_action = 9;
+        // optional .nanobotsreplay.Replay.Action running_action = 8;
         private replay.ReplayProto.Replay.Action runningAction_ = replay.ReplayProto.Replay.Action.getDefaultInstance();
         private com.google.protobuf.SingleFieldBuilder<
             replay.ReplayProto.Replay.Action, replay.ReplayProto.Replay.Action.Builder, replay.ReplayProto.Replay.ActionOrBuilder> runningActionBuilder_;
         public boolean hasRunningAction() {
-          return ((bitField0_ & 0x00000100) == 0x00000100);
+          return ((bitField0_ & 0x00000080) == 0x00000080);
         }
         public replay.ReplayProto.Replay.Action getRunningAction() {
           if (runningActionBuilder_ == null) {
@@ -2911,7 +2353,7 @@ public final class ReplayProto {
           } else {
             runningActionBuilder_.setMessage(value);
           }
-          bitField0_ |= 0x00000100;
+          bitField0_ |= 0x00000080;
           return this;
         }
         public Builder setRunningAction(
@@ -2922,12 +2364,12 @@ public final class ReplayProto {
           } else {
             runningActionBuilder_.setMessage(builderForValue.build());
           }
-          bitField0_ |= 0x00000100;
+          bitField0_ |= 0x00000080;
           return this;
         }
         public Builder mergeRunningAction(replay.ReplayProto.Replay.Action value) {
           if (runningActionBuilder_ == null) {
-            if (((bitField0_ & 0x00000100) == 0x00000100) &&
+            if (((bitField0_ & 0x00000080) == 0x00000080) &&
                 runningAction_ != replay.ReplayProto.Replay.Action.getDefaultInstance()) {
               runningAction_ =
                 replay.ReplayProto.Replay.Action.newBuilder(runningAction_).mergeFrom(value).buildPartial();
@@ -2938,7 +2380,7 @@ public final class ReplayProto {
           } else {
             runningActionBuilder_.mergeFrom(value);
           }
-          bitField0_ |= 0x00000100;
+          bitField0_ |= 0x00000080;
           return this;
         }
         public Builder clearRunningAction() {
@@ -2948,11 +2390,11 @@ public final class ReplayProto {
           } else {
             runningActionBuilder_.clear();
           }
-          bitField0_ = (bitField0_ & ~0x00000100);
+          bitField0_ = (bitField0_ & ~0x00000080);
           return this;
         }
         public replay.ReplayProto.Replay.Action.Builder getRunningActionBuilder() {
-          bitField0_ |= 0x00000100;
+          bitField0_ |= 0x00000080;
           onChanged();
           return getRunningActionFieldBuilder().getBuilder();
         }
@@ -2975,6 +2417,51 @@ public final class ReplayProto {
             runningAction_ = null;
           }
           return runningActionBuilder_;
+        }
+        
+        // optional .nanobotsreplay.Replay.Entity.BotState bot_state = 9;
+        private replay.ReplayProto.Replay.Entity.BotState botState_ = replay.ReplayProto.Replay.Entity.BotState.NORMAL;
+        public boolean hasBotState() {
+          return ((bitField0_ & 0x00000100) == 0x00000100);
+        }
+        public replay.ReplayProto.Replay.Entity.BotState getBotState() {
+          return botState_;
+        }
+        public Builder setBotState(replay.ReplayProto.Replay.Entity.BotState value) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          bitField0_ |= 0x00000100;
+          botState_ = value;
+          onChanged();
+          return this;
+        }
+        public Builder clearBotState() {
+          bitField0_ = (bitField0_ & ~0x00000100);
+          botState_ = replay.ReplayProto.Replay.Entity.BotState.NORMAL;
+          onChanged();
+          return this;
+        }
+        
+        // optional uint32 elapsed_gestation = 10;
+        private int elapsedGestation_ ;
+        public boolean hasElapsedGestation() {
+          return ((bitField0_ & 0x00000200) == 0x00000200);
+        }
+        public int getElapsedGestation() {
+          return elapsedGestation_;
+        }
+        public Builder setElapsedGestation(int value) {
+          bitField0_ |= 0x00000200;
+          elapsedGestation_ = value;
+          onChanged();
+          return this;
+        }
+        public Builder clearElapsedGestation() {
+          bitField0_ = (bitField0_ & ~0x00000200);
+          elapsedGestation_ = 0;
+          onChanged();
+          return this;
         }
         
         // @@protoc_insertion_point(builder_scope:nanobotsreplay.Replay.Entity)
@@ -3557,6 +3044,27 @@ public final class ReplayProto {
       // required .nanobotsreplay.Replay.Action.Type type = 1;
       boolean hasType();
       replay.ReplayProto.Replay.Action.Type getType();
+      
+      // required .nanobotsreplay.Replay.Action.Outcome outcome = 2;
+      boolean hasOutcome();
+      replay.ReplayProto.Replay.Action.Outcome getOutcome();
+      
+      // optional .nanobotsreplay.Point target = 3;
+      boolean hasTarget();
+      replay.ReplayProto.Point getTarget();
+      replay.ReplayProto.PointOrBuilder getTargetOrBuilder();
+      
+      // optional uint32 broadcast_message = 4;
+      boolean hasBroadcastMessage();
+      int getBroadcastMessage();
+      
+      // optional uint32 transfer_amount = 5;
+      boolean hasTransferAmount();
+      int getTransferAmount();
+      
+      // optional uint32 newborn_memory = 6;
+      boolean hasNewbornMemory();
+      int getNewbornMemory();
     }
     public static final class Action extends
         com.google.protobuf.GeneratedMessage
@@ -3592,20 +3100,22 @@ public final class ReplayProto {
         ATTACK(1, 1),
         HARVEST(2, 2),
         MOVE(3, 3),
-        REPRODUCE(4, 4),
-        TRANSFER(5, 5),
-        BROADCAST(6, 6),
-        WAIT(7, 7),
+        CONCEIVE(4, 4),
+        BIRTH(5, 5),
+        TRANSFER(6, 6),
+        BROADCAST(7, 7),
+        WAIT(8, 8),
         ;
         
         public static final int ALL_VALUE = 0;
         public static final int ATTACK_VALUE = 1;
         public static final int HARVEST_VALUE = 2;
         public static final int MOVE_VALUE = 3;
-        public static final int REPRODUCE_VALUE = 4;
-        public static final int TRANSFER_VALUE = 5;
-        public static final int BROADCAST_VALUE = 6;
-        public static final int WAIT_VALUE = 7;
+        public static final int CONCEIVE_VALUE = 4;
+        public static final int BIRTH_VALUE = 5;
+        public static final int TRANSFER_VALUE = 6;
+        public static final int BROADCAST_VALUE = 7;
+        public static final int WAIT_VALUE = 8;
         
         
         public final int getNumber() { return value; }
@@ -3616,10 +3126,11 @@ public final class ReplayProto {
             case 1: return ATTACK;
             case 2: return HARVEST;
             case 3: return MOVE;
-            case 4: return REPRODUCE;
-            case 5: return TRANSFER;
-            case 6: return BROADCAST;
-            case 7: return WAIT;
+            case 4: return CONCEIVE;
+            case 5: return BIRTH;
+            case 6: return TRANSFER;
+            case 7: return BROADCAST;
+            case 8: return WAIT;
             default: return null;
           }
         }
@@ -3650,7 +3161,7 @@ public final class ReplayProto {
         }
         
         private static final Type[] VALUES = {
-          ALL, ATTACK, HARVEST, MOVE, REPRODUCE, TRANSFER, BROADCAST, WAIT, 
+          ALL, ATTACK, HARVEST, MOVE, CONCEIVE, BIRTH, TRANSFER, BROADCAST, WAIT, 
         };
         
         public static Type valueOf(
@@ -3673,6 +3184,87 @@ public final class ReplayProto {
         // @@protoc_insertion_point(enum_scope:nanobotsreplay.Replay.Action.Type)
       }
       
+      public enum Outcome
+          implements com.google.protobuf.ProtocolMessageEnum {
+        SUCCESS(0, 0),
+        ILLEGAL_TARGET(1, 1),
+        INSUFFICIENT_ENERGY(2, 2),
+        WRONG_BOT_STATE(3, 3),
+        COOLDOWN_NOT_ELAPSED(4, 4),
+        GESTATION_NOT_COMPLETE(5, 5),
+        ;
+        
+        public static final int SUCCESS_VALUE = 0;
+        public static final int ILLEGAL_TARGET_VALUE = 1;
+        public static final int INSUFFICIENT_ENERGY_VALUE = 2;
+        public static final int WRONG_BOT_STATE_VALUE = 3;
+        public static final int COOLDOWN_NOT_ELAPSED_VALUE = 4;
+        public static final int GESTATION_NOT_COMPLETE_VALUE = 5;
+        
+        
+        public final int getNumber() { return value; }
+        
+        public static Outcome valueOf(int value) {
+          switch (value) {
+            case 0: return SUCCESS;
+            case 1: return ILLEGAL_TARGET;
+            case 2: return INSUFFICIENT_ENERGY;
+            case 3: return WRONG_BOT_STATE;
+            case 4: return COOLDOWN_NOT_ELAPSED;
+            case 5: return GESTATION_NOT_COMPLETE;
+            default: return null;
+          }
+        }
+        
+        public static com.google.protobuf.Internal.EnumLiteMap<Outcome>
+            internalGetValueMap() {
+          return internalValueMap;
+        }
+        private static com.google.protobuf.Internal.EnumLiteMap<Outcome>
+            internalValueMap =
+              new com.google.protobuf.Internal.EnumLiteMap<Outcome>() {
+                public Outcome findValueByNumber(int number) {
+                  return Outcome.valueOf(number);
+                }
+              };
+        
+        public final com.google.protobuf.Descriptors.EnumValueDescriptor
+            getValueDescriptor() {
+          return getDescriptor().getValues().get(index);
+        }
+        public final com.google.protobuf.Descriptors.EnumDescriptor
+            getDescriptorForType() {
+          return getDescriptor();
+        }
+        public static final com.google.protobuf.Descriptors.EnumDescriptor
+            getDescriptor() {
+          return replay.ReplayProto.Replay.Action.getDescriptor().getEnumTypes().get(1);
+        }
+        
+        private static final Outcome[] VALUES = {
+          SUCCESS, ILLEGAL_TARGET, INSUFFICIENT_ENERGY, WRONG_BOT_STATE, COOLDOWN_NOT_ELAPSED, GESTATION_NOT_COMPLETE, 
+        };
+        
+        public static Outcome valueOf(
+            com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+          if (desc.getType() != getDescriptor()) {
+            throw new java.lang.IllegalArgumentException(
+              "EnumValueDescriptor is not for this type.");
+          }
+          return VALUES[desc.getIndex()];
+        }
+        
+        private final int index;
+        private final int value;
+        
+        private Outcome(int index, int value) {
+          this.index = index;
+          this.value = value;
+        }
+        
+        // @@protoc_insertion_point(enum_scope:nanobotsreplay.Replay.Action.Outcome)
+      }
+      
       private int bitField0_;
       // required .nanobotsreplay.Replay.Action.Type type = 1;
       public static final int TYPE_FIELD_NUMBER = 1;
@@ -3684,8 +3276,66 @@ public final class ReplayProto {
         return type_;
       }
       
+      // required .nanobotsreplay.Replay.Action.Outcome outcome = 2;
+      public static final int OUTCOME_FIELD_NUMBER = 2;
+      private replay.ReplayProto.Replay.Action.Outcome outcome_;
+      public boolean hasOutcome() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      public replay.ReplayProto.Replay.Action.Outcome getOutcome() {
+        return outcome_;
+      }
+      
+      // optional .nanobotsreplay.Point target = 3;
+      public static final int TARGET_FIELD_NUMBER = 3;
+      private replay.ReplayProto.Point target_;
+      public boolean hasTarget() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      public replay.ReplayProto.Point getTarget() {
+        return target_;
+      }
+      public replay.ReplayProto.PointOrBuilder getTargetOrBuilder() {
+        return target_;
+      }
+      
+      // optional uint32 broadcast_message = 4;
+      public static final int BROADCAST_MESSAGE_FIELD_NUMBER = 4;
+      private int broadcastMessage_;
+      public boolean hasBroadcastMessage() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      public int getBroadcastMessage() {
+        return broadcastMessage_;
+      }
+      
+      // optional uint32 transfer_amount = 5;
+      public static final int TRANSFER_AMOUNT_FIELD_NUMBER = 5;
+      private int transferAmount_;
+      public boolean hasTransferAmount() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      public int getTransferAmount() {
+        return transferAmount_;
+      }
+      
+      // optional uint32 newborn_memory = 6;
+      public static final int NEWBORN_MEMORY_FIELD_NUMBER = 6;
+      private int newbornMemory_;
+      public boolean hasNewbornMemory() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      public int getNewbornMemory() {
+        return newbornMemory_;
+      }
+      
       private void initFields() {
         type_ = replay.ReplayProto.Replay.Action.Type.ALL;
+        outcome_ = replay.ReplayProto.Replay.Action.Outcome.SUCCESS;
+        target_ = replay.ReplayProto.Point.getDefaultInstance();
+        broadcastMessage_ = 0;
+        transferAmount_ = 0;
+        newbornMemory_ = 0;
       }
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
@@ -3696,6 +3346,16 @@ public final class ReplayProto {
           memoizedIsInitialized = 0;
           return false;
         }
+        if (!hasOutcome()) {
+          memoizedIsInitialized = 0;
+          return false;
+        }
+        if (hasTarget()) {
+          if (!getTarget().isInitialized()) {
+            memoizedIsInitialized = 0;
+            return false;
+          }
+        }
         memoizedIsInitialized = 1;
         return true;
       }
@@ -3705,6 +3365,21 @@ public final class ReplayProto {
         getSerializedSize();
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
           output.writeEnum(1, type_.getNumber());
+        }
+        if (((bitField0_ & 0x00000002) == 0x00000002)) {
+          output.writeEnum(2, outcome_.getNumber());
+        }
+        if (((bitField0_ & 0x00000004) == 0x00000004)) {
+          output.writeMessage(3, target_);
+        }
+        if (((bitField0_ & 0x00000008) == 0x00000008)) {
+          output.writeUInt32(4, broadcastMessage_);
+        }
+        if (((bitField0_ & 0x00000010) == 0x00000010)) {
+          output.writeUInt32(5, transferAmount_);
+        }
+        if (((bitField0_ & 0x00000020) == 0x00000020)) {
+          output.writeUInt32(6, newbornMemory_);
         }
         getUnknownFields().writeTo(output);
       }
@@ -3718,6 +3393,26 @@ public final class ReplayProto {
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
           size += com.google.protobuf.CodedOutputStream
             .computeEnumSize(1, type_.getNumber());
+        }
+        if (((bitField0_ & 0x00000002) == 0x00000002)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeEnumSize(2, outcome_.getNumber());
+        }
+        if (((bitField0_ & 0x00000004) == 0x00000004)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeMessageSize(3, target_);
+        }
+        if (((bitField0_ & 0x00000008) == 0x00000008)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeUInt32Size(4, broadcastMessage_);
+        }
+        if (((bitField0_ & 0x00000010) == 0x00000010)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeUInt32Size(5, transferAmount_);
+        }
+        if (((bitField0_ & 0x00000020) == 0x00000020)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeUInt32Size(6, newbornMemory_);
         }
         size += getUnknownFields().getSerializedSize();
         memoizedSerializedSize = size;
@@ -3835,6 +3530,7 @@ public final class ReplayProto {
         }
         private void maybeForceBuilderInitialization() {
           if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+            getTargetFieldBuilder();
           }
         }
         private static Builder create() {
@@ -3845,6 +3541,20 @@ public final class ReplayProto {
           super.clear();
           type_ = replay.ReplayProto.Replay.Action.Type.ALL;
           bitField0_ = (bitField0_ & ~0x00000001);
+          outcome_ = replay.ReplayProto.Replay.Action.Outcome.SUCCESS;
+          bitField0_ = (bitField0_ & ~0x00000002);
+          if (targetBuilder_ == null) {
+            target_ = replay.ReplayProto.Point.getDefaultInstance();
+          } else {
+            targetBuilder_.clear();
+          }
+          bitField0_ = (bitField0_ & ~0x00000004);
+          broadcastMessage_ = 0;
+          bitField0_ = (bitField0_ & ~0x00000008);
+          transferAmount_ = 0;
+          bitField0_ = (bitField0_ & ~0x00000010);
+          newbornMemory_ = 0;
+          bitField0_ = (bitField0_ & ~0x00000020);
           return this;
         }
         
@@ -3864,6 +3574,7 @@ public final class ReplayProto {
         public replay.ReplayProto.Replay.Action build() {
           replay.ReplayProto.Replay.Action result = buildPartial();
           if (!result.isInitialized()) {
+        	  System.out.println(this);
             throw newUninitializedMessageException(result);
           }
           return result;
@@ -3887,6 +3598,30 @@ public final class ReplayProto {
             to_bitField0_ |= 0x00000001;
           }
           result.type_ = type_;
+          if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+            to_bitField0_ |= 0x00000002;
+          }
+          result.outcome_ = outcome_;
+          if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+            to_bitField0_ |= 0x00000004;
+          }
+          if (targetBuilder_ == null) {
+            result.target_ = target_;
+          } else {
+            result.target_ = targetBuilder_.build();
+          }
+          if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+            to_bitField0_ |= 0x00000008;
+          }
+          result.broadcastMessage_ = broadcastMessage_;
+          if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+            to_bitField0_ |= 0x00000010;
+          }
+          result.transferAmount_ = transferAmount_;
+          if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+            to_bitField0_ |= 0x00000020;
+          }
+          result.newbornMemory_ = newbornMemory_;
           result.bitField0_ = to_bitField0_;
           onBuilt();
           return result;
@@ -3906,6 +3641,21 @@ public final class ReplayProto {
           if (other.hasType()) {
             setType(other.getType());
           }
+          if (other.hasOutcome()) {
+            setOutcome(other.getOutcome());
+          }
+          if (other.hasTarget()) {
+            mergeTarget(other.getTarget());
+          }
+          if (other.hasBroadcastMessage()) {
+            setBroadcastMessage(other.getBroadcastMessage());
+          }
+          if (other.hasTransferAmount()) {
+            setTransferAmount(other.getTransferAmount());
+          }
+          if (other.hasNewbornMemory()) {
+            setNewbornMemory(other.getNewbornMemory());
+          }
           this.mergeUnknownFields(other.getUnknownFields());
           return this;
         }
@@ -3914,6 +3664,16 @@ public final class ReplayProto {
           if (!hasType()) {
             
             return false;
+          }
+          if (!hasOutcome()) {
+            
+            return false;
+          }
+          if (hasTarget()) {
+            if (!getTarget().isInitialized()) {
+              
+              return false;
+            }
           }
           return true;
         }
@@ -3952,6 +3712,41 @@ public final class ReplayProto {
                 }
                 break;
               }
+              case 16: {
+                int rawValue = input.readEnum();
+                replay.ReplayProto.Replay.Action.Outcome value = replay.ReplayProto.Replay.Action.Outcome.valueOf(rawValue);
+                if (value == null) {
+                  unknownFields.mergeVarintField(2, rawValue);
+                } else {
+                  bitField0_ |= 0x00000002;
+                  outcome_ = value;
+                }
+                break;
+              }
+              case 26: {
+                replay.ReplayProto.Point.Builder subBuilder = replay.ReplayProto.Point.newBuilder();
+                if (hasTarget()) {
+                  subBuilder.mergeFrom(getTarget());
+                }
+                input.readMessage(subBuilder, extensionRegistry);
+                setTarget(subBuilder.buildPartial());
+                break;
+              }
+              case 32: {
+                bitField0_ |= 0x00000008;
+                broadcastMessage_ = input.readUInt32();
+                break;
+              }
+              case 40: {
+                bitField0_ |= 0x00000010;
+                transferAmount_ = input.readUInt32();
+                break;
+              }
+              case 48: {
+                bitField0_ |= 0x00000020;
+                newbornMemory_ = input.readUInt32();
+                break;
+              }
             }
           }
         }
@@ -3978,6 +3773,183 @@ public final class ReplayProto {
         public Builder clearType() {
           bitField0_ = (bitField0_ & ~0x00000001);
           type_ = replay.ReplayProto.Replay.Action.Type.ALL;
+          onChanged();
+          return this;
+        }
+        
+        // required .nanobotsreplay.Replay.Action.Outcome outcome = 2;
+        private replay.ReplayProto.Replay.Action.Outcome outcome_ = replay.ReplayProto.Replay.Action.Outcome.SUCCESS;
+        public boolean hasOutcome() {
+          return ((bitField0_ & 0x00000002) == 0x00000002);
+        }
+        public replay.ReplayProto.Replay.Action.Outcome getOutcome() {
+          return outcome_;
+        }
+        public Builder setOutcome(replay.ReplayProto.Replay.Action.Outcome value) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          bitField0_ |= 0x00000002;
+          outcome_ = value;
+          onChanged();
+          return this;
+        }
+        public Builder clearOutcome() {
+          bitField0_ = (bitField0_ & ~0x00000002);
+          outcome_ = replay.ReplayProto.Replay.Action.Outcome.SUCCESS;
+          onChanged();
+          return this;
+        }
+        
+        // optional .nanobotsreplay.Point target = 3;
+        private replay.ReplayProto.Point target_ = replay.ReplayProto.Point.getDefaultInstance();
+        private com.google.protobuf.SingleFieldBuilder<
+            replay.ReplayProto.Point, replay.ReplayProto.Point.Builder, replay.ReplayProto.PointOrBuilder> targetBuilder_;
+        public boolean hasTarget() {
+          return ((bitField0_ & 0x00000004) == 0x00000004);
+        }
+        public replay.ReplayProto.Point getTarget() {
+          if (targetBuilder_ == null) {
+            return target_;
+          } else {
+            return targetBuilder_.getMessage();
+          }
+        }
+        public Builder setTarget(replay.ReplayProto.Point value) {
+          if (targetBuilder_ == null) {
+            if (value == null) {
+              throw new NullPointerException();
+            }
+            target_ = value;
+            onChanged();
+          } else {
+            targetBuilder_.setMessage(value);
+          }
+          bitField0_ |= 0x00000004;
+          return this;
+        }
+        public Builder setTarget(
+            replay.ReplayProto.Point.Builder builderForValue) {
+          if (targetBuilder_ == null) {
+            target_ = builderForValue.build();
+            onChanged();
+          } else {
+            targetBuilder_.setMessage(builderForValue.build());
+          }
+          bitField0_ |= 0x00000004;
+          return this;
+        }
+        public Builder mergeTarget(replay.ReplayProto.Point value) {
+          if (targetBuilder_ == null) {
+            if (((bitField0_ & 0x00000004) == 0x00000004) &&
+                target_ != replay.ReplayProto.Point.getDefaultInstance()) {
+              target_ =
+                replay.ReplayProto.Point.newBuilder(target_).mergeFrom(value).buildPartial();
+            } else {
+              target_ = value;
+            }
+            onChanged();
+          } else {
+            targetBuilder_.mergeFrom(value);
+          }
+          bitField0_ |= 0x00000004;
+          return this;
+        }
+        public Builder clearTarget() {
+          if (targetBuilder_ == null) {
+            target_ = replay.ReplayProto.Point.getDefaultInstance();
+            onChanged();
+          } else {
+            targetBuilder_.clear();
+          }
+          bitField0_ = (bitField0_ & ~0x00000004);
+          return this;
+        }
+        public replay.ReplayProto.Point.Builder getTargetBuilder() {
+          bitField0_ |= 0x00000004;
+          onChanged();
+          return getTargetFieldBuilder().getBuilder();
+        }
+        public replay.ReplayProto.PointOrBuilder getTargetOrBuilder() {
+          if (targetBuilder_ != null) {
+            return targetBuilder_.getMessageOrBuilder();
+          } else {
+            return target_;
+          }
+        }
+        private com.google.protobuf.SingleFieldBuilder<
+            replay.ReplayProto.Point, replay.ReplayProto.Point.Builder, replay.ReplayProto.PointOrBuilder> 
+            getTargetFieldBuilder() {
+          if (targetBuilder_ == null) {
+            targetBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+                replay.ReplayProto.Point, replay.ReplayProto.Point.Builder, replay.ReplayProto.PointOrBuilder>(
+                    target_,
+                    getParentForChildren(),
+                    isClean());
+            target_ = null;
+          }
+          return targetBuilder_;
+        }
+        
+        // optional uint32 broadcast_message = 4;
+        private int broadcastMessage_ ;
+        public boolean hasBroadcastMessage() {
+          return ((bitField0_ & 0x00000008) == 0x00000008);
+        }
+        public int getBroadcastMessage() {
+          return broadcastMessage_;
+        }
+        public Builder setBroadcastMessage(int value) {
+          bitField0_ |= 0x00000008;
+          broadcastMessage_ = value;
+          onChanged();
+          return this;
+        }
+        public Builder clearBroadcastMessage() {
+          bitField0_ = (bitField0_ & ~0x00000008);
+          broadcastMessage_ = 0;
+          onChanged();
+          return this;
+        }
+        
+        // optional uint32 transfer_amount = 5;
+        private int transferAmount_ ;
+        public boolean hasTransferAmount() {
+          return ((bitField0_ & 0x00000010) == 0x00000010);
+        }
+        public int getTransferAmount() {
+          return transferAmount_;
+        }
+        public Builder setTransferAmount(int value) {
+          bitField0_ |= 0x00000010;
+          transferAmount_ = value;
+          onChanged();
+          return this;
+        }
+        public Builder clearTransferAmount() {
+          bitField0_ = (bitField0_ & ~0x00000010);
+          transferAmount_ = 0;
+          onChanged();
+          return this;
+        }
+        
+        // optional uint32 newborn_memory = 6;
+        private int newbornMemory_ ;
+        public boolean hasNewbornMemory() {
+          return ((bitField0_ & 0x00000020) == 0x00000020);
+        }
+        public int getNewbornMemory() {
+          return newbornMemory_;
+        }
+        public Builder setNewbornMemory(int value) {
+          bitField0_ |= 0x00000020;
+          newbornMemory_ = value;
+          onChanged();
+          return this;
+        }
+        public Builder clearNewbornMemory() {
+          bitField0_ = (bitField0_ & ~0x00000020);
+          newbornMemory_ = 0;
           onChanged();
           return this;
         }
@@ -4049,7 +4021,7 @@ public final class ReplayProto {
       return turns_.get(index);
     }
     
-    // required uint32 winning_team = 4;
+    // optional uint32 winning_team = 4;
     public static final int WINNING_TEAM_FIELD_NUMBER = 4;
     private int winningTeam_;
     public boolean hasWinningTeam() {
@@ -4071,10 +4043,6 @@ public final class ReplayProto {
       if (isInitialized != -1) return isInitialized == 1;
       
       if (!hasMapSize()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasWinningTeam()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -4433,10 +4401,6 @@ public final class ReplayProto {
       
       public final boolean isInitialized() {
         if (!hasMapSize()) {
-          
-          return false;
-        }
-        if (!hasWinningTeam()) {
           
           return false;
         }
@@ -4976,7 +4940,7 @@ public final class ReplayProto {
         return turnsBuilder_;
       }
       
-      // required uint32 winning_team = 4;
+      // optional uint32 winning_team = 4;
       private int winningTeam_ ;
       public boolean hasWinningTeam() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
@@ -7491,11 +7455,6 @@ public final class ReplayProto {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_nanobotsreplay_Replay_Entity_ReceivedMessage_fieldAccessorTable;
   private static com.google.protobuf.Descriptors.Descriptor
-    internal_static_nanobotsreplay_Replay_Entity_ActionTypeCooldown_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_nanobotsreplay_Replay_Entity_ActionTypeCooldown_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
     internal_static_nanobotsreplay_Replay_TurnInfo_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -7534,47 +7493,54 @@ public final class ReplayProto {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\020replay_0.2.proto\022\016nanobotsreplay\"\334\007\n\006R" +
+      "\n\020replay_0.2.proto\022\016nanobotsreplay\"\352\t\n\006R" +
       "eplay\022+\n\010map_size\030\001 \002(\0132\031.nanobotsreplay" +
       ".Dimension\022*\n\005teams\030\002 \003(\0132\033.nanobotsrepl" +
       "ay.Replay.Team\022.\n\005turns\030\003 \003(\0132\037.nanobots" +
       "replay.Replay.TurnInfo\022\024\n\014winning_team\030\004" +
-      " \002(\r\032!\n\004Team\022\014\n\004name\030\001 \002(\t\022\013\n\003tid\030\002 \002(\r\032" +
-      "\257\004\n\006Entity\022\"\n\003pos\030\001 \002(\0132\025.nanobotsreplay" +
+      " \001(\r\032!\n\004Team\022\014\n\004name\030\001 \002(\t\022\013\n\003tid\030\002 \002(\r\032" +
+      "\367\003\n\006Entity\022\"\n\003pos\030\001 \002(\0132\025.nanobotsreplay" +
       ".Point\0220\n\004type\030\002 \002(\0162\".nanobotsreplay.Re" +
       "play.Entity.Type\022\013\n\003eid\030\003 \002(\r\022\016\n\006energy\030" +
       "\004 \001(\r\022<\n\005inbox\030\005 \003(\0132-.nanobotsreplay.Re",
       "play.Entity.ReceivedMessage\022\016\n\006memory\030\006 " +
-      "\001(\r\022\013\n\003tid\030\007 \001(\r\022J\n\020action_cooldowns\030\010 \003" +
-      "(\01320.nanobotsreplay.Replay.Entity.Action" +
-      "TypeCooldown\0225\n\016running_action\030\t \001(\0132\035.n" +
-      "anobotsreplay.Replay.Action\032F\n\017ReceivedM" +
-      "essage\022\014\n\004body\030\001 \002(\r\022%\n\006origin\030\002 \002(\0132\025.n" +
-      "anobotsreplay.Point\032g\n\022ActionTypeCooldow" +
-      "n\0220\n\004type\030\001 \002(\0162\".nanobotsreplay.Replay." +
-      "Action.Type\022\037\n\027turn_cooldown_has_ended\030\002" +
-      " \002(\r\"#\n\004Type\022\007\n\003BOT\020\000\022\010\n\004FOOD\020\001\022\010\n\004WALL\020",
-      "\002\0327\n\010TurnInfo\022+\n\004ents\030\002 \003(\0132\035.nanobotsre" +
-      "play.Replay.Entity\032\244\001\n\006Action\0220\n\004type\030\001 " +
-      "\002(\0162\".nanobotsreplay.Replay.Action.Type\"" +
-      "h\n\004Type\022\007\n\003ALL\020\000\022\n\n\006ATTACK\020\001\022\013\n\007HARVEST\020" +
-      "\002\022\010\n\004MOVE\020\003\022\r\n\tREPRODUCE\020\004\022\014\n\010TRANSFER\020\005" +
-      "\022\r\n\tBROADCAST\020\006\022\010\n\004WAIT\020\007\"\376\003\n\010Settings\022\030" +
-      "\n\020bot_birth_energy\030\001 \001(\r\022\026\n\016bot_max_ener" +
-      "gy\030\002 \001(\r\022\030\n\020bot_vision_range\030\003 \001(\r\022\031\n\021bo" +
-      "t_memory_length\030\004 \001(\r\022\032\n\022bot_message_len" +
-      "gth\030\005 \001(\r\022\034\n\024bot_overcharge_drain\030\006 \001(\001\022",
-      "\031\n\021food_birth_energy\030e \001(\r\0229\n\007actions\030\310\001" +
-      " \003(\0132\'.nanobotsreplay.Settings.ActionSet" +
-      "tings\022\026\n\rattack_damage\030\311\001 \001(\r\022\027\n\016harvest" +
-      "_amount\030\312\001 \001(\r\032\311\001\n\016ActionSettings\022:\n\004typ" +
-      "e\030\001 \002(\0162,.nanobotsreplay.Settings.Action" +
-      "Settings.Type\022\014\n\004cost\030\002 \002(\r\022\r\n\005range\030\003 \001" +
-      "(\r\"^\n\004Type\022\n\n\006ATTACK\020\000\022\010\n\004MOVE\020\001\022\013\n\007HARV" +
-      "EST\020\002\022\r\n\tREPRODUCE\020\003\022\014\n\010TRANSFER\020\004\022\014\n\010TR" +
-      "ANSMIT\020\005\022\010\n\004WAIT\020\006\"\035\n\005Point\022\t\n\001x\030\001 \002(\005\022\t" +
-      "\n\001y\030\002 \002(\005\"*\n\tDimension\022\r\n\005width\030\001 \002(\r\022\016\n",
-      "\006height\030\002 \002(\rB\025\n\006replayB\013ReplayProto"
+      "\001(\r\022\013\n\003tid\030\007 \001(\r\0225\n\016running_action\030\010 \001(\013" +
+      "2\035.nanobotsreplay.Replay.Action\0229\n\tbot_s" +
+      "tate\030\t \001(\0162&.nanobotsreplay.Replay.Entit" +
+      "y.BotState\022\031\n\021elapsed_gestation\030\n \001(\r\032F\n" +
+      "\017ReceivedMessage\022\014\n\004body\030\001 \002(\r\022%\n\006origin" +
+      "\030\002 \002(\0132\025.nanobotsreplay.Point\"#\n\004Type\022\007\n" +
+      "\003BOT\020\000\022\010\n\004FOOD\020\001\022\010\n\004WALL\020\002\"%\n\010BotState\022\n" +
+      "\n\006NORMAL\020\000\022\r\n\tGESTATING\020\001\0327\n\010TurnInfo\022+\n" +
+      "\004ents\030\002 \003(\0132\035.nanobotsreplay.Replay.Enti",
+      "ty\032\352\003\n\006Action\0220\n\004type\030\001 \002(\0162\".nanobotsre" +
+      "play.Replay.Action.Type\0226\n\007outcome\030\002 \002(\016" +
+      "2%.nanobotsreplay.Replay.Action.Outcome\022" +
+      "%\n\006target\030\003 \001(\0132\025.nanobotsreplay.Point\022\031" +
+      "\n\021broadcast_message\030\004 \001(\r\022\027\n\017transfer_am" +
+      "ount\030\005 \001(\r\022\026\n\016newborn_memory\030\006 \001(\r\"r\n\004Ty" +
+      "pe\022\007\n\003ALL\020\000\022\n\n\006ATTACK\020\001\022\013\n\007HARVEST\020\002\022\010\n\004" +
+      "MOVE\020\003\022\014\n\010CONCEIVE\020\004\022\t\n\005BIRTH\020\005\022\014\n\010TRANS" +
+      "FER\020\006\022\r\n\tBROADCAST\020\007\022\010\n\004WAIT\020\010\"\216\001\n\007Outco" +
+      "me\022\013\n\007SUCCESS\020\000\022\022\n\016ILLEGAL_TARGET\020\001\022\027\n\023I",
+      "NSUFFICIENT_ENERGY\020\002\022\023\n\017WRONG_BOT_STATE\020" +
+      "\003\022\030\n\024COOLDOWN_NOT_ELAPSED\020\004\022\032\n\026GESTATION" +
+      "_NOT_COMPLETE\020\005\"\376\003\n\010Settings\022\030\n\020bot_birt" +
+      "h_energy\030\001 \001(\r\022\026\n\016bot_max_energy\030\002 \001(\r\022\030" +
+      "\n\020bot_vision_range\030\003 \001(\r\022\031\n\021bot_memory_l" +
+      "ength\030\004 \001(\r\022\032\n\022bot_message_length\030\005 \001(\r\022" +
+      "\034\n\024bot_overcharge_drain\030\006 \001(\001\022\031\n\021food_bi" +
+      "rth_energy\030e \001(\r\0229\n\007actions\030\310\001 \003(\0132\'.nan" +
+      "obotsreplay.Settings.ActionSettings\022\026\n\ra" +
+      "ttack_damage\030\311\001 \001(\r\022\027\n\016harvest_amount\030\312\001",
+      " \001(\r\032\311\001\n\016ActionSettings\022:\n\004type\030\001 \002(\0162,." +
+      "nanobotsreplay.Settings.ActionSettings.T" +
+      "ype\022\014\n\004cost\030\002 \002(\r\022\r\n\005range\030\003 \001(\r\"^\n\004Type" +
+      "\022\n\n\006ATTACK\020\000\022\010\n\004MOVE\020\001\022\013\n\007HARVEST\020\002\022\r\n\tR" +
+      "EPRODUCE\020\003\022\014\n\010TRANSFER\020\004\022\014\n\010TRANSMIT\020\005\022\010" +
+      "\n\004WAIT\020\006\"\035\n\005Point\022\t\n\001x\030\001 \002(\005\022\t\n\001y\030\002 \002(\005\"" +
+      "*\n\tDimension\022\r\n\005width\030\001 \002(\r\022\016\n\006height\030\002 " +
+      "\002(\rB\025\n\006replayB\013ReplayProto"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -7602,7 +7568,7 @@ public final class ReplayProto {
           internal_static_nanobotsreplay_Replay_Entity_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_nanobotsreplay_Replay_Entity_descriptor,
-              new java.lang.String[] { "Pos", "Type", "Eid", "Energy", "Inbox", "Memory", "Tid", "ActionCooldowns", "RunningAction", },
+              new java.lang.String[] { "Pos", "Type", "Eid", "Energy", "Inbox", "Memory", "Tid", "RunningAction", "BotState", "ElapsedGestation", },
               replay.ReplayProto.Replay.Entity.class,
               replay.ReplayProto.Replay.Entity.Builder.class);
           internal_static_nanobotsreplay_Replay_Entity_ReceivedMessage_descriptor =
@@ -7613,14 +7579,6 @@ public final class ReplayProto {
               new java.lang.String[] { "Body", "Origin", },
               replay.ReplayProto.Replay.Entity.ReceivedMessage.class,
               replay.ReplayProto.Replay.Entity.ReceivedMessage.Builder.class);
-          internal_static_nanobotsreplay_Replay_Entity_ActionTypeCooldown_descriptor =
-            internal_static_nanobotsreplay_Replay_Entity_descriptor.getNestedTypes().get(1);
-          internal_static_nanobotsreplay_Replay_Entity_ActionTypeCooldown_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_nanobotsreplay_Replay_Entity_ActionTypeCooldown_descriptor,
-              new java.lang.String[] { "Type", "TurnCooldownHasEnded", },
-              replay.ReplayProto.Replay.Entity.ActionTypeCooldown.class,
-              replay.ReplayProto.Replay.Entity.ActionTypeCooldown.Builder.class);
           internal_static_nanobotsreplay_Replay_TurnInfo_descriptor =
             internal_static_nanobotsreplay_Replay_descriptor.getNestedTypes().get(2);
           internal_static_nanobotsreplay_Replay_TurnInfo_fieldAccessorTable = new
@@ -7634,7 +7592,7 @@ public final class ReplayProto {
           internal_static_nanobotsreplay_Replay_Action_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_nanobotsreplay_Replay_Action_descriptor,
-              new java.lang.String[] { "Type", },
+              new java.lang.String[] { "Type", "Outcome", "Target", "BroadcastMessage", "TransferAmount", "NewbornMemory", },
               replay.ReplayProto.Replay.Action.class,
               replay.ReplayProto.Replay.Action.Builder.class);
           internal_static_nanobotsreplay_Settings_descriptor =

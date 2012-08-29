@@ -25,7 +25,7 @@ public class Team {
 	}
 
 	public Replay.Team getData(int tid) {
-		return data.setTid(tid).build();
+		return (data.clone()).setTid(tid).build();
 	}
 
 	public BrainActionAndMemory decideAction(BrainInfo info) {

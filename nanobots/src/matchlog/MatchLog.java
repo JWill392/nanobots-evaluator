@@ -12,7 +12,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import replay.ReplayProto.Replay;
@@ -113,7 +112,7 @@ public class MatchLog {
 		assert inst == null;
 		inst = new MatchLog(game);
 		//TODO
-		logger.log(Level.INFO, "startMatch| " + game);
+		//logger.log(Level.INFO, "startMatch| " + game);
 	}
 
 	private int getEid(Entity ent) {
@@ -129,10 +128,6 @@ public class MatchLog {
 	}
 
 	public static void endTurn() {
-		if ((getTurnCount() % 100) == 0) {
-			System.out.println("Turn#" + getTurnCount());
-		}
-
 		World world = inst.game.getWorld();
 		for (Entry<Entity> entry : world.getEntries()) {
 			Entity entity = entry.getContents();
@@ -144,7 +139,7 @@ public class MatchLog {
 				BotEntity bot = (BotEntity) entity;
 
 				int tid = inst.teamIdMap.get(bot.getTeam());
-				entData = entity.getData(entPos, eid, tid);
+				entData = bot.getData(entPos, eid, tid);
 			} else {
 				entData = entity.getData(entPos, eid);
 			}
@@ -157,9 +152,9 @@ public class MatchLog {
 	}
 
 	public static void endMatch(Team winner, File outputFile) throws FileNotFoundException, IOException {
-		inst.replayBuilder.setWinningTeam(inst.teamIdMap.get(winner));
-
-		System.out.println("END MATCH, writing replay to " + outputFile.getAbsolutePath());
+		if (winner != null) {
+			inst.replayBuilder.setWinningTeam(inst.teamIdMap.get(winner));
+		}
 		// overwrite
 		if (outputFile.exists()) {
 			if (!outputFile.delete()) {
@@ -169,5 +164,10 @@ public class MatchLog {
 
 		Replay fullGameReplay = inst.replayBuilder.build();
 		fullGameReplay.writeTo(new FileOutputStream(outputFile));
+		System.out.println(fullGameReplay);
+	}
+
+	public static String getMatch() {
+		return (inst.replayBuilder.clone()).build().toString();
 	}
 }

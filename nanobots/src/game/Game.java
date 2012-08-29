@@ -4,6 +4,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
+import teampg.grid2d.point.AbsPos;
+
 import matchlog.MatchLog;
 
 import entity.BotEntity;
@@ -12,15 +14,16 @@ import game.world.MapLoader;
 import game.world.World;
 
 import action.RunningAction;
+import action.WaitCmd;
 import brain.BrainInfo;
 import brain.BotBrain.BrainActionAndMemory;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 
 public class Game {
+	private static final int MAX_TURNS = 10000;
 	private final GameMap map;
 	private final World world;
 	private final ImmutableList<Team> teams;
@@ -61,27 +64,31 @@ public class Game {
 		//get actions from brain
 		for (BotEntity bot : teamBots) {
 			BrainInfo info = world.getBotInfo(bot.getID());
-			BrainActionAndMemory decidedOutcome = currTeam.decideAction(info);
+			BrainActionAndMemory brainDecision = currTeam.decideAction(info);
 
-			bot.setMemory(decidedOutcome.mem);
-			if (decidedOutcome.cmd != null) {
-				bot.setRunningAction(decidedOutcome.cmd);
+			if (brainDecision.mem != null) {
+				bot.setMemory(brainDecision.mem);
+			}
+			if (brainDecision.cmd != null) {
+				bot.setRunningAction(brainDecision.cmd);
+			} else {
+				bot.setRunningAction(new WaitCmd());
 			}
 		}
 
 		//execute running actions
-		for (final RunningAction actionType : Settings.getActionExecutionOrder()) {
-			List<BotEntity> botsWithRunningActionType =
-					Lists.newLinkedList(
-							Iterables.filter(teamBots, new HasRunningActionOfType(actionType.getClass())));
-
-			actionType.executeAll(world, botsWithRunningActionType);
+		for (Class<? extends RunningAction> actionType : Settings.getActionExecutionOrder()) {
+			RunningAction.executeAll(actionType, teamBots, world);
 		}
 
 		MatchLog.endTurn();
 
 		//tick all dynamic ents
 		world.tick();
+
+		for (BotEntity bot : world.getTeamBots(currTeam)) {
+			System.out.println(bot.getData(AbsPos.of(0,0), 0, 0).getRunningAction());
+		}
 
 		// check lose condition on team
 		for (Team team : teams) {
@@ -92,6 +99,11 @@ public class Game {
 
 		// determine which team gets next turn
 		currTeamIndex = getNextTeam();
+
+		// Game too long.. tie
+		if (MatchLog.getTurnCount() > MAX_TURNS) {
+			currTeamIndex = -1;
+		}
 
 		// Game over?
 		if (currTeamIndex == -1) {
@@ -107,9 +119,7 @@ public class Game {
 					e.printStackTrace();
 				}
 			}
-			// TODO end
 			//TODO terrible, fix
-			System.out.println("skipping turn since done");
 			return false;
 		}
 
@@ -148,23 +158,6 @@ public class Game {
 			}
 
 			possNextTeam = rotateIndex(possNextTeam, teams.size());
-		}
-	}
-
-	private static final class HasRunningActionOfType implements Predicate<BotEntity> {
-		private final Class<? extends RunningAction> actionType;
-		public HasRunningActionOfType(Class<? extends RunningAction> actionType) {
-			this.actionType = actionType;
-		}
-
-		@Override
-		public boolean apply(BotEntity bot) {
-			RunningAction runningAction = bot.getRunningAction();
-			if (runningAction == null) {
-				return false;
-			}
-
-			return runningAction.getClass().equals(actionType);
 		}
 	}
 

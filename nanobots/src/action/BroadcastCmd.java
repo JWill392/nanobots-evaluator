@@ -2,8 +2,12 @@ package action;
 
 import java.util.List;
 
+import com.google.common.collect.ImmutableList;
+
+
 import replay.ReplayProto.Replay;
 import replay.ReplayProto.Replay.Action.Type;
+import static replay.ReplayProto.Replay.Entity.BotState;
 import teampg.grid2d.point.AbsPos;
 
 import entity.BotEntity;
@@ -12,19 +16,21 @@ import entity.bot.MessageSignal;
 import game.Settings;
 import game.world.World;
 
-public class TransmitCmd extends RunningAction{
+public class BroadcastCmd extends RunningAction{
 	public final Message msg;
 
-	public TransmitCmd(Message toSend) {
+	public BroadcastCmd(Message toSend) {
+		super();
+
 		msg = toSend;
+		data.setBroadcastMessage(msg.getAll());
 	}
 
-	@Override
-	public final void executeAll(World world, List<BotEntity> actors) {
-		super.executeAll(world, actors);
+	static void executeAll(World world, List<BotEntity> actors) {
+		filterBasicInvalid(world, actors);
 
 		for (BotEntity actor : actors) {
-			TransmitCmd action = (TransmitCmd) actor.getRunningAction();
+			BroadcastCmd action = (BroadcastCmd) actor.getRunningAction();
 			AbsPos origin = world.getBotPosition(actor.getID());
 
 			Iterable<BotEntity> teamBotsInMessageRange =
@@ -34,7 +40,7 @@ public class TransmitCmd extends RunningAction{
 					receiver.addReceivedMessage(new MessageSignal(action.msg, origin));
 			}
 
-			action.exactCostAndRemoveFrom(actor);
+			action.succeed(actor);
 		}
 	}
 
@@ -46,5 +52,12 @@ public class TransmitCmd extends RunningAction{
 	@Override
 	public Type getType() {
 		return Replay.Action.Type.BROADCAST;
+	}
+
+	@Override
+	protected ImmutableList<BotState> getLegalActorStates() {
+		return ImmutableList.of(
+				BotState.NORMAL,
+				BotState.GESTATING);
 	}
 }

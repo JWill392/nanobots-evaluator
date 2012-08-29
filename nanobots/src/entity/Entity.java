@@ -17,15 +17,8 @@ public abstract class Entity {
 	}
 
 	public Replay.Entity getData(AbsPos entPos, int eid) {
-		return data.setPos(replay.Util.of(entPos))
+		return (data.clone()).setPos(replay.Util.of(entPos))
 				.setEid(eid)
-				.build();
-	}
-
-	public Replay.Entity getData(AbsPos entPos, int eid, int tid) {
-		return data.setPos(replay.Util.of(entPos))
-				.setEid(eid)
-				.setTid(tid)
 				.build();
 	}
 

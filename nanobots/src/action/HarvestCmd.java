@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import entity.BotEntity;
 import entity.Entity;
@@ -12,6 +13,7 @@ import game.Settings;
 import game.world.World;
 import replay.ReplayProto.Replay;
 import replay.ReplayProto.Replay.Action.Type;
+import replay.ReplayProto.Replay.Entity.BotState;
 import teampg.grid2d.point.AbsPos;
 
 public class HarvestCmd extends TargettedAction {
@@ -19,9 +21,8 @@ public class HarvestCmd extends TargettedAction {
 		super(target);
 	}
 
-	@Override
-	public final void executeAll(World world, List<BotEntity> actors) {
-		super.executeAll(world, actors); //remove obviously illegal actions
+	static void executeAll(World world, List<BotEntity> actors) {
+		filterBasicInvalid(world, actors);
 
 		// All bots harvesting one FoodEntity are in one harvest group.
 		Multimap<AbsPos, BotEntity> harvestGroups = HashMultimap.create(100, 3);
@@ -29,12 +30,12 @@ public class HarvestCmd extends TargettedAction {
 		// VALIDATE, GROUP
 		for (BotEntity bot : actors) {
 			HarvestCmd action = (HarvestCmd) bot.getRunningAction();
-			AbsPos targetPos = action.target;
+			AbsPos targetPos = action.getTarget();
 			Entity targetEnt = world.get(targetPos);
 
 			// target illegal
 			if (!(targetEnt instanceof FoodEntity)) {
-				action.destroy();
+				action.fail(Replay.Action.Outcome.ILLEGAL_TARGET);
 				continue;
 			}
 
@@ -55,7 +56,7 @@ public class HarvestCmd extends TargettedAction {
 			for (BotEntity bot : harvesters) {
 				HarvestCmd action = (HarvestCmd) bot.getRunningAction();
 
-				action.exactCostAndRemoveFrom(bot);
+				action.succeed(bot);
 				bot.addEnergy(fractionForEachHarvester);
 			}
 		}
@@ -69,5 +70,10 @@ public class HarvestCmd extends TargettedAction {
 	@Override
 	public Type getType() {
 		return Replay.Action.Type.HARVEST;
+	}
+
+	@Override
+	protected ImmutableList<BotState> getLegalActorStates() {
+		return ImmutableList.of(BotState.NORMAL);
 	}
 }

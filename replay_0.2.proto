@@ -18,9 +18,9 @@ message Replay {
 			required uint32 body = 1;
 			required Point origin = 2;
 		}
-		message ActionTypeCooldown {
-			required Action.Type type = 1;
-			required uint32 turn_cooldown_has_ended = 2;
+		enum BotState {
+			NORMAL = 0;
+			GESTATING = 1;
 		}
 	
 		required Point pos = 1;
@@ -34,8 +34,9 @@ message Replay {
 		repeated ReceivedMessage inbox = 5;
 		optional uint32 memory = 6;
 		optional uint32 tid = 7;
-		repeated ActionTypeCooldown action_cooldowns = 8;
-		optional Action running_action = 9;
+		optional Action running_action = 8;
+		optional BotState bot_state = 9;
+		optional uint32 elapsed_gestation = 10;
 	}
 	message TurnInfo {
 		repeated Entity ents = 2;
@@ -46,18 +47,32 @@ message Replay {
 			ATTACK = 1;
 			HARVEST = 2;
 			MOVE = 3;
-			REPRODUCE = 4;
-			TRANSFER = 5;
-			BROADCAST = 6;
-			WAIT = 7;
+			CONCEIVE = 4;
+			BIRTH = 5;
+			TRANSFER = 6;
+			BROADCAST = 7;
+			WAIT = 8;
+		}
+		enum Outcome {
+			SUCCESS = 0;
+			ILLEGAL_TARGET = 1;
+			INSUFFICIENT_ENERGY = 2;
+			WRONG_BOT_STATE = 3;
+			COOLDOWN_NOT_ELAPSED = 4;
+			GESTATION_NOT_COMPLETE = 5;
 		}
 		required Type type = 1;
+		required Outcome outcome = 2;
+		optional Point target = 3;
+		optional uint32 broadcast_message = 4;
+		optional uint32 transfer_amount = 5;
+		optional uint32 newborn_memory = 6;
 	}
 	
 	required Dimension map_size = 1;
 	repeated Team teams = 2;
 	repeated TurnInfo turns = 3;
-	required uint32 winning_team = 4;
+	optional uint32 winning_team = 4;
 }
 
 message Settings {

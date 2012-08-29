@@ -31,6 +31,7 @@ public class _ReproduceCmdTest {
 	@Before
 	public void setUp() throws Exception {
 		Settings.load();
+		Settings.setReproduceExecutionDuration(1);
 		Settings.setNewbornEnergy(NEWBORN);
 		Settings.setActionCost(ReproduceCmd.class, REPRODUCE_COST);
 		Settings.setActionRange(ReproduceCmd.class, 1);

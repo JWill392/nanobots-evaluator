@@ -2,9 +2,6 @@ package replay;
 
 import java.awt.Dimension;
 
-import action.RunningAction;
-
-import replay.ReplayProto.Replay;
 import teampg.grid2d.point.AbsPos;
 
 public class Util {
@@ -20,9 +17,9 @@ public class Util {
 				.setHeight(dim.height)
 				.build();
 	}
-	public static Replay.Action of(RunningAction action) {
-		return Replay.Action.newBuilder()
-				.setType(action.getType())
-				.build();
+	public static AbsPos of(ReplayProto.Point pos) {
+		return AbsPos.of(
+				pos.getX(),
+				pos.getY());
 	}
 }

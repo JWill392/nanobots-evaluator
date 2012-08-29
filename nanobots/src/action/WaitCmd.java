@@ -2,8 +2,12 @@ package action;
 
 import java.util.List;
 
+import com.google.common.collect.ImmutableList;
+
+
 import replay.ReplayProto.Replay;
 import replay.ReplayProto.Replay.Action.Type;
+import replay.ReplayProto.Replay.Entity.BotState;
 
 import entity.BotEntity;
 import game.Settings;
@@ -14,15 +18,15 @@ import game.world.World;
  */
 public class WaitCmd extends RunningAction{
 	public WaitCmd() {
+		super();
 	}
 
-	@Override
-	public final void executeAll(World world, List<BotEntity> actors) {
-		super.executeAll(world, actors); // validates for common things; eg cost.
+	static void executeAll(World world, List<BotEntity> actors) {
+		filterBasicInvalid(world, actors); // validates for common things; eg cost.
 
 		for (BotEntity bot : actors) {
 			WaitCmd action = (WaitCmd) bot.getRunningAction(); //get the waitaction this actor is trying to execute
-			action.exactCostAndRemoveFrom(bot); //and just execute it.  No need to validate; anyone can run this action, provided they can afford the cost.
+			action.succeed(bot); //and just execute it.  No need to validate; anyone can run this action, provided they can afford the cost.
 		}
 	}
 
@@ -34,5 +38,11 @@ public class WaitCmd extends RunningAction{
 	@Override
 	public Type getType() {
 		return Replay.Action.Type.WAIT;
+	}
+
+	@Override
+	protected ImmutableList<BotState> getLegalActorStates() {
+		// bots are allowed to wait no matter their current situation.
+		return ImmutableList.of(BotState.NORMAL, BotState.GESTATING);
 	}
 }

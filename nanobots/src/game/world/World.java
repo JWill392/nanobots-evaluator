@@ -99,6 +99,7 @@ public class World {
 		Collection<AbsPos> visPoints = Pos2D
 				.getDiamondNear(observerPos, Settings.getVisionRadius());
 
+
 		BrainInfo info = new BrainInfo(observer, observerPos, new Vision(this, visPoints,
 				observerPos));
 		return info;
@@ -155,10 +156,9 @@ public class World {
 		Collection<AbsPos> proxCells = Pos2D.getDiamondNear(near, radius);
 		for (AbsPos cell : proxCells) {
 			Entity proxEntity = get(cell);
-			BotEntity proxBot = (BotEntity) proxEntity;
 			if (proxEntity instanceof BotEntity
-					&& proxBot.getTeam().equals(matchTeam)) {
-				ret.add(proxBot);
+					&& ((BotEntity) proxEntity).getTeam().equals(matchTeam)) {
+				ret.add((BotEntity) proxEntity);
 			}
 		}
 

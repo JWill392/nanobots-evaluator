@@ -1,5 +1,7 @@
 package game;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,13 +9,14 @@ import java.util.List;
 import java.util.Map;
 
 import action.ActionCmd;
-import action.RunningAction;
 import action.AttackCmd;
+import action.BirthCmd;
+import action.ConceiveCmd;
 import action.HarvestCmd;
 import action.MoveCmd;
-import action.ReproduceCmd;
+import action.RunningAction;
 import action.TransferCmd;
-import action.TransmitCmd;
+import action.BroadcastCmd;
 import action.WaitCmd;
 import action.TargettedAction;
 
@@ -35,9 +38,12 @@ public class Settings {
 
 	private int ATTACK_DAMAGE = 25;
 
+	private int REPRODUCE_GESTATION_DURATION = 5;
+	private int REPRODUCE_GESTATION_UPKEEP = 20;
+
 	private final Map<Class<? extends TargettedAction>, Integer> ACTION_RANGES;
 	private final Map<Class<? extends ActionCmd>, Integer> ACTION_COSTS;
-	private final List<RunningAction> ACTION_EXECUTION_ORDER;
+	private final List<Class<? extends RunningAction>> ACTION_EXECUTION_ORDER;
 
 	private boolean locked = false;
 
@@ -64,11 +70,12 @@ public class Settings {
 
 	private Settings() {
 		ACTION_COSTS = new HashMap<Class<? extends ActionCmd>, Integer>(10);
-		ACTION_COSTS.put(AttackCmd.class, 10);
+		ACTION_COSTS.put(AttackCmd.class, 0);
 		ACTION_COSTS.put(HarvestCmd.class, 0);
 		ACTION_COSTS.put(MoveCmd.class, 0);
-		ACTION_COSTS.put(ReproduceCmd.class, 150);
-		ACTION_COSTS.put(TransmitCmd.class, 10);
+		ACTION_COSTS.put(ConceiveCmd.class, 0);
+		ACTION_COSTS.put(BirthCmd.class, 20);
+		ACTION_COSTS.put(BroadcastCmd.class, 0);
 		ACTION_COSTS.put(WaitCmd.class, 0);
 
 		ACTION_RANGES = new HashMap<Class<? extends TargettedAction>, Integer>(10);
@@ -76,20 +83,24 @@ public class Settings {
 		ACTION_RANGES.put(AttackCmd.class, 2);
 		ACTION_RANGES.put(HarvestCmd.class, 1);
 		ACTION_RANGES.put(MoveCmd.class, 2);
-		ACTION_RANGES.put(ReproduceCmd.class, 1);
+		ACTION_RANGES.put(BirthCmd.class, 1);
 
 		ACTION_EXECUTION_ORDER = new ArrayList<>(10);
-		ACTION_EXECUTION_ORDER.add(new TransferCmd(null, 0));
-		ACTION_EXECUTION_ORDER.add(new MoveCmd(null));
-		ACTION_EXECUTION_ORDER.add(new HarvestCmd(null));
-		ACTION_EXECUTION_ORDER.add(new TransmitCmd(null));
-		ACTION_EXECUTION_ORDER.add(new WaitCmd());
-		ACTION_EXECUTION_ORDER.add(new AttackCmd(null));
-		ACTION_EXECUTION_ORDER.add(new ReproduceCmd(null, null));
 	}
 
 	// ACTION EXECUTION ORDER
-	public static List<RunningAction> getActionExecutionOrder() {
+	public static List<Class<? extends RunningAction>> getActionExecutionOrder() {
+		if (inst.ACTION_EXECUTION_ORDER.isEmpty()) {
+			inst.ACTION_EXECUTION_ORDER.add(TransferCmd.class);
+			inst.ACTION_EXECUTION_ORDER.add(ConceiveCmd.class);
+			inst.ACTION_EXECUTION_ORDER.add(MoveCmd.class);
+			inst.ACTION_EXECUTION_ORDER.add(HarvestCmd.class);
+			inst.ACTION_EXECUTION_ORDER.add(BroadcastCmd.class);
+			inst.ACTION_EXECUTION_ORDER.add(WaitCmd.class);
+			inst.ACTION_EXECUTION_ORDER.add(AttackCmd.class);
+			inst.ACTION_EXECUTION_ORDER.add(BirthCmd.class);
+		}
+
 		return inst.ACTION_EXECUTION_ORDER;
 	}
 
@@ -235,6 +246,30 @@ public class Settings {
 			return;
 		}
 		inst.OVERCHARGE_DRAIN = drain;
+	}
+
+	public static float getGestationDuration() {
+		return inst.REPRODUCE_GESTATION_DURATION;
+	}
+
+	public static void setGestationDuration(int turns) {
+		checkArgument(turns > 0);
+		if (inst.locked) {
+			return;
+		}
+		inst.REPRODUCE_GESTATION_DURATION = turns;
+	}
+
+	public static int getGestationUpkeep() {
+		return inst.REPRODUCE_GESTATION_UPKEEP;
+	}
+
+	public static void setGestationUpkeep(int cost) {
+		checkArgument(cost > 0);
+		if (inst.locked) {
+			return;
+		}
+		inst.REPRODUCE_GESTATION_UPKEEP = cost;
 	}
 
 }

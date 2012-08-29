@@ -5,12 +5,10 @@ import game.world.World;
 import java.io.File;
 import java.util.Scanner;
 
+import matchlog.MatchLog;
+
 import com.google.common.collect.ImmutableList;
 
-import action.AttackCmd;
-import action.HarvestCmd;
-import action.MoveCmd;
-import action.ReproduceCmd;
 import brain.demo.BasicBrain;
 
 
@@ -27,17 +25,6 @@ public class _GameTest {
 
 	public _GameTest() {
 		Settings.load();
-		Settings.setNewbornEnergy(5);
-		Settings.setActionCost(ReproduceCmd.class, 10);
-		Settings.setActionCost(AttackCmd.class, 0);
-		Settings.setActionRange(AttackCmd.class, 1);
-		Settings.setActionCost(HarvestCmd.class, 0);
-		Settings.setActionRange(HarvestCmd.class, 1);
-		Settings.setActionCost(MoveCmd.class, 0);
-		Settings.setActionRange(MoveCmd.class, 1);
-		Settings.setAttackDamage(1);
-		Settings.setBotMaxEnergy(5);
-		Settings.setVisionRadius(2);
 		Settings.lock();
 
 		teamA = new Team(new BasicBrain(), "teamA");
@@ -45,9 +32,12 @@ public class _GameTest {
 		ImmutableList<Team> teamList = ImmutableList.of(teamA, teamB);
 
 		GameMap map = new GameMap("PLACEHOLDER",
-				"00..F\n" +
-				".....\n" +
-				"F..11");
+				"00..F.........\n" +
+				"..............\n" +
+				"..............\n" +
+				"..............\n" +
+				"..............\n" +
+				".........F..11");
 
 		game = new Game(map, teamList, new File("/home/jackson/testreplay"));
 		world = game.getWorld();
@@ -57,7 +47,13 @@ public class _GameTest {
 
 	public void runTest() {
 		try(Scanner continueListener = new Scanner(System.in)){
+			int tc = 0;
+			teampg.util.Util.setSeed(4337);
 			while (game.runNextTurn()) {
+				if (tc == 17) {
+					System.out.println("FULL MATCH: " + MatchLog.getMatch());
+				}
+				System.out.println("TURN #" + tc++);
 				/*
 				System.out.println("\n------------\n");
 				System.out.println(world);
@@ -67,7 +63,6 @@ public class _GameTest {
 				}
 				*/
 			}
-			System.out.println("Done");
 		}
 	}
 }

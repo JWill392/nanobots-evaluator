@@ -35,7 +35,7 @@ public class Simulade {
 				MoveCmd moveCmd = (MoveCmd) bot.getRunningAction();
 
 				AbsPos start = pos;
-				AbsPos goal = moveCmd.target;
+				AbsPos goal = moveCmd.getTarget();
 
 				assert(!start.equals(goal));
 

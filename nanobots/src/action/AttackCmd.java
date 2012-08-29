@@ -2,6 +2,8 @@ package action;
 
 import java.util.List;
 
+import com.google.common.collect.ImmutableList;
+
 import entity.BotEntity;
 import entity.Entity;
 import game.Settings;
@@ -16,30 +18,35 @@ public class AttackCmd extends TargettedAction {
 		super(target);
 	}
 
-	@Override
-	public final void executeAll(World world, List<BotEntity> actors) {
-		super.executeAll(world, actors); //remove obviously illegal actions
+	static void executeAll(World world, List<BotEntity> actors) {
+		//remove obviously illegal actions
+		filterBasicInvalid(world, actors);
 
 		for (BotEntity bot : actors) {
 			AttackCmd action = (AttackCmd) bot.getRunningAction();
-			Entity targetEnt = world.get(action.target);
+			Entity targetEnt = world.get(action.getTarget());
 
 			// target must be bot
 			if (!(targetEnt instanceof BotEntity)) {
-				action.destroy();
+				action.fail(Replay.Action.Outcome.ILLEGAL_TARGET);
 				continue;
 			}
 
 			// cannot attack teammates
 			BotEntity targetBot = (BotEntity) targetEnt;
 			if (Team.onSameTeam(bot, targetBot) == true) {
-				action.destroy();
+				action.fail(Replay.Action.Outcome.ILLEGAL_TARGET);
 				continue;
 			}
 
-			action.exactCostAndRemoveFrom(bot);
+			action.succeed(bot);
 			((BotEntity) targetEnt).addEnergy(-Settings.getAttackDamage());
 		}
+	}
+
+	@Override
+	protected ImmutableList<Replay.Entity.BotState> getLegalActorStates() {
+		return ImmutableList.of(Replay.Entity.BotState.NORMAL);
 	}
 
 	@Override
