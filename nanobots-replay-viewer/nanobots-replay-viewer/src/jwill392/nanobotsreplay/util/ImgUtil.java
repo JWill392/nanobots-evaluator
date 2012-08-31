@@ -28,22 +28,55 @@ public class ImgUtil {
 	}
 
 	public static void tileImgToBuffer(ImageBuffer target, Image src, Rectangle fillArea) {
+		// draw full tiles in fillArea
 		for (int tileX = fillArea.x;
-				tileX + src.getWidth() <= fillArea.x + fillArea.width;
+				tileX + src.getWidth() - 1 <= fillArea.x + fillArea.width - 1;
 				tileX += src.getWidth()) {
 			for (int tileY = fillArea.y;
-					tileY + src.getHeight() <= fillArea.y + fillArea.height;
+					tileY + src.getHeight() - 1 <= fillArea.y + fillArea.height - 1;
 					tileY += src.getHeight()) {
 				drawImgToBuffer(target, src, tileX, tileY);
 			}
 		}
+
+		// any cracks left from fillArea not being evenly divisible into tiles?
+		int xLeftover = fillArea.width % src.getWidth();
+		int yLeftover = fillArea.height % src.getHeight();
+
+		if (xLeftover == 0 && yLeftover == 0) {
+			return;
+		}
+
+		int xFullTileEnd = fillArea.x + fillArea.width - 1 - xLeftover + 1;
+		int yFullTileEnd = fillArea.y + fillArea.height -1 - yLeftover + 1;
+
+		//System.out.println("xL " + xLeftover + " yL " + yLeftover + " xFullEnd " + xFullTileEnd + " yFullEnd " + yFullTileEnd);
+		//Image testImg = Assets.getSheet("assets/spritesheet").getSprite("gridPanel.png");
+
+		if (xLeftover != 0) {
+			Image xRemainder = src.getSubImage(0, 0, xLeftover, src.getHeight());
+
+			tileImgToBuffer(target, xRemainder, new Rectangle(xFullTileEnd, fillArea.y, xLeftover, fillArea.height));
+		}
+
+		if (yLeftover != 0) {
+			Image yRemainder = src.getSubImage(0, 0, src.getWidth(), yLeftover);
+
+			tileImgToBuffer(target, yRemainder, new Rectangle(fillArea.x, yFullTileEnd, fillArea.width, yLeftover));
+		}
 	}
+
+
 	public static void drawImgToBuffer(ImageBuffer target, Image src, final int destX, final int destY) {
 		int currTarX = destX;
 		int currTarY = destY;
 
 		for (int srcX = 0; srcX < src.getWidth(); srcX++) {
+
+
 			for (int srcY = 0; srcY < src.getHeight(); srcY++) {
+
+
 				Color pxl = src.getColor(srcX, srcY);
 				target.setRGBA(currTarX, currTarY,
 						pxl.getRed(), pxl.getGreen(), pxl.getBlue(), pxl.getAlpha());
@@ -103,25 +136,26 @@ public class ImgUtil {
 
 		int wLeft = sideLeft.getWidth();
 		int wRight = sideRight.getWidth();
-		//TODO the rest
 
 		ImageBuffer bldr = new ImageBuffer(panelDim.width, panelDim.height);
 
-		// draw corners
-		drawImgToBuffer(bldr, cornerTopLeft,     0        , 0);
-		drawImgToBuffer(bldr, cornerTopRight,    w - wRight, 0);
-		drawImgToBuffer(bldr, cornerBottomLeft,  0        , h - hBottom);
-		drawImgToBuffer(bldr, cornerBottomRight, w - wRight, h - hBottom);
+		// TODO properly draw panels when the bits we have to draw don't fit in evenly (mainly a problem with big theme images)
 
 		// fill centre
 		tileImgToBuffer(bldr, fillCentre,
-				new Rectangle(hTop,wLeft,w - wRight - wLeft, h - hBottom - hTop));
+				new Rectangle(wLeft,hTop,w - wRight - wLeft, h - hBottom - hTop));
 
 		// draw edges -- width for horizontal must subtract width of both corners (likewise for vertical)
 		tileImgToBuffer(bldr, sideTop,    new Rectangle(wLeft     , 0          , w - wLeft - wRight, hTop));
 		tileImgToBuffer(bldr, sideBottom, new Rectangle(wLeft     , h - hBottom, w - wLeft - wRight, hBottom));
 		tileImgToBuffer(bldr, sideLeft,   new Rectangle(0         , hTop       , wLeft                 ,  h - hTop - hBottom));
 		tileImgToBuffer(bldr, sideRight,  new Rectangle(w - wRight, hTop       , wRight                ,  h - hTop - hBottom));
+
+		// draw corners
+		drawImgToBuffer(bldr, cornerTopLeft,     0        , 0);
+		drawImgToBuffer(bldr, cornerTopRight,    w - wRight, 0);
+		drawImgToBuffer(bldr, cornerBottomLeft,  0        , h - hBottom);
+		drawImgToBuffer(bldr, cornerBottomRight, w - wRight, h - hBottom);
 
 		return bldr.getImage();
 	}

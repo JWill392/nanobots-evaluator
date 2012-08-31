@@ -1,11 +1,14 @@
 package jwill392.slickutil;
 
 import java.awt.Dimension;
+import java.util.Comparator;
 
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Vector2f;
 
-public class SillySlickFixes {
+import teampg.grid2d.point.RelPos;
+
+public class SlickUtil {
 	/**
 	 * Two rects of same size are NOT considered to contain each other
 	 */
@@ -56,5 +59,36 @@ public class SillySlickFixes {
 
 	public static Dimension getRectDim(Rectangle rect) {
 		return new Dimension((int)rect.getWidth(), (int)rect.getHeight());
+	}
+
+	public static Vector2f of(RelPos pos) {
+		return new Vector2f(pos.x, pos.y);
+	}
+
+	/**
+	 * Closer to angle is better (smaller).
+	 */
+	public static class ByAngleLikeness implements Comparator<Vector2f> {
+		private final double angle;
+
+		public ByAngleLikeness(double angle) {
+			this.angle = angle;
+		}
+
+		public ByAngleLikeness(Vector2f closeTo) {
+			this(closeTo.getTheta());
+		}
+
+		@Override
+		public int compare(Vector2f a, Vector2f b) {
+			double adiff = a.getTheta() - angle;
+			double aDist = Math.min(Math.abs(adiff), Math.abs(adiff - 360));
+
+			double bdiff = b.getTheta() - angle;
+			double bDist = Math.min(Math.abs(bdiff), Math.abs(bdiff - 360));
+
+			return Double.compare(aDist, bDist);
+		}
+
 	}
 }

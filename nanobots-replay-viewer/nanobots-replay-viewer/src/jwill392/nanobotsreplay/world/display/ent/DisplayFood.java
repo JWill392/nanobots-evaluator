@@ -17,7 +17,7 @@ public class DisplayFood extends WorldDisplayEntity {
 	}
 
 	@Override
-	protected Image getImage() {
-		return foodImg;
+	protected void draw(float x, float y) {
+		foodImg.draw(x, y);
 	}
 }

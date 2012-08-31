@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import jwill392.slickutil.SillySlickFixes;
+import jwill392.slickutil.SlickUtil;
 
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -87,7 +87,7 @@ public abstract class AbstractUIComponent implements Iterable<UIComponent>, Mous
 	}
 
 	public Rectangle getDrawArea() {
-		return SillySlickFixes.copy(drawArea);
+		return SlickUtil.copy(drawArea);
 	}
 
 	@Override
@@ -95,7 +95,7 @@ public abstract class AbstractUIComponent implements Iterable<UIComponent>, Mous
 		return Iterators.unmodifiableIterator(children.iterator());
 	}
 	public void addChild(UIComponent child) {
-		checkArgument(SillySlickFixes.contains(drawArea, child.getDrawArea()), drawArea + " does not contain " + child.getDrawArea());
+		checkArgument(SlickUtil.contains(drawArea, child.getDrawArea()), drawArea + " does not contain " + child.getDrawArea());
 		children.add(child);
 		onChildAdded(child);
 	}

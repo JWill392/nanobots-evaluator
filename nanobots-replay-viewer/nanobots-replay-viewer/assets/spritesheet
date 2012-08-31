@@ -1,43 +1,197 @@
 spritesheet.png
 {
-	bot.png
-	84
-	222
-	32
-	32
+	bot.gif
+	68
+	210
+	31
+	31
 	0
 	0
 	0
 	0
 }
 {
-	button.png
+	bot_attack.gif
+	35
+	210
+	31
+	31
+	0
+	0
+	0
+	0
+}
+{
+	bot_birth.gif
 	2
-	222
-	80
-	20
+	210
+	31
+	31
 	0
 	0
 	0
 	0
 }
 {
-	button_hover.png
-	140
-	188
-	80
-	20
+	bot_conceive.gif
+	68
+	177
+	31
+	31
 	0
 	0
 	0
 	0
 }
 {
-	button_press.png
-	58
-	188
-	80
-	20
+	bot_dir_lb.gif
+	35
+	177
+	31
+	31
+	0
+	0
+	0
+	0
+}
+{
+	bot_dir_lm.gif
+	2
+	177
+	31
+	31
+	0
+	0
+	0
+	0
+}
+{
+	bot_dir_lu.gif
+	68
+	144
+	31
+	31
+	0
+	0
+	0
+	0
+}
+{
+	bot_dir_mb.gif
+	35
+	144
+	31
+	31
+	0
+	0
+	0
+	0
+}
+{
+	bot_dir_mu.gif
+	2
+	144
+	31
+	31
+	0
+	0
+	0
+	0
+}
+{
+	bot_dir_rb.gif
+	68
+	111
+	31
+	31
+	0
+	0
+	0
+	0
+}
+{
+	bot_dir_rm.gif
+	35
+	111
+	31
+	31
+	0
+	0
+	0
+	0
+}
+{
+	bot_dir_ru.gif
+	2
+	111
+	31
+	31
+	0
+	0
+	0
+	0
+}
+{
+	bot_focus.gif
+	68
+	78
+	31
+	31
+	0
+	0
+	0
+	0
+}
+{
+	bot_harvest.gif
+	35
+	78
+	31
+	31
+	0
+	0
+	0
+	0
+}
+{
+	bot_move.gif
+	2
+	78
+	31
+	31
+	0
+	0
+	0
+	0
+}
+{
+	bot_transfer.gif
+	68
+	45
+	31
+	31
+	0
+	0
+	0
+	0
+}
+{
+	bot_transmit.gif
+	35
+	45
+	31
+	31
+	0
+	0
+	0
+	0
+}
+{
+	bot_wait.gif
+	2
+	45
+	31
+	31
 	0
 	0
 	0
@@ -45,43 +199,21 @@ spritesheet.png
 }
 {
 	food.png
-	24
-	188
-	32
-	32
-	0
-	0
-	0
-	0
-}
-{
-	garishtestpanel.png
+	85
 	2
-	188
-	20
-	20
+	22
+	22
 	0
 	0
 	0
 	0
 }
 {
-	grid.png
-	204
-	36
-	35
-	35
-	0
-	0
-	0
-	0
-}
-{
-	mainmenu.png
+	grid_panel.gif
+	42
 	2
-	36
-	200
-	150
+	41
+	41
 	0
 	0
 	0
@@ -89,21 +221,10 @@ spritesheet.png
 }
 {
 	panel.png
-	58
+	26
 	2
 	14
 	14
-	0
-	0
-	0
-	0
-}
-{
-	testpanel.png
-	36
-	2
-	20
-	20
 	0
 	0
 	0
@@ -113,8 +234,8 @@ spritesheet.png
 	wall.png
 	2
 	2
-	32
-	32
+	22
+	22
 	0
 	0
 	0

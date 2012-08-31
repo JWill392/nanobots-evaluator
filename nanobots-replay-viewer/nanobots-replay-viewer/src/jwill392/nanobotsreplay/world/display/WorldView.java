@@ -8,11 +8,12 @@ import jwill392.nanobotsreplay.NBRV;
 import jwill392.nanobotsreplay.assets.Assets;
 import jwill392.nanobotsreplay.ui.AbstractUIComponent;
 import jwill392.nanobotsreplay.ui.UIComponent;
+import jwill392.nanobotsreplay.util.ImgUtil;
 import jwill392.nanobotsreplay.world.EntityModel;
 import jwill392.nanobotsreplay.world.WorldModel;
 import jwill392.nanobotsreplay.world.WorldModel.ModelTurnChange;
 import jwill392.nanobotsreplay.world.display.ent.WorldDisplayEntity;
-import jwill392.slickutil.SillySlickFixes;
+import jwill392.slickutil.SlickUtil;
 
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -20,6 +21,7 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Vector2f;
+import org.newdawn.slick.gui.GUIContext;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -29,12 +31,14 @@ import teampg.grid2d.point.AbsPos;
 
 public class WorldView extends UIComponent {
 	private static final int ZOOM = 1; //TODO use
+	private static final Dimension CELL_SIZE = new Dimension(34, 34);
+	private static final Dimension CELL_PADDING = new Dimension(2, 2);
+	private static final Dimension TABLE_BORDER = new Dimension(3, 3);
 
 	private WorldModel worldData;
 	private RectGrid<WorldDisplayEntity> grid;
 
-	private final Image gridImg;
-	private static final AbsPos GRID_SPACING = AbsPos.of(3, 3);
+	private Image worldGrid;
 
 	public WorldView(Rectangle drawArea) {
 		this(drawArea, AbstractUIComponent.getRoot());
@@ -44,11 +48,22 @@ public class WorldView extends UIComponent {
 	}
 	private WorldView(Rectangle drawArea, AbstractUIComponent parent) {
 		super(drawArea, parent);
-		gridImg = Assets.getSheet("assets/spritesheet").getSprite("grid.png");
+
+
 	}
 
 	public void connectWorldModel(WorldModel model) {
 		worldData = model;
+
+		Image panelTheme = Assets.getSheet("assets/spritesheet").getSprite("grid_panel.gif");
+
+		Dimension areaInTiles = worldData.getSize();
+
+		Dimension gridArea = new Dimension( // TODO ugh
+				panelTheme.getWidth() + (CELL_SIZE.width) * (areaInTiles.width-1),
+				panelTheme.getHeight() + (CELL_SIZE.height) * (areaInTiles.height-1));
+
+		worldGrid = ImgUtil.buildPanelImage(panelTheme, gridArea, 3, 3, 37, 37);
 
 		grid = new RectGrid<>(worldData.getSize());
 		setTurn(0);
@@ -57,19 +72,23 @@ public class WorldView extends UIComponent {
 		return worldData;
 	}
 
-	public Vector2f getAbsolutePos(AbsPos of) {
+	public Vector2f getAbsolutePos(AbsPos gridPos) {
+		int originX = (int) getDrawArea().getX();
+		int originY = (int) getDrawArea().getY();
+
 		return new Vector2f(
-				getDrawArea().getX() + gridImg.getWidth() * of.x + GRID_SPACING.x,
-				getDrawArea().getY() + gridImg.getHeight() * of.y + GRID_SPACING.y
-				);
+				originX + (CELL_SIZE.width * gridPos.x) + CELL_PADDING.width + TABLE_BORDER.width,
+				originY + (CELL_SIZE.height * gridPos.y) + CELL_PADDING.height + TABLE_BORDER.height);
 	}
 
-	public void render(GameContainer container, Graphics g) throws SlickException {
+	@Override
+	public void render(GUIContext container, Graphics g) throws SlickException {
 		if (worldData == null) {
 			return;
 		}
 
-		drawTiled(gridImg, getDrawArea(), ZOOM, worldData.getSize());
+		worldGrid.draw(getDrawArea().getX(), getDrawArea().getY());
+		//drawTiled(gridImg, getDrawArea(), ZOOM, worldData.getSize());
 		// TODO draw ents in grid
 		for (WorldDisplayEntity ent : grid) {
 			if (ent == null) {
@@ -98,11 +117,18 @@ public class WorldView extends UIComponent {
 
 	private void setTurn(int turn) {
 		grid.fill(null);
+		for (WorldDisplayEntity ent : grid) {
+			if (ent == null) {
+				continue;
+			}
+			removeChild(ent);
+		}
 		for (EntityModel ent : worldData) {
 			grid.set(Util.of(ent.getTurn(turn).getPos()), WorldDisplayEntity.getEnt(this, ent));
 		}
 	}
 
+	//TODO remove me
 	public static void drawTiled(Image tile, Rectangle drawArea, int scale, Dimension areaInTiles) {
 		int tileHeight = tile.getHeight() * scale;
 		int tileWidth = tile.getWidth() * scale;
@@ -116,7 +142,7 @@ public class WorldView extends UIComponent {
 				tiledAreaPixelWidth,
 				tiledAreaPixelHeight
 				);
-		checkArgument(SillySlickFixes.contains(drawArea, tiledAreaInPixels), "Render area not big enough to draw full world");
+		checkArgument(SlickUtil.contains(drawArea, tiledAreaInPixels), "Render area not big enough to draw full world");
 
 		// TODO optimize
 

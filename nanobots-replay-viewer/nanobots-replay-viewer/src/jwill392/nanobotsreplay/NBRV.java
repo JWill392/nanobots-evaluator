@@ -13,6 +13,7 @@ import jwill392.nanobotsreplay.world.display.WorldView;
 
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
+import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
@@ -46,21 +47,24 @@ public class NBRV extends BasicGame {
 		NBRV inst = new NBRV();
 		AppGameContainer app = new AppGameContainer(inst);
 
+		app.setShowFPS(false);
 		app.setDisplayMode((int)SCREEN.getWidth(), (int)SCREEN.getHeight(), false);
 		app.start();
 	}
 
 	@Override
 	public void init(GameContainer container) throws SlickException {
+		container.getGraphics().setBackground(new Color(0x9990AA));
+
 		Assets.loadSheet("assets/spritesheet");
 		Assets.loadFont(2);
 
 		UIComponent.setRoot(SCREEN, container);
 
-		worldDisplay = new WorldView(new Rectangle(1, 1, 498, 598));
+		worldDisplay = new WorldView(new Rectangle(1, 1, 598, 598));
 		eventBus.register(worldDisplay);
 
-		infoPanel = new WorldInfoPanel(new Rectangle(501, 1, 298, 598));
+		infoPanel = new WorldInfoPanel(new Rectangle(601, 1, 198, 598));
 		eventBus.register(infoPanel);
 
 

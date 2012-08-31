@@ -17,7 +17,7 @@ public class DisplayWall extends WorldDisplayEntity {
 	}
 
 	@Override
-	protected Image getImage() {
-		return wallImg;
+	protected void draw(float x, float y) {
+		wallImg.draw(x, y);
 	}
 }
