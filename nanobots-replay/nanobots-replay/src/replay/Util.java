@@ -1,7 +1,8 @@
 package replay;
 
 import java.awt.Dimension;
-
+import replay.ReplayProto.Replay;
+import replay.ReplayProto.Replay.TurnInfo;
 import teampg.grid2d.point.AbsPos;
 
 public class Util {
@@ -21,5 +22,19 @@ public class Util {
 		return AbsPos.of(
 				pos.getX(),
 				pos.getY());
+	}
+
+	public static Dimension of(replay.ReplayProto.Dimension size) {
+		return new Dimension(size.getWidth(), size.getHeight());
+	}
+
+	public static Replay.Entity get(TurnInfo turn, int eid) {
+		for (Replay.Entity ent : turn.getEntsList()) {
+			if (ent.getEid() == eid) {
+				return ent;
+			}
+		}
+
+		return null;
 	}
 }
