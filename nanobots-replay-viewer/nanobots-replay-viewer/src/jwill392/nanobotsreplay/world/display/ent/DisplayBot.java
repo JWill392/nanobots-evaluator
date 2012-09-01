@@ -2,6 +2,7 @@ package jwill392.nanobotsreplay.world.display.ent;
 
 import java.util.Collections;
 import java.util.EnumMap;
+
 import org.newdawn.slick.Image;
 import org.newdawn.slick.PackedSpriteSheet;
 import org.newdawn.slick.geom.Vector2f;
@@ -12,14 +13,15 @@ import replay.ReplayProto.Replay.Action.Type;
 import replay.ReplayProto.Replay.Entity;
 import teampg.grid2d.point.AbsPos;
 import teampg.grid2d.point.RelPos;
+import jwill392.nanobotsreplay.Settings;
 import jwill392.nanobotsreplay.assets.Assets;
 import jwill392.nanobotsreplay.world.EntityModel;
 import jwill392.nanobotsreplay.world.display.WorldView;
 import jwill392.slickutil.SlickUtil;
 
 public class DisplayBot extends WorldDisplayEntity {
-	private final Image idleImg;
-	private final Image focusImg;
+	private final Image baseBotImg;
+	private final Image teamFeatureImg;
 	private static EnumMap<Replay.Action.Type, Image> actionImg;
 	private static ImmutableMap<Vector2f, Image> dirImg;
 	private static boolean initialized = false;
@@ -55,20 +57,21 @@ public class DisplayBot extends WorldDisplayEntity {
 			actionImg.put(Type.WAIT, sheet.getSprite("bot_wait.gif"));
 		}
 
-		idleImg = sheet.getSprite("bot.gif");
-		idleImg.setCenterOfRotation(idleImg.getWidth()/2, idleImg.getHeight()/2);
+		baseBotImg = sheet.getSprite("bot.gif");
+		baseBotImg.setCenterOfRotation(baseBotImg.getWidth()/2, baseBotImg.getHeight()/2);
 
-		focusImg = sheet.getSprite("bot_focus.gif");
-		focusImg.setCenterOfRotation(idleImg.getWidth()/2, idleImg.getHeight()/2);
+		teamFeatureImg = sheet.getSprite("bot_team_color.gif");
+		teamFeatureImg.setCenterOfRotation(baseBotImg.getWidth()/2, baseBotImg.getHeight()/2);
 	}
 
 	@Override
 	protected void draw(float x, float y) {
 		// TODO button-ify... img hover/click etc is currently wrong
-		if (isFocused() || (isMouseDown() && isMouseHover())) {
-			focusImg.draw(x, y);
-		}
-		idleImg.draw(x, y);
+		//if (isFocused() || (isMouseDown() && isMouseHover())) {
+		//	focusImg.draw(x, y);
+		//}
+		baseBotImg.draw(x, y);
+		teamFeatureImg.draw(x, y, Settings.getTeamColor(getData().onTurn(getTurn()).getTid()));
 
 		drawActionIndicator(x, y);
 	}
@@ -78,8 +81,8 @@ public class DisplayBot extends WorldDisplayEntity {
 			return;
 		}
 
-		Entity nextTurnPlans = getData().getTurn(getTurn() + 1);
-		Entity currTurnInfo = getData().getTurn(getTurn());
+		Entity nextTurnPlans = getData().onTurn(getTurn() + 1);
+		Entity currTurnInfo = getData().onTurn(getTurn());
 
 		if (!nextTurnPlans.hasRunningAction()) {
 			return;

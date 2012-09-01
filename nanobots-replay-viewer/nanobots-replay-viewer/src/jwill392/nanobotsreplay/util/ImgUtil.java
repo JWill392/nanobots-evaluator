@@ -28,41 +28,14 @@ public class ImgUtil {
 	}
 
 	public static void tileImgToBuffer(ImageBuffer target, Image src, Rectangle fillArea) {
-		// draw full tiles in fillArea
-		for (int tileX = fillArea.x;
-				tileX + src.getWidth() - 1 <= fillArea.x + fillArea.width - 1;
-				tileX += src.getWidth()) {
-			for (int tileY = fillArea.y;
-					tileY + src.getHeight() - 1 <= fillArea.y + fillArea.height - 1;
-					tileY += src.getHeight()) {
-				drawImgToBuffer(target, src, tileX, tileY);
+		for (int destX = fillArea.x; destX < fillArea.x + fillArea.width; destX++) {
+			for (int destY = fillArea.y; destY < fillArea.y + fillArea.height; destY++) {
+				Color pxl = src.getColor(
+						(destX - fillArea.x)%src.getWidth(),
+						(destY - fillArea.y)%src.getHeight());
+				target.setRGBA(destX, destY,
+						pxl.getRed(), pxl.getGreen(), pxl.getBlue(), pxl.getAlpha());
 			}
-		}
-
-		// any cracks left from fillArea not being evenly divisible into tiles?
-		int xLeftover = fillArea.width % src.getWidth();
-		int yLeftover = fillArea.height % src.getHeight();
-
-		if (xLeftover == 0 && yLeftover == 0) {
-			return;
-		}
-
-		int xFullTileEnd = fillArea.x + fillArea.width - 1 - xLeftover + 1;
-		int yFullTileEnd = fillArea.y + fillArea.height -1 - yLeftover + 1;
-
-		//System.out.println("xL " + xLeftover + " yL " + yLeftover + " xFullEnd " + xFullTileEnd + " yFullEnd " + yFullTileEnd);
-		//Image testImg = Assets.getSheet("assets/spritesheet").getSprite("gridPanel.png");
-
-		if (xLeftover != 0) {
-			Image xRemainder = src.getSubImage(0, 0, xLeftover, src.getHeight());
-
-			tileImgToBuffer(target, xRemainder, new Rectangle(xFullTileEnd, fillArea.y, xLeftover, fillArea.height));
-		}
-
-		if (yLeftover != 0) {
-			Image yRemainder = src.getSubImage(0, 0, src.getWidth(), yLeftover);
-
-			tileImgToBuffer(target, yRemainder, new Rectangle(fillArea.x, yFullTileEnd, fillArea.width, yLeftover));
 		}
 	}
 
@@ -72,11 +45,7 @@ public class ImgUtil {
 		int currTarY = destY;
 
 		for (int srcX = 0; srcX < src.getWidth(); srcX++) {
-
-
 			for (int srcY = 0; srcY < src.getHeight(); srcY++) {
-
-
 				Color pxl = src.getColor(srcX, srcY);
 				target.setRGBA(currTarX, currTarY,
 						pxl.getRed(), pxl.getGreen(), pxl.getBlue(), pxl.getAlpha());

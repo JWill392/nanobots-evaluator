@@ -47,7 +47,7 @@ public class EntityModel {
 		return Ranges.closed(birthTurn, birthTurn + turnEntities.size() - 1);
 	}
 
-	public Replay.Entity getTurn(int turn) {
+	public Replay.Entity onTurn(int turn) {
 		checkArgument(getLifespan().contains(turn), "Given turn is outside lifetime");
 		return turnEntities.get(turn - birthTurn); // FIXME above says valid, but this get gets out of range for 2086.
 	}

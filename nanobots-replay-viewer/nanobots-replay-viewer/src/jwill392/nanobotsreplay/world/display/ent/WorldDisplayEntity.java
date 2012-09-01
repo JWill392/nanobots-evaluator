@@ -20,7 +20,7 @@ public abstract class WorldDisplayEntity extends UIComponent {
 		super(
 				SlickUtil.newRect(
 						world.getAbsolutePos(Util.of(
-								data.getTurn(world.getModel().getTurn()).getPos())),
+								data.onTurn(world.getModel().getTurn()).getPos())),
 						DISP_ENT_SIZE.width, DISP_ENT_SIZE.height),
 				world);
 		this.data = data;
@@ -45,7 +45,7 @@ public abstract class WorldDisplayEntity extends UIComponent {
 	}
 
 	public static WorldDisplayEntity getEnt(WorldView world, EntityModel data) {
-		switch (data.getTurn(world.getModel().getTurn()).getType()) {
+		switch (data.onTurn(world.getModel().getTurn()).getType()) {
 		case BOT:
 			return new DisplayBot(world, data);
 		case FOOD:

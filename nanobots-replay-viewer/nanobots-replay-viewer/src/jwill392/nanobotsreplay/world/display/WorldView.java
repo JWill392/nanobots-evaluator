@@ -124,7 +124,7 @@ public class WorldView extends UIComponent {
 			removeChild(ent);
 		}
 		for (EntityModel ent : worldData) {
-			grid.set(Util.of(ent.getTurn(turn).getPos()), WorldDisplayEntity.getEnt(this, ent));
+			grid.set(Util.of(ent.onTurn(turn).getPos()), WorldDisplayEntity.getEnt(this, ent));
 		}
 	}
 

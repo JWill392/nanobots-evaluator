@@ -132,7 +132,7 @@ spritesheet.png
 	0
 }
 {
-	bot_focus.gif
+	bot_harvest.gif
 	68
 	78
 	31
@@ -143,7 +143,7 @@ spritesheet.png
 	0
 }
 {
-	bot_harvest.gif
+	bot_move.gif
 	35
 	78
 	31
@@ -154,7 +154,7 @@ spritesheet.png
 	0
 }
 {
-	bot_move.gif
+	bot_team_color.gif
 	2
 	78
 	31
@@ -166,7 +166,7 @@ spritesheet.png
 }
 {
 	bot_transfer.gif
-	68
+	92
 	45
 	31
 	31
@@ -177,7 +177,7 @@ spritesheet.png
 }
 {
 	bot_transmit.gif
-	35
+	59
 	45
 	31
 	31
@@ -188,7 +188,7 @@ spritesheet.png
 }
 {
 	bot_wait.gif
-	2
+	26
 	45
 	31
 	31
@@ -199,10 +199,21 @@ spritesheet.png
 }
 {
 	food.png
+	2
+	45
+	22
+	22
+	0
+	0
+	0
+	0
+}
+{
+	garishtestpanel.png
 	85
 	2
-	22
-	22
+	20
+	20
 	0
 	0
 	0

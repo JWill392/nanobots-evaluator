@@ -51,13 +51,13 @@ public class WorldInfoPanel extends UIComponent {
 		background.draw(getDrawArea().getX(), getDrawArea().getY());
 
 		if (selected != null) {
-			Entity turnInfo = selected.getTurn(turn);
+			Entity turnInfo = selected.onTurn(turn);
 
 			font.drawString(getDrawArea().getX() + 10, getDrawArea().getY() + 20, "ID: " + turnInfo.getEid());
 			font.drawString(getDrawArea().getX() + 10, getDrawArea().getY() + 40, "Energy: " + turnInfo.getEnergy());
 
 			if (selected.hasTurn(turn + 1)) {
-				Entity nextTurn = selected.getTurn(turn + 1);
+				Entity nextTurn = selected.onTurn(turn + 1);
 
 				if (nextTurn.hasRunningAction() && nextTurn.getRunningAction().hasTarget()) {
 					AbsPos target = replay.Util.of(nextTurn.getRunningAction().getTarget());
@@ -87,7 +87,7 @@ public class WorldInfoPanel extends UIComponent {
 
 	private void setTurn(int newTurn) {
 		if (selected != null) {
-			System.out.println(selected.getTurn(newTurn));
+			System.out.println(selected.onTurn(newTurn));
 		}
 		turn = newTurn;
 	}
@@ -100,6 +100,6 @@ public class WorldInfoPanel extends UIComponent {
 	@Subscribe
 	public void selectedEntityChanged(SelectedEntityChange e) {
 		setSelected(e.selected);
-		System.out.println(selected.getTurn(turn));
+		System.out.println(selected.onTurn(turn));
 	}
 }
