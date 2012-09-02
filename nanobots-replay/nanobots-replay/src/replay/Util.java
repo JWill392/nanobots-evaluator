@@ -28,7 +28,7 @@ public class Util {
 		return new Dimension(size.getWidth(), size.getHeight());
 	}
 
-	public static Replay.Entity get(TurnInfo turn, int eid) {
+	public static Replay.Entity getEntFromTurn(TurnInfo turn, int eid) {
 		for (Replay.Entity ent : turn.getEntsList()) {
 			if (ent.getEid() == eid) {
 				return ent;
