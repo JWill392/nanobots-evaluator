@@ -88,13 +88,15 @@ public class WorldView extends UIComponent {
 		}
 
 		worldGrid.draw(getDrawArea().getX(), getDrawArea().getY());
-		//drawTiled(gridImg, getDrawArea(), ZOOM, worldData.getSize());
-		// TODO draw ents in grid
+
 		for (WorldDisplayEntity ent : grid) {
 			if (ent == null) {
 				continue;
 			}
 			ent.render(container, g);
+			if (!ent.getData().getLifespan().contains(getModel().getTurn())) {
+				System.out.println(ent);
+			}
 		}
 	}
 
@@ -116,13 +118,14 @@ public class WorldView extends UIComponent {
 	}
 
 	private void setTurn(int turn) {
-		grid.fill(null);
 		for (WorldDisplayEntity ent : grid) {
 			if (ent == null) {
 				continue;
 			}
 			removeChild(ent);
 		}
+		grid.fill(null);
+
 		for (EntityModel ent : worldData) {
 			grid.set(Util.of(ent.onTurn(turn).getPos()), WorldDisplayEntity.getEnt(this, ent));
 		}
@@ -155,11 +158,13 @@ public class WorldView extends UIComponent {
 
 
 	@Override
-	public void onClick(int x, int y) {
-		super.onClick(x, y);
+	public void onPressed(int x, int y) {
+		super.onPressed(x, y);
 
 		if (getFocusedChild() instanceof WorldDisplayEntity) {
 			NBRV.eventBus.post(new SelectedEntityChange(((WorldDisplayEntity)getFocusedChild()).getData()));
+		} else {
+			NBRV.eventBus.post(new SelectedEntityChange(null));
 		}
 	}
 

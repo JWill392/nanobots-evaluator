@@ -81,14 +81,13 @@ public class DisplayBot extends WorldDisplayEntity {
 			return;
 		}
 
-		Entity nextTurnPlans = getData().onTurn(getTurn() + 1);
 		Entity currTurnInfo = getData().onTurn(getTurn());
 
-		if (!nextTurnPlans.hasRunningAction()) {
+		if (!currTurnInfo.hasRunningAction()) {
 			return;
 		}
 
-		Replay.Action action = nextTurnPlans.getRunningAction();
+		Replay.Action action = currTurnInfo.getRunningAction();
 		actionImg.get(action.getType()).draw(x, y);
 
 		if (action.hasTarget()) {

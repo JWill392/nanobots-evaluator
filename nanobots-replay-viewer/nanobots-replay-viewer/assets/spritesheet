@@ -166,7 +166,7 @@ spritesheet.png
 }
 {
 	bot_transfer.gif
-	92
+	68
 	45
 	31
 	31
@@ -177,7 +177,7 @@ spritesheet.png
 }
 {
 	bot_transmit.gif
-	59
+	35
 	45
 	31
 	31
@@ -188,7 +188,7 @@ spritesheet.png
 }
 {
 	bot_wait.gif
-	26
+	2
 	45
 	31
 	31
@@ -199,21 +199,10 @@ spritesheet.png
 }
 {
 	food.png
-	2
-	45
-	22
-	22
-	0
-	0
-	0
-	0
-}
-{
-	garishtestpanel.png
 	85
 	2
-	20
-	20
+	22
+	22
 	0
 	0
 	0

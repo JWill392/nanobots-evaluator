@@ -34,16 +34,4 @@ public class UIComponent extends AbstractUIComponent {
 		super.onChildRemoved(child);
 		parent.onChildRemoved(child);
 	}
-
-	@Override
-	public void removeChild(UIComponent child) {
-		super.removeChild(child);
-		parent.onChildAdded(child);
-	}
-
-	@Override
-	public void addChild(UIComponent child) {
-		super.addChild(child);
-		parent.onChildAdded(child);
-	}
 }

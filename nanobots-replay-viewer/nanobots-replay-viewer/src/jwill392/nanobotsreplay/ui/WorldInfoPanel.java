@@ -1,31 +1,28 @@
 package jwill392.nanobotsreplay.ui;
 
+import java.awt.Dimension;
+
 import jwill392.nanobotsreplay.assets.Assets;
 import jwill392.nanobotsreplay.util.ImgUtil;
 import jwill392.nanobotsreplay.world.EntityModel;
 import jwill392.nanobotsreplay.world.WorldModel.ModelTurnChange;
 import jwill392.nanobotsreplay.world.display.WorldView.SelectedEntityChange;
-import jwill392.slickutil.SlickUtil;
-
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheetFont;
 import org.newdawn.slick.geom.Rectangle;
-import org.newdawn.slick.geom.Vector2f;
 import org.newdawn.slick.gui.GUIContext;
 
 import replay.ReplayProto.Replay.Entity;
-import teampg.grid2d.point.AbsPos;
-import teampg.grid2d.point.RelPos;
-
 import com.google.common.eventbus.Subscribe;
 
 public class WorldInfoPanel extends UIComponent {
 	private int turn = -1;
 	private EntityModel selected;
-	private final Image background;
+	private final Image mainPanel;
+	private final Image turnPanel;
 	private final SpriteSheetFont font;
 
 	public WorldInfoPanel(Rectangle drawArea, UIComponent parent) throws SlickException {
@@ -40,7 +37,10 @@ public class WorldInfoPanel extends UIComponent {
 		super(drawArea, parent);
 		Image panelBackgroundTheme = Assets.getSheet("assets/spritesheet").getSprite("panel.png");
 
-		background = ImgUtil.buildPanelImage(panelBackgroundTheme, SlickUtil.getRectDim(drawArea), 6, 6, 8, 8);
+		Dimension turnPanelSize = new Dimension((int) getDrawArea().getWidth(), 30);
+		Dimension mainPanelSize = new Dimension((int) getDrawArea().getWidth(), (int) getDrawArea().getHeight() - 25);
+		turnPanel = ImgUtil.buildPanelImage(panelBackgroundTheme, turnPanelSize, 6, 6, 8, 8);
+		mainPanel = ImgUtil.buildPanelImage(panelBackgroundTheme, mainPanelSize, 6, 6, 8, 8);
 
 		font = Assets.getFont(2);
 	}
@@ -48,30 +48,24 @@ public class WorldInfoPanel extends UIComponent {
 	@Override
 	public void render(GUIContext container, Graphics g) throws SlickException {
 		super.render(container, g);
-		background.draw(getDrawArea().getX(), getDrawArea().getY());
+		turnPanel.draw(getDrawArea().getX(), getDrawArea().getY());
+		mainPanel.draw(getDrawArea().getX(), getDrawArea().getY() + 30);
+
+		font.drawString(getDrawArea().getX() + 10, getDrawArea().getY() + 10, "Turn: " + turn);
 
 		if (selected != null) {
 			Entity turnInfo = selected.onTurn(turn);
 
-			font.drawString(getDrawArea().getX() + 10, getDrawArea().getY() + 20, "ID: " + turnInfo.getEid());
-			font.drawString(getDrawArea().getX() + 10, getDrawArea().getY() + 40, "Energy: " + turnInfo.getEnergy());
+			font.drawString(getDrawArea().getX() + 10, getDrawArea().getY() + 40, "ID: " + turnInfo.getEid());
+			font.drawString(getDrawArea().getX() + 10, getDrawArea().getY() + 60, "Energy: " + turnInfo.getEnergy());
 
-			if (selected.hasTurn(turn + 1)) {
-				Entity nextTurn = selected.onTurn(turn + 1);
-
-				if (nextTurn.hasRunningAction() && nextTurn.getRunningAction().hasTarget()) {
-					AbsPos target = replay.Util.of(nextTurn.getRunningAction().getTarget());
-					AbsPos currPos = replay.Util.of(turnInfo.getPos());
-
-					RelPos tarVector = RelPos.offsetVector(currPos, target);
-
-					font.drawString(
-							getDrawArea().getX() + 10, getDrawArea().getY() + 60,
-							"Target: " + "[" + tarVector.x + ", " + tarVector.y + "]");
-					font.drawString(
-							getDrawArea().getX() + 10, getDrawArea().getY() + 80,
-							"Target: " + new Vector2f(tarVector.x, tarVector.y).getTheta() + " deg");
-				}
+			if (turnInfo.hasRunningAction()) {
+				font.drawString(
+						getDrawArea().getX() + 10, getDrawArea().getY() + 80,
+						"Action: " + turnInfo.getRunningAction().getType());
+				font.drawString(
+						getDrawArea().getX() + 10, getDrawArea().getY() + 100,
+						"Outcome: " + turnInfo.getRunningAction().getOutcome());
 			}
 		}
 	}
@@ -86,20 +80,26 @@ public class WorldInfoPanel extends UIComponent {
 	}
 
 	private void setTurn(int newTurn) {
-		if (selected != null) {
-			System.out.println(selected.onTurn(newTurn));
-		}
 		turn = newTurn;
 	}
 
 	@Subscribe
 	public void turnChanged(ModelTurnChange e) {
+		if (selected != null && !selected.hasTurn(e.newTurn)) {
+			selected = null;
+		}
+
 		setTurn(e.newTurn);
 	}
 
 	@Subscribe
 	public void selectedEntityChanged(SelectedEntityChange e) {
 		setSelected(e.selected);
+
+		if (e.selected == null) {
+			return;
+		}
+
 		System.out.println(selected.onTurn(turn));
 	}
 }

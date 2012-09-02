@@ -41,11 +41,10 @@ public class WorldModel implements Iterable<EntityModel> {
 	public void setTurn(int turn) {
 		this.turn = turn;
 
+		livingEnts.clear();
 		for (EntityModel ent : ents.values()) {
 			if (ent.getLifespan().contains(turn)) {
 				livingEnts.add(ent);
-			} else {
-				livingEnts.remove(ent);
 			}
 		}
 

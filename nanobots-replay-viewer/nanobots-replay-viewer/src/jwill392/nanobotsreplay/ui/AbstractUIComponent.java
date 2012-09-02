@@ -94,13 +94,14 @@ public abstract class AbstractUIComponent implements Iterable<UIComponent>, Mous
 	public Iterator<UIComponent> iterator() {
 		return Iterators.unmodifiableIterator(children.iterator());
 	}
-	public void addChild(UIComponent child) {
+	public final void addChild(UIComponent child) {
 		checkArgument(SlickUtil.contains(drawArea, child.getDrawArea()), drawArea + " does not contain " + child.getDrawArea());
 		children.add(child);
 		onChildAdded(child);
 	}
-	public void removeChild(UIComponent child) {
+	public final void removeChild(UIComponent child) {
 		checkArgument(children.remove(child));
+		children.remove(child);
 		onChildRemoved(child);
 	}
 
@@ -173,28 +174,29 @@ public abstract class AbstractUIComponent implements Iterable<UIComponent>, Mous
 	}
 	@Override
 	public void mousePressed(int button, int x, int y) {
-
-		if (drawArea.contains(x, y) && !mouseDown) {
+		assert !mouseDown;
+		if (drawArea.contains(x, y)) {
 			mouseDown = true;
 			inputNotifications.add(new OnClick(true, x, y));
-		}
-	}
-	@Override
-	public void mouseReleased(int button, int x, int y) {
 
-		if (drawArea.contains(x, y) && mouseDown) {
-			inputNotifications.add(new OnClick(false, x, y));
 			if (!focused) {
 				focused = true;
 				inputNotifications.add(new OnFocus(true));
 				onFocus();
 			}
+
 		} else {
 			if (focused) {
 				focused = false;
 				inputNotifications.add(new OnFocus(false));
 			}
 
+		}
+	}
+	@Override
+	public void mouseReleased(int button, int x, int y) {
+		if (drawArea.contains(x, y) && mouseDown) {
+			inputNotifications.add(new OnClick(false, x, y));
 		}
 		mouseDown = false;
 	}

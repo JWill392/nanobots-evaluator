@@ -4,8 +4,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import java.awt.Dimension;
 import java.awt.Rectangle;
-import java.util.Arrays;
-
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.ImageBuffer;
@@ -19,7 +17,6 @@ public class ImgUtil {
 	}
 
 	public static Image getSubImage(Image img, Rectangle dim) {
-		System.out.println("subimg: " + dim.x + " y" + dim.y + " width" + dim.getWidth() + " height" + dim.getHeight());
 		return img.getSubImage(dim.x, dim.y, dim.width, dim.height);
 	}
 
@@ -59,16 +56,13 @@ public class ImgUtil {
 
 	/**
 	 * Given an image split into 9 sections, draws a panel using these sections as 4 corners, 4 edges, and center fill.
-	 * @param theme
-	 * @param lx
-	 * @param rx
-	 * @param ty
-	 * @param by
+	 * @param theme Composed of 9 segments; top left corner, top side (etc...) and middle.
+	 * 			Should look like a mini version of the panel you want to draw.
+	 * lx and ty are top left point inside middle section
+	 * rx and by are top left point inside bottom right corner
 	 * @return
 	 */
 	public static Image buildPanelImage(Image theme, Dimension panelDim, int lx, int ty, int rx, int by) {
-		System.out.println("theme: " + theme);
-
 		checkArgument(panelDim.width > theme.getWidth());
 		checkArgument(panelDim.height > theme.getHeight());
 		Segment[] segValues = Segment.values();
@@ -81,8 +75,6 @@ public class ImgUtil {
 		for (int i = 0; i < segValues.length; i++) {
 			segments[i] = getSubImage(theme, segmentRects[i]);
 		}
-
-		System.out.println(Arrays.toString(segments));
 
 		//convenience variables
 		Image cornerTopLeft     = segments[Segment.TOP_LEFT.ordinal()];
@@ -117,13 +109,13 @@ public class ImgUtil {
 		// draw edges -- width for horizontal must subtract width of both corners (likewise for vertical)
 		tileImgToBuffer(bldr, sideTop,    new Rectangle(wLeft     , 0          , w - wLeft - wRight, hTop));
 		tileImgToBuffer(bldr, sideBottom, new Rectangle(wLeft     , h - hBottom, w - wLeft - wRight, hBottom));
-		tileImgToBuffer(bldr, sideLeft,   new Rectangle(0         , hTop       , wLeft                 ,  h - hTop - hBottom));
-		tileImgToBuffer(bldr, sideRight,  new Rectangle(w - wRight, hTop       , wRight                ,  h - hTop - hBottom));
+		tileImgToBuffer(bldr, sideLeft,   new Rectangle(0         , hTop       , wLeft             ,  h - hTop - hBottom));
+		tileImgToBuffer(bldr, sideRight,  new Rectangle(w - wRight, hTop       , wRight            ,  h - hTop - hBottom));
 
 		// draw corners
-		drawImgToBuffer(bldr, cornerTopLeft,     0        , 0);
+		drawImgToBuffer(bldr, cornerTopLeft,     0         , 0);
 		drawImgToBuffer(bldr, cornerTopRight,    w - wRight, 0);
-		drawImgToBuffer(bldr, cornerBottomLeft,  0        , h - hBottom);
+		drawImgToBuffer(bldr, cornerBottomLeft,  0         , h - hBottom);
 		drawImgToBuffer(bldr, cornerBottomRight, w - wRight, h - hBottom);
 
 		return bldr.getImage();

@@ -24,7 +24,6 @@ public class UIRoot extends AbstractUIComponent {
 		allChildren.add(child);
 
 		container.getInput().addMouseListener(child);
-		System.out.println("child added to root: " + child);
 	}
 
 	@Override
