@@ -2,6 +2,7 @@ package brain;
 
 import replay.ReplayProto.Replay;
 import replay.ReplayProto.Replay.Entity.BotState;
+import replay.ReplayProto.Replay.Entity.ReceivedMessage;
 import teampg.grid2d.point.AbsPos;
 
 import action.ActionCmd;
@@ -9,7 +10,6 @@ import action.RunningAction;
 import com.google.common.collect.ImmutableList;
 
 import entity.bot.Memory;
-import entity.bot.MessageSignal;
 
 
 public abstract class BotBrain {
@@ -17,7 +17,7 @@ public abstract class BotBrain {
 	protected Memory mem;
 	protected Vision vision;
 	protected AbsPos position;
-	protected ImmutableList<MessageSignal> msgs;
+	protected ImmutableList<ReceivedMessage> msgs;
 	protected Replay.Action lastAction;
 	protected BotState state;
 	protected Integer elapsedGestation;

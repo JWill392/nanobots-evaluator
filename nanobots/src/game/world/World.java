@@ -1,5 +1,7 @@
 package game.world;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -180,8 +182,10 @@ public class World {
 	 */
 	public void addNewEntity(AbsPos target, Entity toAdd) {
 		// target position for new entity should be empty
+		checkNotNull(toAdd);
 		assert (grid.get(target) != DEBUG_PENDING_CHANGE_PLACEHOLDER);
 		assert (grid.get(target) == null);
+		assert (!addBuffer.contains(toAdd));
 
 		grid.set(target, DEBUG_PENDING_CHANGE_PLACEHOLDER); // TODO removeme; pending new ent; don't want anything else to happen here
 		addBuffer.add(new Entry<Entity>(target, toAdd));
@@ -237,6 +241,7 @@ public class World {
 			Entity toAdd = entry.getContents();
 			AbsPos addPos = entry.getPosition();
 
+			assert (!grid.contains(toAdd));
 			assert(grid.get(addPos) == DEBUG_PENDING_CHANGE_PLACEHOLDER);
 
 			if (toAdd instanceof BotEntity) {

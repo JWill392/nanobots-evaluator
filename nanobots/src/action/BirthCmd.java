@@ -3,6 +3,7 @@ package action;
 import java.util.List;
 
 import replay.ReplayProto.Replay;
+import replay.ReplayProto.Replay.Action.Outcome;
 import replay.ReplayProto.Replay.Action.Type;
 import replay.ReplayProto.Replay.Entity.BotState;
 import teampg.grid2d.point.AbsPos;
@@ -27,6 +28,11 @@ public class BirthCmd extends TargettedAction {
 
 		for (BotEntity bot : actors) {
 			BirthCmd action = (BirthCmd) bot.getRunningAction();
+
+			if (world.get(action.getTarget()) != null) {
+				action.fail(Outcome.ILLEGAL_TARGET);
+				continue;
+			}
 
 			if (bot.getElapsedGestation() < Settings.getGestationDuration()) {
 				action.fail(Replay.Action.Outcome.GESTATION_NOT_COMPLETE);

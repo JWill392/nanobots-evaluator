@@ -35,6 +35,9 @@ public class MapLoader {
 		//TODO load into world
 		World world = new World(ents.getSize().width, ents.getSize().height);
 		for (Entry<Entity> entry : ents.getEntries()) {
+			if (entry.getContents() == null) {
+				continue;
+			}
 			world.addNewEntity(entry.getPosition(), entry.getContents());
 		}
 		world.tick(); //flush add queue

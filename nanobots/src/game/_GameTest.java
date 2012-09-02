@@ -5,8 +5,6 @@ import game.world.World;
 import java.io.File;
 import java.util.Scanner;
 
-import matchlog.MatchLog;
-
 import com.google.common.collect.ImmutableList;
 
 import brain.demo.BasicBrain;
@@ -51,7 +49,7 @@ public class _GameTest {
 			teampg.util.Util.setSeed(4337);
 			while (game.runNextTurn()) {
 				if (tc == 17) {
-					System.out.println("FULL MATCH: " + MatchLog.getMatch());
+					//System.out.println("FULL MATCH: " + MatchLog.getMatch());
 				}
 				System.out.println("TURN #" + tc++);
 				/*

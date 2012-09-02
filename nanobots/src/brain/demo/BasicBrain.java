@@ -48,7 +48,7 @@ public class BasicBrain extends BotBrain {
 		// Hear a gestating bot asking for help?
 		int pregMsg = msgs.indexOf(GESTATING_SIGNAL);
 		if (pregMsg != -1) {
-			AbsPos pregPos = msgs.get(pregMsg).origin;
+			AbsPos pregPos = replay.Util.of(msgs.get(pregMsg).getOrigin());
 			if (Pos2D.squareDistance(pregPos, position) <= Settings.getActionRange(TransferCmd.class)) {
 				return new TransferCmd(pregPos, Settings.getGestationUpkeep());
 			}

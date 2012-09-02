@@ -3,12 +3,12 @@ package brain;
 
 import replay.ReplayProto.Replay;
 import replay.ReplayProto.Replay.Entity.BotState;
+import replay.ReplayProto.Replay.Entity.ReceivedMessage;
 import teampg.grid2d.point.AbsPos;
 
 import com.google.common.collect.ImmutableList;
 
 import entity.BotEntity;
-import entity.bot.MessageSignal;
 
 
 public class BrainInfo {
@@ -16,13 +16,13 @@ public class BrainInfo {
 	public final int mem;
 	public final Vision vision;
 	public final AbsPos position;
-	public final ImmutableList<MessageSignal> msgs;
+	public final ImmutableList<ReceivedMessage> msgs;
 	public final Replay.Action lastAction;
 	public final BotState botState;
 	public final Integer elapsedGestation;
 
 	public BrainInfo(BotEntity beholder, AbsPos position, Vision vision) {
-		msgs = beholder.getReceivedMessages();
+		msgs = ImmutableList.copyOf(beholder.getReceivedMessages());
 		energy = beholder.getEnergy();
 
 		if (beholder.getRunningAction() != null) {

@@ -4,8 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
-import teampg.grid2d.point.AbsPos;
-
 import matchlog.MatchLog;
 
 import entity.BotEntity;
@@ -61,7 +59,12 @@ public class Game {
 		Team currTeam = teams.get(currTeamIndex);
 		Iterable<BotEntity> teamBots = world.getTeamBots(currTeam);
 
-		//get actions from brain
+		// log world state when brains get their input
+		MatchLog.logWorldState();
+
+		System.out.println("GET ACT: " + teamBots);
+
+		// SET ACTIONS - given info, bots decide what they want to do this turn.
 		for (BotEntity bot : teamBots) {
 			BrainInfo info = world.getBotInfo(bot.getID());
 			BrainActionAndMemory brainDecision = currTeam.decideAction(info);
@@ -76,19 +79,22 @@ public class Game {
 			}
 		}
 
-		//execute running actions
+		System.out.println("EXEC: " + teamBots);
+		//execute actions just proposed
 		for (Class<? extends RunningAction> actionType : Settings.getActionExecutionOrder()) {
 			RunningAction.executeAll(actionType, teamBots, world);
 		}
 
-		MatchLog.endTurn();
+		// log the actions brains proposed, and whether they succeeded.
+		MatchLog.logActionsAndOutcomes();
 
-		//tick all dynamic ents
+
+		//##########################################
+		//# clean up dead bots, check if game over #
+		//##########################################
+
+		// kill dead ents, clear actions and outcomes, etc.
 		world.tick();
-
-		for (BotEntity bot : world.getTeamBots(currTeam)) {
-			System.out.println(bot.getData(AbsPos.of(0,0), 0, 0).getRunningAction());
-		}
 
 		// check lose condition on team
 		for (Team team : teams) {

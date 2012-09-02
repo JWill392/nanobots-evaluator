@@ -33,6 +33,7 @@ public class MatchLog {
 
 	private final Replay.Builder replayBuilder;
 	private final Replay.TurnInfo.Builder currTurnBuilder;
+	private final Map<BotEntity, Replay.Entity.Builder> currTurnBotsToGetActionInfo;
 
 	//private final Map<RunningAction, BotEntity> actions;
 
@@ -56,6 +57,7 @@ public class MatchLog {
 		}
 
 		currTurnBuilder = Replay.TurnInfo.newBuilder();
+		currTurnBotsToGetActionInfo = new HashMap<>();
 	}
 
 	public static int getTurnCount() {
@@ -127,30 +129,6 @@ public class MatchLog {
 		return entIdMap.get(ent);
 	}
 
-	public static void endTurn() {
-		World world = inst.game.getWorld();
-		for (Entry<Entity> entry : world.getEntries()) {
-			Entity entity = entry.getContents();
-			AbsPos entPos = entry.getPosition();
-			int eid = inst.getEid(entity);
-
-			Replay.Entity entData;
-			if (entity instanceof BotEntity) {
-				BotEntity bot = (BotEntity) entity;
-
-				int tid = inst.teamIdMap.get(bot.getTeam());
-				entData = bot.getData(entPos, eid, tid);
-			} else {
-				entData = entity.getData(entPos, eid);
-			}
-
-			inst.currTurnBuilder.addEnts(entData);
-		}
-
-		inst.replayBuilder.addTurns(inst.currTurnBuilder.build());
-		inst.currTurnBuilder.clear();
-	}
-
 	public static void endMatch(Team winner, File outputFile) throws FileNotFoundException, IOException {
 		if (winner != null) {
 			inst.replayBuilder.setWinningTeam(inst.teamIdMap.get(winner));
@@ -164,10 +142,60 @@ public class MatchLog {
 
 		Replay fullGameReplay = inst.replayBuilder.build();
 		fullGameReplay.writeTo(new FileOutputStream(outputFile));
-		System.out.println(fullGameReplay);
 	}
 
 	public static String getMatch() {
 		return (inst.replayBuilder.clone()).build().toString();
+	}
+
+	/**
+	 * Called first thing in a turn, before executing actions or ticking.
+	 */
+	public static void logWorldState() {
+		// TODO Auto-generated method stub
+
+		World world = inst.game.getWorld();
+		for (Entry<Entity> entry : world.getEntries()) {
+			Entity entity = entry.getContents();
+			AbsPos entPos = entry.getPosition();
+			int eid = inst.getEid(entity);
+
+			if (entity instanceof BotEntity) {
+				BotEntity bot = (BotEntity) entity;
+				int tid = inst.teamIdMap.get(bot.getTeam());
+
+				// don't build yet, need to come back to later and add action/outcome
+				inst.currTurnBotsToGetActionInfo.put(bot, bot.getData(entPos, eid, tid));
+			} else {
+				// just a normal ent without actions
+				Replay.Entity entData = entity.getData(entPos, eid);
+				inst.currTurnBuilder.addEnts(entData);
+			}
+
+		}
+
+	}
+
+	/**
+	 * Called after proposing and executing actions, but BEFORE ticking.
+	 * Only logs proposed actions and outcomes, not world state.
+	 */
+	public static void logActionsAndOutcomes() {
+		// get actions and outcomes for all bots processed earlier this turn (in logworldstate)
+		for (Map.Entry<BotEntity, Replay.Entity.Builder> entry : inst.currTurnBotsToGetActionInfo.entrySet()) {
+			BotEntity bot = entry.getKey();
+			Replay.Entity.Builder data = entry.getValue();
+
+			// add action data to bot (that was recorded before action execution)
+			if (bot.hasRunningAction()) {
+				data.setRunningAction(bot.getRunningAction().getData());
+			}
+
+			inst.currTurnBuilder.addEnts(data.build());
+		}
+
+		inst.replayBuilder.addTurns(inst.currTurnBuilder.build());
+		inst.currTurnBuilder.clear();
+		inst.currTurnBotsToGetActionInfo.clear();
 	}
 }
