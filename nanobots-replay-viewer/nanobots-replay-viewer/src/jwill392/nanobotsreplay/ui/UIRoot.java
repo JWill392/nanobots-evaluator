@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.newdawn.slick.GameContainer;
+import org.newdawn.slick.Graphics;
+import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.gui.GUIContext;
 
 public class UIRoot extends AbstractUIComponent {
 	private final List<UIComponent> allChildren;
@@ -34,5 +37,7 @@ public class UIRoot extends AbstractUIComponent {
 		container.getInput().removeMouseListener(child);
 	}
 
-
+	@Override
+	protected void draw(GUIContext container, Graphics g) throws SlickException {
+	}
 }

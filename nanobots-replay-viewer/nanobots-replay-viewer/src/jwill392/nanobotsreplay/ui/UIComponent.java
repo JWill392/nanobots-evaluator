@@ -2,7 +2,7 @@ package jwill392.nanobotsreplay.ui;
 
 import org.newdawn.slick.geom.Rectangle;
 
-public class UIComponent extends AbstractUIComponent {
+public abstract class UIComponent extends AbstractUIComponent {
 	private final AbstractUIComponent parent;
 
 	public UIComponent(Rectangle drawArea) {

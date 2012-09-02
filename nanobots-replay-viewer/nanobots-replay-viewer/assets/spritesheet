@@ -199,10 +199,21 @@ spritesheet.png
 }
 {
 	food.png
-	85
+	101
 	2
 	22
 	22
+	0
+	0
+	0
+	0
+}
+{
+	frame.gif
+	85
+	2
+	14
+	14
 	0
 	0
 	0

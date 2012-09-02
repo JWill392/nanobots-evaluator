@@ -38,9 +38,7 @@ public abstract class WorldDisplayEntity extends UIComponent {
 	}
 
 	@Override
-	public void render(GUIContext container, Graphics g) throws SlickException {
-		super.render(container, g);
-
+	protected void draw(GUIContext container, Graphics g) throws SlickException {
 		draw(getDrawArea().getX(), getDrawArea().getY());
 	}
 

@@ -25,8 +25,6 @@ import org.newdawn.slick.gui.GUIContext;
 
 import com.google.common.eventbus.Subscribe;
 
-import replay.Util;
-import teampg.grid2d.RectGrid;
 import teampg.grid2d.point.AbsPos;
 
 public class WorldView extends UIComponent {
@@ -36,7 +34,6 @@ public class WorldView extends UIComponent {
 	private static final Dimension TABLE_BORDER = new Dimension(3, 3);
 
 	private WorldModel worldData;
-	private RectGrid<WorldDisplayEntity> grid;
 
 	private Image worldGrid;
 
@@ -48,8 +45,6 @@ public class WorldView extends UIComponent {
 	}
 	private WorldView(Rectangle drawArea, AbstractUIComponent parent) {
 		super(drawArea, parent);
-
-
 	}
 
 	public void connectWorldModel(WorldModel model) {
@@ -65,7 +60,6 @@ public class WorldView extends UIComponent {
 
 		worldGrid = ImgUtil.buildPanelImage(panelTheme, gridArea, 3, 3, 37, 37);
 
-		grid = new RectGrid<>(worldData.getSize());
 		setTurn(0);
 	}
 	public WorldModel getModel() {
@@ -82,22 +76,12 @@ public class WorldView extends UIComponent {
 	}
 
 	@Override
-	public void render(GUIContext container, Graphics g) throws SlickException {
+	protected void draw(GUIContext container, Graphics g) throws SlickException {
 		if (worldData == null) {
 			return;
 		}
 
 		worldGrid.draw(getDrawArea().getX(), getDrawArea().getY());
-
-		for (WorldDisplayEntity ent : grid) {
-			if (ent == null) {
-				continue;
-			}
-			ent.render(container, g);
-			if (!ent.getData().getLifespan().contains(getModel().getTurn())) {
-				System.out.println(ent);
-			}
-		}
 	}
 
 	@Override
@@ -118,16 +102,11 @@ public class WorldView extends UIComponent {
 	}
 
 	private void setTurn(int turn) {
-		for (WorldDisplayEntity ent : grid) {
-			if (ent == null) {
-				continue;
-			}
-			removeChild(ent);
-		}
-		grid.fill(null);
+		//TODO persist living ents; don't remake every turn
+		removeAllChildren();
 
 		for (EntityModel ent : worldData) {
-			grid.set(Util.of(ent.onTurn(turn).getPos()), WorldDisplayEntity.getEnt(this, ent));
+			addChild(WorldDisplayEntity.getEnt(this, ent));
 		}
 	}
 

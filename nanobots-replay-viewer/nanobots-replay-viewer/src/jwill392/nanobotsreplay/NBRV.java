@@ -3,9 +3,11 @@ package jwill392.nanobotsreplay;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 
 import jwill392.nanobotsreplay.assets.Assets;
 import jwill392.nanobotsreplay.ui.AbstractUIComponent;
+import jwill392.nanobotsreplay.ui.Frame;
 import jwill392.nanobotsreplay.ui.UIComponent;
 import jwill392.nanobotsreplay.ui.WorldInfoPanel;
 import jwill392.nanobotsreplay.world.WorldModel;
@@ -22,6 +24,7 @@ import org.newdawn.slick.geom.Rectangle;
 
 import replay.ReplayProto.Replay;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 
 public class NBRV extends BasicGame {
@@ -33,8 +36,14 @@ public class NBRV extends BasicGame {
 
 	private WorldView worldDisplay;
 	private WorldInfoPanel infoPanel;
+	private Frame worldFrame;
 
 	private WorldModel worldModel;
+
+	private int keyRepeatCounter = 1;
+	private static final int KEY_REPEAT = 5;
+	private static final int INITIAL_KEY_REPEAT = 20;
+	private static final List<Integer> repeatKeys = ImmutableList.of(Input.KEY_UP, Input.KEY_DOWN, Input.KEY_RIGHT, Input.KEY_LEFT);
 
 	public NBRV() {
 		super("Nanobots Replay Viewer");
@@ -61,8 +70,12 @@ public class NBRV extends BasicGame {
 
 		UIComponent.setRoot(SCREEN, container);
 
-		worldDisplay = new WorldView(new Rectangle(1, 1, 598, 598));
+		worldFrame = new Frame(new Rectangle(1, 1, 598, 598));
+
+		worldDisplay = new WorldView(worldFrame.getFramedArea());
 		eventBus.register(worldDisplay);
+
+		worldFrame.setContents(worldDisplay);
 
 		infoPanel = new WorldInfoPanel(new Rectangle(601, 1, 198, 598));
 		eventBus.register(infoPanel);
@@ -86,39 +99,40 @@ public class NBRV extends BasicGame {
 	@Override
 	public void keyPressed(int key, char c) {
 		super.keyPressed(key, c);
+		keyRepeatCounter = INITIAL_KEY_REPEAT;
+
+		doKeyPressedAction(key);
+	}
+
+	private void doKeyPressedAction(int key) {
+		if (worldModel == null) {
+			return;
+		}
 
 		if (key == Input.KEY_RIGHT) {
-			if (worldModel != null && worldModel.hasNextTurn()) {
+			if (worldModel.hasNextTurn()) {
 				worldModel.nextTurn();
 			}
 		} else if (key == Input.KEY_LEFT) {
-			if (worldModel != null && worldModel.hasPrevTurn()) {
+			if (worldModel.hasPrevTurn()) {
 				worldModel.prevTurn();
 			}
 		} else if (key == Input.KEY_UP) {
-			if (worldModel != null && worldModel.hasTurn(worldModel.getTurn() + 10)) {
-				worldModel.setTurn(worldModel.getTurn() + 10);
+			if (worldModel.hasTurn(worldModel.getTurn() + 9)) {
+				worldModel.setTurn(worldModel.getTurn() + 9);
 			}
 		} else if (key == Input.KEY_DOWN) {
-			if (worldModel != null && worldModel.hasTurn(worldModel.getTurn() - 10)) {
-				worldModel.setTurn(worldModel.getTurn() - 10);
+			if (worldModel.hasTurn(worldModel.getTurn() - 9)) {
+				worldModel.setTurn(worldModel.getTurn() - 9);
 			}
 		} else if (key == Input.KEY_SPACE) {
-			if (worldModel != null) {
-				System.out.println(worldModel.getEndTurn());
-			}
+			System.out.println(worldModel.getEndTurn());
 		}
 	}
 
 	@Override
 	public void render(GameContainer container, Graphics g) throws SlickException {
 		AbstractUIComponent.getRoot().render(container, g);
-
-		if (container.getInput().isKeyDown(Input.KEY_UP)) {
-			if (worldModel != null && worldModel.hasTurn(worldModel.getTurn() + 10)) {
-				worldModel.setTurn(worldModel.getTurn() + 10);
-			}
-		}
 	}
 
 	@Override
@@ -127,6 +141,25 @@ public class NBRV extends BasicGame {
 
 		if (worldDisplay != null) {
 			worldDisplay.update(container, delta);
+		}
+
+		inputTick(container.getInput());
+	}
+
+	private void inputTick(Input input) {
+		if (keyRepeatCounter > 0) {
+			keyRepeatCounter--;
+		}
+		if (keyRepeatCounter != 0) {
+			return;
+		}
+
+		for (Integer keyCode : repeatKeys) {
+			if (input.isKeyDown(keyCode)) {
+				keyRepeatCounter = KEY_REPEAT;
+				doKeyPressedAction(keyCode);
+				return;
+			}
 		}
 
 	}

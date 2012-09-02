@@ -38,7 +38,7 @@ public class WorldInfoPanel extends UIComponent {
 		Image panelBackgroundTheme = Assets.getSheet("assets/spritesheet").getSprite("panel.png");
 
 		Dimension turnPanelSize = new Dimension((int) getDrawArea().getWidth(), 30);
-		Dimension mainPanelSize = new Dimension((int) getDrawArea().getWidth(), (int) getDrawArea().getHeight() - 25);
+		Dimension mainPanelSize = new Dimension((int) getDrawArea().getWidth(), (int) getDrawArea().getHeight() - 30);
 		turnPanel = ImgUtil.buildPanelImage(panelBackgroundTheme, turnPanelSize, 6, 6, 8, 8);
 		mainPanel = ImgUtil.buildPanelImage(panelBackgroundTheme, mainPanelSize, 6, 6, 8, 8);
 
@@ -46,8 +46,7 @@ public class WorldInfoPanel extends UIComponent {
 	}
 
 	@Override
-	public void render(GUIContext container, Graphics g) throws SlickException {
-		super.render(container, g);
+	protected void draw(GUIContext container, Graphics g) throws SlickException {
 		turnPanel.draw(getDrawArea().getX(), getDrawArea().getY());
 		mainPanel.draw(getDrawArea().getX(), getDrawArea().getY() + 30);
 

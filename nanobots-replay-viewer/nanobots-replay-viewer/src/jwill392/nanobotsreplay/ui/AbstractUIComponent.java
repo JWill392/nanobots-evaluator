@@ -18,10 +18,8 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.gui.GUIContext;
 
-import com.google.common.collect.Iterators;
-
 public abstract class AbstractUIComponent implements Iterable<UIComponent>, MouseListener {
-	private final Rectangle drawArea;
+	private Rectangle drawArea;
 	private final List<UIComponent> children;
 
 	private boolean hidden;
@@ -90,9 +88,40 @@ public abstract class AbstractUIComponent implements Iterable<UIComponent>, Mous
 		return SlickUtil.copy(drawArea);
 	}
 
+	public void setDrawArea(Rectangle drawArea) {
+		this.drawArea = drawArea;
+	}
+
+	/**
+	 * Can call remove; it's equivalent to calling removeChild.
+	 */
 	@Override
-	public Iterator<UIComponent> iterator() {
-		return Iterators.unmodifiableIterator(children.iterator());
+	public final Iterator<UIComponent> iterator() {
+		final Iterator<UIComponent> iter = children.iterator();
+		return new Iterator<UIComponent>() {
+			private UIComponent curr;
+
+			@Override
+			public boolean hasNext() {
+				return iter.hasNext();
+			}
+
+			@Override
+			public UIComponent next() {
+				curr = iter.next();
+				return curr;
+			}
+
+			@Override
+			public void remove() {
+				if (curr == null) {
+					throw new IllegalStateException();
+				}
+
+				onChildRemoved(curr);
+				iter.remove();
+			}
+		};
 	}
 	public final void addChild(UIComponent child) {
 		checkArgument(SlickUtil.contains(drawArea, child.getDrawArea()), drawArea + " does not contain " + child.getDrawArea());
@@ -104,6 +133,12 @@ public abstract class AbstractUIComponent implements Iterable<UIComponent>, Mous
 		children.remove(child);
 		onChildRemoved(child);
 	}
+	public final void removeAllChildren() {
+		for (Iterator<UIComponent> iter = iterator(); iter.hasNext();) {
+			iter.next();
+			iter.remove();
+		}
+	}
 
 	public boolean getHidden() {
 		return hidden;
@@ -112,15 +147,19 @@ public abstract class AbstractUIComponent implements Iterable<UIComponent>, Mous
 		hidden = hid;
 	}
 
-	public void render(GUIContext container, Graphics g) throws SlickException {
+	public final void render(GUIContext container, Graphics g) throws SlickException {
 		if (hidden) {
 			return;
 		}
+
+		draw(container, g);
 
 		for (UIComponent child : children) {
 			child.render(container, g);
 		}
 	}
+
+	protected abstract void draw(GUIContext container, Graphics g) throws SlickException;
 
 	public void update(GameContainer container, int delta)
 			throws SlickException {
