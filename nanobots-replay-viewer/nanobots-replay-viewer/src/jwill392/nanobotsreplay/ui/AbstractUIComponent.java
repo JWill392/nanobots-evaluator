@@ -26,7 +26,7 @@ public abstract class AbstractUIComponent implements Iterable<UIComponent>, Mous
 
 	private boolean hidden;
 
-	private boolean mouseDown;
+	private boolean mouseDownAndStartedInsideComponent;
 	private boolean mouseHover;
 	private boolean focused;
 
@@ -43,7 +43,7 @@ public abstract class AbstractUIComponent implements Iterable<UIComponent>, Mous
 	}
 
 	public boolean isMouseDown() {
-		return mouseDown;
+		return mouseDownAndStartedInsideComponent;
 	}
 	public boolean isMouseHover() {
 		return mouseHover;
@@ -174,9 +174,9 @@ public abstract class AbstractUIComponent implements Iterable<UIComponent>, Mous
 	}
 	@Override
 	public void mousePressed(int button, int x, int y) {
-		assert !mouseDown;
+		assert !mouseDownAndStartedInsideComponent;
 		if (drawArea.contains(x, y)) {
-			mouseDown = true;
+			mouseDownAndStartedInsideComponent = true;
 			inputNotifications.add(new OnClick(true, x, y));
 
 			if (!focused) {
@@ -195,26 +195,28 @@ public abstract class AbstractUIComponent implements Iterable<UIComponent>, Mous
 	}
 	@Override
 	public void mouseReleased(int button, int x, int y) {
-		if (drawArea.contains(x, y) && mouseDown) {
+		if (drawArea.contains(x, y) && mouseDownAndStartedInsideComponent) {
 			inputNotifications.add(new OnClick(false, x, y));
 		}
-		mouseDown = false;
+		mouseDownAndStartedInsideComponent = false;
 	}
 	@Override
 	public void mouseMoved(int oldx, int oldy, int newx, int newy) {
+		// moved outside component
+		if (!drawArea.contains(newx, newy) && mouseHover) {
+			mouseHover = false;
+			inputNotifications.add(new OnHover(false));
+			return;
+		}
 
-		if (drawArea.contains(newx, newy)) {
-			if (!mouseHover) {
-				inputNotifications.add(new OnHover(true));
-			}
+		// moved onto component
+		if (!mouseHover) {
+			inputNotifications.add(new OnHover(true));
 			mouseHover = true;
 			return;
 		}
 
-		if (mouseHover) {
-			mouseHover = false;
-			inputNotifications.add(new OnHover(false));
-		}
+		// already hovering, moving within component.  Don't care.
 	}
 	@Override
 	public void mouseDragged(int oldx, int oldy, int newx, int newy) {
