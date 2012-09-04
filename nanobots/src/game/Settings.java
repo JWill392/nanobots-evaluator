@@ -26,7 +26,7 @@ public class Settings {
 	private int MEMORY_SIZE = 16;
 
 	private int MESSAGE_LENGTH = 16;
-	private int MESSAGE_RANGE = 8;
+	private int MESSAGE_RANGE = 12;
 
 	private int BOT_MAX_ENERGY = 100;
 	private float OVERCHARGE_DRAIN = 0.8f;
@@ -76,6 +76,7 @@ public class Settings {
 		ACTION_COSTS.put(ConceiveCmd.class, 0);
 		ACTION_COSTS.put(BirthCmd.class, 20);
 		ACTION_COSTS.put(BroadcastCmd.class, 0);
+		ACTION_COSTS.put(TransferCmd.class, 0);
 		ACTION_COSTS.put(WaitCmd.class, 0);
 
 		ACTION_RANGES = new HashMap<Class<? extends TargettedAction>, Integer>(10);

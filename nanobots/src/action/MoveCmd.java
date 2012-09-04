@@ -32,11 +32,6 @@ public class MoveCmd extends TargettedAction {
 			BotEntity bot = iter.next();
 			MoveCmd action = (MoveCmd) bot.getRunningAction();
 
-			// TODO REMOVE ME
-			if (action.getTarget().equals(AbsPos.of(11, 3))) {
-				System.out.println("######### Potential weird one: " + action);
-			}
-
 			AbsPos startPos = world.getBotPosition(bot.getID());
 			Entity targetEnt = world.get(action.getTarget());
 

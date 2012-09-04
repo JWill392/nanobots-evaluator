@@ -1,5 +1,8 @@
 package entity;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 import replay.ReplayProto.Replay;
 import replay.ReplayProto.Replay.Action.Outcome;
 import replay.ReplayProto.Replay.Entity.ReceivedMessage;
@@ -23,6 +26,8 @@ public class BotEntity extends MortalEntity implements MobileEntity{
 
 	private final int botID;
 	private final Team team;
+
+	private final Queue<ReceivedMessage> inboxBuffer;
 
 	private RunningAction runningAction;
 
@@ -49,6 +54,7 @@ public class BotEntity extends MortalEntity implements MobileEntity{
 		setEnergy(Settings.getNewbornEnergy());
 
 		runningAction = null;
+		inboxBuffer = new LinkedList<>();
 
 		data.setBotState(Replay.Entity.BotState.NORMAL);
 		data.setMemory(0);
@@ -96,7 +102,15 @@ public class BotEntity extends MortalEntity implements MobileEntity{
 			}
 		}
 
+		// receive messages from this turn, throw out ones from last turn
+
 		data.clearInbox();
+
+		while (!inboxBuffer.isEmpty()) {
+			ReceivedMessage msg = inboxBuffer.remove();
+			data.addInbox(msg);
+		}
+
 		runningAction = null;
 	}
 
@@ -130,7 +144,7 @@ public class BotEntity extends MortalEntity implements MobileEntity{
 	}
 
 	public void addReceivedMessage(MessageSignal msg) {
-		data.addInbox(msg.getData());
+		inboxBuffer.add(msg.getData());
 	}
 
 	public UnmodifiableIterator<ReceivedMessage> getReceivedMessages() {

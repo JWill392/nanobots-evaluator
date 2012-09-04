@@ -8,6 +8,7 @@ import java.util.Scanner;
 import com.google.common.collect.ImmutableList;
 
 import brain.demo.BasicBrain;
+import brain.demo.communalbot.CommunalBrain;
 
 
 public class _GameTest {
@@ -26,16 +27,30 @@ public class _GameTest {
 		Settings.lock();
 
 		teamA = new Team(new BasicBrain(), "teamA");
-		teamB = new Team(new BasicBrain(), "teamB");
+		teamB = new Team(new CommunalBrain(), "teamB");
 		ImmutableList<Team> teamList = ImmutableList.of(teamA, teamB);
 
 		GameMap map = new GameMap("PLACEHOLDER",
-				"00..F.........\n" +
-				"..............\n" +
-				"..............\n" +
-				"..............\n" +
-				"..............\n" +
-				".........F..11");
+						"00..F..F..................\n" +
+						"00..F..F..................\n" +
+						"00..F..F..................\n" +
+						"..........................\n" +
+						"..........................\n" +
+						"..........................\n" +
+						"..........................\n" +
+						"..........................\n" +
+						"..........................\n" +
+						"..........................\n" +
+						"..........................\n" +
+						"..........................\n" +
+						"..........................\n" +
+						"..........................\n" +
+						"..........................\n" +
+						"..........................\n" +
+						"..................F..F..11\n" +
+						"..................F..F..11\n" +
+						"..................F..F..11"
+						);
 
 		game = new Game(map, teamList, new File("/home/jackson/testreplay"));
 		world = game.getWorld();
@@ -48,18 +63,10 @@ public class _GameTest {
 			int tc = 0;
 			teampg.util.Util.setSeed(4337);
 			while (game.runNextTurn()) {
-				if (tc == 17) {
-					//System.out.println("FULL MATCH: " + MatchLog.getMatch());
+				tc++;
+				if (tc % 10 == 0) {
+					System.out.println("TURN #: " + tc);
 				}
-				System.out.println("TURN #" + tc++);
-				/*
-				System.out.println("\n------------\n");
-				System.out.println(world);
-				String line = continueListener.nextLine();
-				if (line.equals("done")) {
-					MatchLog.endMatch();
-				}
-				*/
 			}
 		}
 	}

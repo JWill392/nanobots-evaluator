@@ -22,7 +22,6 @@ import teampg.grid2d.point.AbsPos;
 import teampg.grid2d.point.Pos2D;
 
 import entity.BotEntity;
-import entity.DynamicEntity;
 import entity.Entity;
 import entity.MortalEntity;
 import game.Settings;
@@ -256,10 +255,6 @@ public class World {
 	}
 
 	public void tick() {
-		for (DynamicEntity dynEnt : Iterables.filter(grid, DynamicEntity.class)) {
-			dynEnt.tick();
-		}
-
 		for (MortalEntity mortEnt : Iterables.filter(grid, MortalEntity.class)) {
 			if (mortEnt.getEnergy() <= 0) {
 				destroy(mortEnt);

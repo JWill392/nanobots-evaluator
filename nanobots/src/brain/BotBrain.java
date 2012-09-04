@@ -1,6 +1,5 @@
 package brain;
 
-import replay.ReplayProto.Replay;
 import replay.ReplayProto.Replay.Entity.BotState;
 import replay.ReplayProto.Replay.Entity.ReceivedMessage;
 import teampg.grid2d.point.AbsPos;
@@ -18,7 +17,6 @@ public abstract class BotBrain {
 	protected Vision vision;
 	protected AbsPos position;
 	protected ImmutableList<ReceivedMessage> msgs;
-	protected Replay.Action lastAction;
 	protected BotState state;
 	protected Integer elapsedGestation;
 
@@ -31,7 +29,6 @@ public abstract class BotBrain {
 		vision = info.vision;
 		position = info.position;
 		msgs = info.msgs;
-		lastAction = info.lastAction;
 		state = info.botState;
 		elapsedGestation = info.elapsedGestation;
 

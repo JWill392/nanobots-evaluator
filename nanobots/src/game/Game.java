@@ -21,7 +21,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
 public class Game {
-	private static final int MAX_TURNS = 10000;
+	private static final int MAX_TURNS = 5000;
 	private final GameMap map;
 	private final World world;
 	private final ImmutableList<Team> teams;
@@ -62,8 +62,6 @@ public class Game {
 		// log world state when brains get their input
 		MatchLog.logWorldState();
 
-		System.out.println("GET ACT: " + teamBots);
-
 		// SET ACTIONS - given info, bots decide what they want to do this turn.
 		for (BotEntity bot : teamBots) {
 			BrainInfo info = world.getBotInfo(bot.getID());
@@ -79,7 +77,6 @@ public class Game {
 			}
 		}
 
-		System.out.println("EXEC: " + teamBots);
 		//execute actions just proposed
 		for (Class<? extends RunningAction> actionType : Settings.getActionExecutionOrder()) {
 			RunningAction.executeAll(actionType, teamBots, world);
@@ -94,6 +91,9 @@ public class Game {
 		//##########################################
 
 		// kill dead ents, clear actions and outcomes, etc.
+		for (BotEntity bot : teamBots) {
+			bot.tick();
+		}
 		world.tick();
 
 		// check lose condition on team
