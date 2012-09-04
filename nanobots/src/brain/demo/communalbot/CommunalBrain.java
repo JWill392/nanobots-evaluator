@@ -12,7 +12,6 @@ import teampg.grid2d.point.Pos2D;
 import teampg.grid2d.point.RelPos;
 import teampg.util.Util;
 
-import entity.bot.Memory;
 import entity.bot.Message;
 import game.Settings;
 import action.ActionCmd;
@@ -41,37 +40,34 @@ public class CommunalBrain extends BotBrain {
 		/*
 		 * TODO priority system, rather than just ordering?  Yeah.  Compute priorities first, then decide which to do.
 		 */
-		CommunalMemory cMem;
-		ActionCmd ret;
-
-		switch (CommunalMemory.getRole(mem)) {
-		case UNDECIDED:
-			cMem = new UndecidedMemory(mem);
-			ret = doUndecided((UndecidedMemory) cMem);
-			break;
-		case BREEDER:
-			cMem = new BreederMemory(mem);
-			ret = doBreeder((BreederMemory) cMem);
-			break;
-		case FEEDER:
-			cMem = new FeederMemory(mem);
-			ret = doFeeder((FeederMemory) cMem);
-			break;
-		case FIGHTER:
-			cMem = new FighterMemory(mem);
-			ret = doFighter((FighterMemory) cMem);
-			break;
-		default:
-			throw new IllegalStateException();
-		}
+		CommunalMemory cMem = CommunalMemory.getMemory(mem);
+		ActionCmd ret = doRole(cMem);
 
 		mem = cMem.getData();
 		return ret;
 	}
 
-	private ActionCmd doUndecided(UndecidedMemory cMem) {
+	private ActionCmd doRole(CommunalMemory cMem) {
+		switch (cMem.getRole()) {
+		case UNDECIDED:
+			return doUndecided((UndecidedMemory) cMem);
+		case BREEDER:
+			return doBreeder((BreederMemory) cMem);
+		case FEEDER:
+			return doFeeder((FeederMemory) cMem);
+		case FIGHTER:
+			return doFighter((FighterMemory) cMem);
+		default:
+			throw new IllegalStateException();
+		}
+	}
 
-		//TODO broken at the moment, because the initial breeders will always spawn in the same location, meaning they'll each spawn the same type, every birth.
+	private ActionCmd doUndecided(UndecidedMemory cMem) {
+		ActionCmd selfDefenceAction = selfDefence();
+		if (selfDefenceAction != null) {
+			return selfDefenceAction;
+		}
+
 		BotRole choice;
 		if (position.hashCode() % 3 == 0) {
 			choice = BotRole.FIGHTER;
@@ -81,18 +77,15 @@ public class CommunalBrain extends BotBrain {
 			choice = BotRole.BREEDER;
 		}
 
-		cMem.decide(choice);
+		CommunalMemory newMem = CommunalMemory.getBlankMemory(choice);
+		ActionCmd ret = doRole(newMem);
 
-		switch (choice) {
-		case BREEDER:
-			return doBreeder(new BreederMemory(new Memory()));
-		case FEEDER:
-			return doFeeder(new FeederMemory(new Memory()));
-		case FIGHTER:
-			return doFighter(new FighterMemory(new Memory()));
-		default:
-			throw new IllegalStateException();
-		}
+		// set input/output memory to new state's memory
+		cMem.decided(newMem);
+		return ret;
+
+
+
 		/*
 		 * TODO broadcast choice, and change it based on other's choices.
 		 */
@@ -101,6 +94,8 @@ public class CommunalBrain extends BotBrain {
 	}
 
 	private ActionCmd doBreeder(BreederMemory cMem) {
+		// TODO if too close to another breeder, move away
+
 		// Not pregnant?  Get pregnant.
 		if (state != BotState.GESTATING &&
 				energy > Settings.getBotMaxEnergy()) {
@@ -111,7 +106,10 @@ public class CommunalBrain extends BotBrain {
 		if (state == BotState.GESTATING && elapsedGestation >= Settings.getGestationDuration()) {
 			List<AbsPos> emptyCells = vision.getPositions(Vision.EMPTY);
 			if (!emptyCells.isEmpty()) {
-				return new BirthCmd(emptyCells.get(0), new Memory());
+
+				BotRole newbornRole = Util.choice(BotRole.BREEDER, BotRole.FEEDER, BotRole.FIGHTER, BotRole.FIGHTER);
+
+				return new BirthCmd(emptyCells.get(0), CommunalMemory.getBlankMemory(newbornRole).getData());
 			}
 		}
 
@@ -120,22 +118,14 @@ public class CommunalBrain extends BotBrain {
 	}
 
 	private ActionCmd doFeeder(FeederMemory cMem) {
+		ActionCmd selfDefenceAction = selfDefence();
+		if (selfDefenceAction != null) {
+			return selfDefenceAction;
+		}
 
-		// Eat
-		List<AbsPos> foodPos = vision.getPositions(Vision.FOOD);
-		if (energy < Settings.getBotMaxEnergy() && !foodPos.isEmpty()) {
-			AbsPos bestFoodPos = foodPos.get(0);
-			RelPos relFoodPos = RelPos.offsetVector(position, bestFoodPos);
-
-			if (relFoodPos.squareMagnitude() == 1) {
-				return new HarvestCmd(bestFoodPos);
-			}
-
-			AbsPos moveTowardsFood = BrainUtil.getMoveTowards(position, bestFoodPos);
-
-			if (vision.get(moveTowardsFood) == Vision.EMPTY) {
-				return new MoveCmd(moveTowardsFood);
-			}
+		ActionCmd eatAction = moveTowardsFoodAndEat();
+		if (eatAction != null) {
+			return eatAction;
 		}
 
 		// Hear a gestating bot asking for help?
@@ -180,8 +170,49 @@ public class CommunalBrain extends BotBrain {
 
 		}
 
+		ActionCmd eatAction = moveTowardsFoodAndEat();
+		if (eatAction != null) {
+			return eatAction;
+		}
+
 		// Random walk
 		return new MoveCmd(Pos2D.offset(position,
 				Util.choice(RelPos.UP, RelPos.RIGHT, RelPos.DOWN, RelPos.LEFT)));
+	}
+
+	private ActionCmd moveTowardsFoodAndEat() {
+		// Eat
+		List<AbsPos> foodPos = vision.getPositions(Vision.FOOD);
+		if (energy < Settings.getBotMaxEnergy() && !foodPos.isEmpty()) {
+			AbsPos bestFoodPos = foodPos.get(0);
+			RelPos relFoodPos = RelPos.offsetVector(position, bestFoodPos);
+
+			if (relFoodPos.squareMagnitude() == 1) {
+				return new HarvestCmd(bestFoodPos);
+			}
+
+			AbsPos moveTowardsFood = BrainUtil.getMoveTowards(position, bestFoodPos);
+
+			if (vision.get(moveTowardsFood) == Vision.EMPTY) {
+				return new MoveCmd(moveTowardsFood);
+			}
+		}
+
+		return null;
+	}
+
+	private ActionCmd selfDefence() {
+		// Kill
+		List<AbsPos> enemyPos = vision.getPositions(Vision.ENEMY_BOT);
+		if (!enemyPos.isEmpty()) {
+			AbsPos bestEnemyPos = enemyPos.get(0);
+			RelPos relEnemyPos = RelPos.offsetVector(position, bestEnemyPos);
+
+			if (relEnemyPos.squareMagnitude() == 1) {
+				return new AttackCmd(bestEnemyPos);
+			}
+		}
+
+		return null;
 	}
 }

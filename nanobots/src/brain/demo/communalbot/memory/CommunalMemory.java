@@ -11,7 +11,7 @@ public abstract class CommunalMemory {
 		FIGHTER;
 	}
 
-	private final Memory mem;
+	protected final Memory mem;
 	public CommunalMemory(Memory mem) {
 		this.mem = mem;
 	}
@@ -26,5 +26,39 @@ public abstract class CommunalMemory {
 
 	public Memory getData() {
 		return (Memory) mem.clone();
+	}
+
+	public static CommunalMemory getMemory(Memory mem) {
+		switch (getRole(mem)) {
+		case UNDECIDED:
+			return new UndecidedMemory(mem);
+		case BREEDER:
+			return new BreederMemory(mem);
+		case FEEDER:
+			return new FeederMemory(mem);
+		case FIGHTER:
+			return new FighterMemory(mem);
+		default:
+			throw new IllegalStateException();
+		}
+	}
+
+	public static CommunalMemory getBlankMemory(BotRole role) {
+		switch (role) {
+		case UNDECIDED:
+			return new UndecidedMemory(new Memory());
+		case BREEDER:
+			return new BreederMemory(new Memory());
+		case FEEDER:
+			return new FeederMemory(new Memory());
+		case FIGHTER:
+			return new FighterMemory(new Memory());
+		default:
+			throw new IllegalStateException();
+		}
+	}
+
+	public BotRole getRole() {
+		return getRole(mem);
 	}
 }

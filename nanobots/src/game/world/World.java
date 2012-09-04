@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import teampg.grid2d.point.AbsPos;
 import teampg.grid2d.point.Pos2D;
 
 import entity.BotEntity;
+import entity.DynamicEntity;
 import entity.Entity;
 import entity.MortalEntity;
 import game.Settings;
@@ -36,7 +38,7 @@ import brain.Vision;
  *
  * @author Jackson Williams
  */
-public class World {
+public class World implements Iterable<BotEntity> {
 	private final GridInterface<Entity> grid;
 	private final Map<Integer, AbsPos> botIndex;
 	private final Entity TO_APPEAR_OUTSIDE_GRID = Entity.getNewWall();
@@ -255,6 +257,10 @@ public class World {
 	}
 
 	public void tick() {
+		for (DynamicEntity dynEnt : Iterables.filter(grid, DynamicEntity.class)) {
+			dynEnt.tick();
+		}
+
 		for (MortalEntity mortEnt : Iterables.filter(grid, MortalEntity.class)) {
 			if (mortEnt.getEnergy() <= 0) {
 				destroy(mortEnt);
@@ -277,5 +283,10 @@ public class World {
 	@Override
 	public String toString() {
 		return grid.toString();
+	}
+
+	@Override
+	public Iterator<BotEntity> iterator() {
+		return Iterables.filter(grid, BotEntity.class).iterator();
 	}
 }

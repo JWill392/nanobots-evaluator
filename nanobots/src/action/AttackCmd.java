@@ -1,5 +1,6 @@
 package action;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
@@ -22,6 +23,10 @@ public class AttackCmd extends TargettedAction {
 		//remove obviously illegal actions
 		filterBasicInvalid(world, actors);
 
+		// must apply damage after 'running' all attack actions in case two bots attack each other (and cause one to be 'unable' to pay for attack action)
+		List<BotEntity> hurtBots = new ArrayList<>();
+
+		// Execute
 		for (BotEntity bot : actors) {
 			AttackCmd action = (AttackCmd) bot.getRunningAction();
 			Entity targetEnt = world.get(action.getTarget());
@@ -40,7 +45,12 @@ public class AttackCmd extends TargettedAction {
 			}
 
 			action.succeed(bot);
-			((BotEntity) targetEnt).addEnergy(-Settings.getAttackDamage());
+			hurtBots.add(targetBot);
+		}
+
+		// Apply damage
+		for (BotEntity hurtBot : hurtBots) {
+			hurtBot.addEnergy(-Settings.getAttackDamage());
 		}
 	}
 

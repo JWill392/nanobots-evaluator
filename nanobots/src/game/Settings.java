@@ -30,7 +30,7 @@ public class Settings {
 
 	private int BOT_MAX_ENERGY = 100;
 	private float OVERCHARGE_DRAIN = 0.8f;
-	private int VISION_RAD = 2;
+	private int VISION_RAD = 4;
 	private int HARVEST_ENERGY = 20;
 	private int BOT_NEWBORN_ENERGY = 50;
 

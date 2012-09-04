@@ -56,16 +56,14 @@ public class Game {
 	}
 
 	public boolean runNextTurn() {
-		Team currTeam = teams.get(currTeamIndex);
-		Iterable<BotEntity> teamBots = world.getTeamBots(currTeam);
 
 		// log world state when brains get their input
 		MatchLog.logWorldState();
 
 		// SET ACTIONS - given info, bots decide what they want to do this turn.
-		for (BotEntity bot : teamBots) {
+		for (BotEntity bot : world) {
 			BrainInfo info = world.getBotInfo(bot.getID());
-			BrainActionAndMemory brainDecision = currTeam.decideAction(info);
+			BrainActionAndMemory brainDecision = bot.getTeam().decideAction(info);
 
 			if (brainDecision.mem != null) {
 				bot.setMemory(brainDecision.mem);
@@ -79,7 +77,7 @@ public class Game {
 
 		//execute actions just proposed
 		for (Class<? extends RunningAction> actionType : Settings.getActionExecutionOrder()) {
-			RunningAction.executeAll(actionType, teamBots, world);
+			RunningAction.executeAll(actionType, world, world);
 		}
 
 		// log the actions brains proposed, and whether they succeeded.
@@ -91,9 +89,6 @@ public class Game {
 		//##########################################
 
 		// kill dead ents, clear actions and outcomes, etc.
-		for (BotEntity bot : teamBots) {
-			bot.tick();
-		}
 		world.tick();
 
 		// check lose condition on team

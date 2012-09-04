@@ -8,7 +8,7 @@ public class UndecidedMemory extends CommunalMemory {
 		setRole(BotRole.UNDECIDED);
 	}
 
-	public void decide(BotRole role) {
-		setRole(role);
+	public void decided(CommunalMemory newMem) {
+		mem.setBits(0, mem.size(), newMem.getData().getAll());
 	}
 }

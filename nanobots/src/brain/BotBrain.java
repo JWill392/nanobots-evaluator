@@ -60,7 +60,7 @@ public abstract class BotBrain {
 		public final Memory mem;
 		public final RunningAction cmd;
 
-		private BrainActionAndMemory(Memory mem, ActionCmd cmd) {
+		public BrainActionAndMemory(Memory mem, ActionCmd cmd) {
 			this.mem = mem;
 			this.cmd = (RunningAction) cmd;
 		}
