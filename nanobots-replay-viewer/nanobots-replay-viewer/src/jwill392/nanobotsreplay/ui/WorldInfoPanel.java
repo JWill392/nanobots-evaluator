@@ -12,33 +12,25 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheetFont;
-import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.geom.Vector2f;
 import org.newdawn.slick.gui.GUIContext;
 
 import replay.ReplayProto.Replay.Entity;
 import com.google.common.eventbus.Subscribe;
 
-public class WorldInfoPanel extends UIComponent {
+public class WorldInfoPanel extends AbstractUIComponent{
 	private int turn = -1;
 	private EntityModel selected;
 	private final Image mainPanel;
 	private final Image turnPanel;
 	private final SpriteSheetFont font;
 
-	public WorldInfoPanel(Rectangle drawArea, UIComponent parent) throws SlickException {
-		this(drawArea, (AbstractUIComponent) parent);
-	}
-
-	public WorldInfoPanel(Rectangle drawArea) throws SlickException {
-		this(drawArea, AbstractUIComponent.getRoot());
-	}
-
-	protected WorldInfoPanel(Rectangle drawArea, AbstractUIComponent parent) throws SlickException {
-		super(drawArea, parent);
+	public WorldInfoPanel(Dimension drawSize, Vector2f drawPos) throws SlickException {
+		super(drawSize, drawPos);
 		Image panelBackgroundTheme = Assets.getSheet("assets/spritesheet").getSprite("panel.png");
 
-		Dimension turnPanelSize = new Dimension((int) getDrawArea().getWidth(), 30);
-		Dimension mainPanelSize = new Dimension((int) getDrawArea().getWidth(), (int) getDrawArea().getHeight() - 30);
+		Dimension turnPanelSize = new Dimension(drawSize.width, 30);
+		Dimension mainPanelSize = new Dimension(drawSize.width, drawSize.height - 30);
 		turnPanel = ImgUtil.buildPanelImage(panelBackgroundTheme, turnPanelSize, 6, 6, 8, 8);
 		mainPanel = ImgUtil.buildPanelImage(panelBackgroundTheme, mainPanelSize, 6, 6, 8, 8);
 
@@ -47,24 +39,27 @@ public class WorldInfoPanel extends UIComponent {
 
 	@Override
 	protected void draw(GUIContext container, Graphics g) throws SlickException {
-		turnPanel.draw(getDrawArea().getX(), getDrawArea().getY());
-		mainPanel.draw(getDrawArea().getX(), getDrawArea().getY() + 30);
+		turnPanel.draw(getAbsPos().x, getAbsPos().y);
+		mainPanel.draw(getAbsPos().x, getAbsPos().y + 30);
 
-		font.drawString(getDrawArea().getX() + 10, getDrawArea().getY() + 10, "Turn: " + turn);
+		font.drawString(getAbsPos().x + 10, getAbsPos().y + 10, "Turn: " + turn);
 
 		if (selected != null) {
 			Entity turnInfo = selected.onTurn(turn);
 
-			font.drawString(getDrawArea().getX() + 10, getDrawArea().getY() + 40, "ID: " + turnInfo.getEid());
-			font.drawString(getDrawArea().getX() + 10, getDrawArea().getY() + 60, "Energy: " + turnInfo.getEnergy());
+			font.drawString(getAbsPos().x + 10, getAbsPos().y + 40, "ID: " + turnInfo.getEid());
+			font.drawString(getAbsPos().x + 10, getAbsPos().y + 60, "Energy: " + turnInfo.getEnergy());
+
+			font.drawString(getAbsPos().x + 10, getAbsPos().y + 80, "Msgs: " + turnInfo.getInboxCount());
+			font.drawString(getAbsPos().x + 10, getAbsPos().y + 100, "Mem: " + Integer.toBinaryString(turnInfo.getMemory()));
 
 			if (turnInfo.hasRunningAction()) {
 				font.drawString(
-						getDrawArea().getX() + 10, getDrawArea().getY() + 80,
+						getAbsPos().x + 10, getAbsPos().y + 120,
 						"Action: " + turnInfo.getRunningAction().getType());
 				font.drawString(
-						getDrawArea().getX() + 10, getDrawArea().getY() + 100,
-						"Outcome: " + turnInfo.getRunningAction().getOutcome());
+						getAbsPos().x + 10, getAbsPos().y + 140,
+						" > " + turnInfo.getRunningAction().getOutcome());
 			}
 		}
 	}

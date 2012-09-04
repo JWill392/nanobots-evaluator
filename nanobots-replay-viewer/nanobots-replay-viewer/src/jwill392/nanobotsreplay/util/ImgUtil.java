@@ -3,11 +3,16 @@ package jwill392.nanobotsreplay.util;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.Rectangle;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.ImageBuffer;
 import org.newdawn.slick.SlickException;
+import teampg.grid2d.point.AbsPos;
 
 
 public class ImgUtil {
@@ -20,8 +25,19 @@ public class ImgUtil {
 		return img.getSubImage(dim.x, dim.y, dim.width, dim.height);
 	}
 
+	public static Rectangle getRectangle(org.newdawn.slick.geom.Rectangle badRect) {
+		return new Rectangle(
+				(int)badRect.getX(),
+				(int)badRect.getY(),
+				(int)badRect.getWidth(),
+				(int)badRect.getHeight()
+				);
+	}
 	public static Rectangle getRectangle(Image img) {
 		return new Rectangle(0, 0, img.getWidth(), img.getHeight());
+	}
+	public static Dimension getDim(Image img) {
+		return new Dimension(img.getWidth(), img.getHeight());
 	}
 
 	public static void tileImgToBuffer(ImageBuffer target, Image src, Rectangle fillArea) {
@@ -121,6 +137,62 @@ public class ImgUtil {
 		return bldr.getImage();
 	}
 
+
+	private static int xMax(Rectangle rect) {
+		return rect.x + rect.width;
+	}
+	private static int yMax(Rectangle rect) {
+		return rect.y + rect.height;
+	}
+
+	public static void drawTiled(Image theme, AbsPos offset, Rectangle fillArea) {
+		int startX = offset.x % theme.getWidth();
+		int startY = offset.y % theme.getHeight();
+		if (startX > 0) {
+			startX -= theme.getWidth();
+		}
+		if (startY > 0) {
+			startY -= theme.getHeight();
+		}
+
+		Point start = new Point(startX, startY);
+
+		List<Rectangle> tileRects = tileWithRects(fillArea, getDim(theme), start);
+
+		for (Rectangle drawRect : tileRects) {
+			int srcLeft = 0;
+			int srcTop = 0;
+
+			int srcRight = theme.getWidth();
+			int srcBottom = theme.getHeight();
+
+			if (drawRect.x == fillArea.x && drawRect.y == fillArea.y) {
+				srcLeft = theme.getWidth() - drawRect.width;
+				srcTop = theme.getHeight() - drawRect.height;
+			} else if (drawRect.y == fillArea.y) {
+				// remaining tops can be drawn as if top right
+				srcRight = drawRect.width;
+				srcTop = theme.getHeight() - drawRect.height;
+
+			} else if (xMax(drawRect) == xMax(fillArea)) {
+				// remaining rights can be drawn as if bottom right
+				srcRight = drawRect.width;
+				srcBottom = drawRect.height;
+
+
+			} else if (yMax(drawRect) == yMax(fillArea)) {
+				// remaining bottoms can be drawn as if bottom left
+				srcLeft = theme.getWidth() - drawRect.width;
+				srcBottom = drawRect.height;
+			} else if (drawRect.x == fillArea.x){
+				srcLeft = theme.getWidth() - drawRect.width;
+			}
+
+			Image subsect = theme.getSubImage(srcLeft, srcTop, srcRight, srcBottom);
+			subsect.draw(drawRect.x, drawRect.y);
+		}
+	}
+
 	public enum Segment {
 		TOP_LEFT,
 		TOP_RIGHT,
@@ -178,6 +250,30 @@ public class ImgUtil {
 		ret[Segment.LEFT.ordinal()]         = new Rectangle(xLeft , yMid   , wLeft , hMid);
 
 		ret[Segment.CENTRE.ordinal()]       = new Rectangle(xMid  , yMid   , wMid  , hMid);
+
+		return ret;
+	}
+
+	/**
+	 * Given a big rectangle and a small rectangle, fill tiles small rect onto big rect.
+	 * If rects aren't perfect multiples of each other (or are offset), some tiled rects
+	 * will be subsections of small rect.
+	 *
+	 * @param relTileStart The point where the first (top left) tile rect will be layed.  Must be on top left of toFill, or within one tile dim of top left.
+	 */
+	public static List<Rectangle> tileWithRects(Rectangle toFill, Dimension tile, Point relTileStart) {
+		List<Rectangle> ret = new ArrayList<>();
+
+		int toFillMaxX = toFill.x + toFill.width;
+		int toFillMaxY = toFill.y + toFill.height;
+
+		Point tileStart = new Point(relTileStart.x + toFill.x, relTileStart.y + toFill.y);
+
+		for (int x = tileStart.x; x < toFillMaxX; x += tile.width) {
+			for (int y = tileStart.y; y < toFillMaxY; y += tile.height) {
+				ret.add(toFill.intersection(new Rectangle(x, y, tile.width, tile.height)));
+			}
+		}
 
 		return ret;
 	}

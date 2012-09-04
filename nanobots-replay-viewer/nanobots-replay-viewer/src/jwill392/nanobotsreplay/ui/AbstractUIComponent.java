@@ -1,8 +1,8 @@
 package jwill392.nanobotsreplay.ui;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
+import java.awt.Dimension;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,15 +16,37 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.MouseListener;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.geom.Vector2f;
 import org.newdawn.slick.gui.GUIContext;
 
-public abstract class AbstractUIComponent implements Iterable<UIComponent>, MouseListener {
-	private Rectangle drawArea;
-	private final List<UIComponent> children;
+public abstract class AbstractUIComponent implements Iterable<AbstractUIComponent>, MouseListener {
+	private final Vector2f drawPos;
+	private final Dimension drawSize;
+	private final List<AbstractUIComponent> children;
+	private AbstractUIComponent parent;
 
 	private boolean hidden;
 
-	private boolean mouseDownAndStartedInsideComponent;
+	private enum MouseButton {
+		LEFT,
+		MIDDLE,
+		RIGHT;
+
+		public static MouseButton of(int code) {
+			switch (code) {
+			case Input.MOUSE_LEFT_BUTTON:
+				return LEFT;
+			case Input.MOUSE_MIDDLE_BUTTON:
+				return MIDDLE;
+			case Input.MOUSE_RIGHT_BUTTON:
+				return RIGHT;
+			default:
+				throw new IllegalStateException();
+			}
+		}
+	}
+
+	private final EnumSet<MouseButton> downAndStartedInsideComponent;
 	private boolean mouseHover;
 	private boolean focused;
 
@@ -32,16 +54,16 @@ public abstract class AbstractUIComponent implements Iterable<UIComponent>, Mous
 
 	// root stuff
 	private static UIRoot root;
-	public static void setRoot(Rectangle screen, GameContainer container) {
-		checkArgument(root == null);
+	public static void setRoot(Dimension screen, GameContainer container) {
+		assert root == null;
 		root = new UIRoot(screen, container);
 	}
 	public static UIRoot getRoot() {
 		return root;
 	}
 
-	public boolean isMouseDown() {
-		return mouseDownAndStartedInsideComponent;
+	public boolean isMouseDown(int button) {
+		return downAndStartedInsideComponent.contains(MouseButton.of(button));
 	}
 	public boolean isMouseHover() {
 		return mouseHover;
@@ -50,8 +72,8 @@ public abstract class AbstractUIComponent implements Iterable<UIComponent>, Mous
 		return focused;
 	}
 
-	public UIComponent getFocusedChild() {
-		for (UIComponent child : this) {
+	public AbstractUIComponent getFocusedChild() {
+		for (AbstractUIComponent child : this) {
 			if (child.isFocused()) {
 				return child;
 			}
@@ -60,46 +82,68 @@ public abstract class AbstractUIComponent implements Iterable<UIComponent>, Mous
 	}
 
 	// can be overridden
-	public void onChildAdded(UIComponent child) {
+	public void onChildAdded(AbstractUIComponent child) {
+		parent.onChildAdded(child);
 	}
-	public void onChildRemoved(UIComponent child) {
+	public void onChildRemoved(AbstractUIComponent child) {
+		parent.onChildRemoved(child);
 	}
 
-	public List<UIComponent> getRecursiveChildren() {
-		final List<UIComponent> ret = new ArrayList<>();
+	public List<AbstractUIComponent> getRecursiveChildren() {
+		final List<AbstractUIComponent> ret = new ArrayList<>();
 
 		// only add children; not root
-		for (UIComponent child : this) {
+		for (AbstractUIComponent child : this) {
 			teampg.util.Util.addEachBranchAndLeaf(ret, child);
 		}
 
 		return ret;
 	}
 
-	public AbstractUIComponent(Rectangle drawArea) {
-		this.drawArea = drawArea;
+	public AbstractUIComponent(Dimension drawSize, Vector2f drawPos) {
+		this.drawPos = drawPos;
+		this.drawSize = drawSize;
+		parent = parent;
 
 		hidden = false;
 		children = new ArrayList<>();
 		inputNotifications = new LinkedList<>();
+		downAndStartedInsideComponent = EnumSet.noneOf(MouseButton.class);
 	}
 
-	public Rectangle getDrawArea() {
-		return SlickUtil.copy(drawArea);
+	public AbstractUIComponent getParent() {
+		return parent;
 	}
 
-	public void setDrawArea(Rectangle drawArea) {
-		this.drawArea = drawArea;
+	public Vector2f getRelPos() {
+		return drawPos.copy();
+	}
+	public Vector2f getAbsPos() {
+		return parent.getAbsPos().add(drawPos);
+	}
+	public Rectangle getAbsBounds() {
+		return SlickUtil.newRect(getAbsPos(), drawSize);
+	}
+
+	public void setRelPos(Vector2f drawPos) {
+		this.drawPos.set(drawPos);
+	}
+
+	public void setSize(Dimension size) {
+		drawSize.setSize(size);
+	}
+	public Dimension getSize() {
+		return (Dimension) drawSize.clone();
 	}
 
 	/**
 	 * Can call remove; it's equivalent to calling removeChild.
 	 */
 	@Override
-	public final Iterator<UIComponent> iterator() {
-		final Iterator<UIComponent> iter = children.iterator();
-		return new Iterator<UIComponent>() {
-			private UIComponent curr;
+	public final Iterator<AbstractUIComponent> iterator() {
+		final Iterator<AbstractUIComponent> iter = children.iterator();
+		return new Iterator<AbstractUIComponent>() {
+			private AbstractUIComponent curr;
 
 			@Override
 			public boolean hasNext() {
@@ -107,7 +151,7 @@ public abstract class AbstractUIComponent implements Iterable<UIComponent>, Mous
 			}
 
 			@Override
-			public UIComponent next() {
+			public AbstractUIComponent next() {
 				curr = iter.next();
 				return curr;
 			}
@@ -123,18 +167,18 @@ public abstract class AbstractUIComponent implements Iterable<UIComponent>, Mous
 			}
 		};
 	}
-	public final void addChild(UIComponent child) {
-		checkArgument(SlickUtil.contains(drawArea, child.getDrawArea()), drawArea + " does not contain " + child.getDrawArea());
+	public final void addChild(AbstractUIComponent child) {
 		children.add(child);
+		child.parent = this;
 		onChildAdded(child);
 	}
-	public final void removeChild(UIComponent child) {
-		checkArgument(children.remove(child));
+	public final void removeChild(AbstractUIComponent child) {
 		children.remove(child);
+		child.parent = null;
 		onChildRemoved(child);
 	}
 	public final void removeAllChildren() {
-		for (Iterator<UIComponent> iter = iterator(); iter.hasNext();) {
+		for (Iterator<AbstractUIComponent> iter = iterator(); iter.hasNext();) {
 			iter.next();
 			iter.remove();
 		}
@@ -154,7 +198,7 @@ public abstract class AbstractUIComponent implements Iterable<UIComponent>, Mous
 
 		draw(container, g);
 
-		for (UIComponent child : children) {
+		for (AbstractUIComponent child : children) {
 			child.render(container, g);
 		}
 	}
@@ -167,7 +211,7 @@ public abstract class AbstractUIComponent implements Iterable<UIComponent>, Mous
 			return;
 		}
 
-		for (UIComponent child : children) {
+		for (AbstractUIComponent child : children) {
 			child.update(container, delta);
 		}
 	}
@@ -178,9 +222,9 @@ public abstract class AbstractUIComponent implements Iterable<UIComponent>, Mous
 	}
 	public void onHoverEnd() {
 	}
-	public void onPressed(int x, int y) {
+	public void onPressed(int x, int y, int button) {
 	}
-	public void onClick(int x, int y) {
+	public void onClick(int x, int y, int button) {
 	}
 	public void onFocus() {
 	}
@@ -213,19 +257,19 @@ public abstract class AbstractUIComponent implements Iterable<UIComponent>, Mous
 	}
 	@Override
 	public void mousePressed(int button, int x, int y) {
-		assert !mouseDownAndStartedInsideComponent;
-		if (drawArea.contains(x, y)) {
-			mouseDownAndStartedInsideComponent = true;
-			inputNotifications.add(new OnClick(true, x, y));
+		assert !downAndStartedInsideComponent.contains(MouseButton.of(button));
+		if (getAbsBounds().contains(x, y)) {
+			downAndStartedInsideComponent.add(MouseButton.of(button));
+			inputNotifications.add(new OnClick(true, x, y, button));
 
-			if (!focused) {
+			if (!focused && button == Input.MOUSE_LEFT_BUTTON) {
 				focused = true;
 				inputNotifications.add(new OnFocus(true));
 				onFocus();
 			}
 
 		} else {
-			if (focused) {
+			if (focused && button == Input.MOUSE_LEFT_BUTTON) {
 				focused = false;
 				inputNotifications.add(new OnFocus(false));
 			}
@@ -234,15 +278,15 @@ public abstract class AbstractUIComponent implements Iterable<UIComponent>, Mous
 	}
 	@Override
 	public void mouseReleased(int button, int x, int y) {
-		if (drawArea.contains(x, y) && mouseDownAndStartedInsideComponent) {
-			inputNotifications.add(new OnClick(false, x, y));
+		if (getAbsBounds().contains(x, y) && downAndStartedInsideComponent.contains(MouseButton.of(button))) {
+			inputNotifications.add(new OnClick(false, x, y, button));
 		}
-		mouseDownAndStartedInsideComponent = false;
+		downAndStartedInsideComponent.remove(MouseButton.of(button));
 	}
 	@Override
 	public void mouseMoved(int oldx, int oldy, int newx, int newy) {
 		// moved outside component
-		if (!drawArea.contains(newx, newy) && mouseHover) {
+		if (!getAbsBounds().contains(newx, newy) && mouseHover) {
 			mouseHover = false;
 			inputNotifications.add(new OnHover(false));
 			return;
@@ -301,18 +345,20 @@ public abstract class AbstractUIComponent implements Iterable<UIComponent>, Mous
 	private class OnClick extends InputNotificationCommand {
 		final int x;
 		final int y;
-		public OnClick(boolean start, int x, int y) {
+		final int button;
+		public OnClick(boolean start, int x, int y, int button) {
 			super(start);
 			this.x = x;
 			this.y = y;
+			this.button = button;
 		}
 
 		@Override
 		void execute() {
 			if (start) {
-				onPressed(x, y);
+				onPressed(x, y, button);
 			} else {
-				onClick(x, y);
+				onClick(x, y, button);
 			}
 		}
 	}

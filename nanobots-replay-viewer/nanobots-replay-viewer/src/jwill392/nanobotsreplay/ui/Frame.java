@@ -1,5 +1,7 @@
 package jwill392.nanobotsreplay.ui;
 
+import java.awt.Dimension;
+
 import jwill392.nanobotsreplay.assets.Assets;
 import jwill392.nanobotsreplay.util.ImgUtil;
 import jwill392.slickutil.SlickUtil;
@@ -8,53 +10,47 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.geom.Vector2f;
 import org.newdawn.slick.gui.GUIContext;
 
-public class Frame extends UIComponent {
+public class Frame extends AbstractUIComponent {
 	private final Image frameImg;
-	private UIComponent content;
-	private final Rectangle framedArea;
+	private AbstractUIComponent content;
+	private final Rectangle relFramedArea;
 
-	public Frame(Rectangle drawArea) {
-		this(drawArea, AbstractUIComponent.getRoot());
-	}
-
-	public Frame(Rectangle drawArea, UIComponent parent) {
-		this(drawArea, (AbstractUIComponent)parent);
-	}
-
-	protected Frame(Rectangle drawArea, AbstractUIComponent parent) {
-		super(drawArea, parent);
+	public Frame(Dimension drawSize, Vector2f drawPos) {
+		super(drawSize, drawPos);
 
 		Image frameTheme = Assets.getSheet("assets/spritesheet").getSprite("frame.gif");
-		frameImg = ImgUtil.buildPanelImage(frameTheme, SlickUtil.getRectDim(drawArea), 6, 6, 8, 8);
+		frameImg = ImgUtil.buildPanelImage(frameTheme, drawSize, 6, 6, 8, 8);
 
-
-		framedArea = SlickUtil.copy(drawArea);
-		framedArea.setBounds(
-				getDrawArea().getX() + 6,
-				getDrawArea().getY() + 6,
-				getDrawArea().getWidth() - frameTheme.getWidth() + 2,
-				getDrawArea().getHeight() - frameTheme.getHeight() + 2);
+		relFramedArea = new Rectangle(
+				6,
+				6,
+				- frameTheme.getWidth() + 2,
+				- frameTheme.getHeight() + 2);
 	}
 
 	@Override
 	protected void draw(GUIContext container, Graphics g) throws SlickException {
-		frameImg.draw(getDrawArea().getX(), getDrawArea().getY());
+		frameImg.draw(getAbsPos().x, getAbsPos().y);
 	}
 
-	public void setContents(UIComponent newContent) {
+	public void setContents(AbstractUIComponent newContent) {
 		if (content != null) {
 			removeChild(content);
 		}
 
 		content = newContent;
-		newContent.setDrawArea(framedArea);
+		newContent.setSize(new Dimension(
+				getSize().width + (int) relFramedArea.getWidth(),
+				getSize().height + (int) relFramedArea.getHeight()));
+		newContent.setRelPos(SlickUtil.getPos(relFramedArea));
 
 		addChild(newContent);
 	}
 
 	public Rectangle getFramedArea() {
-		return SlickUtil.copy(framedArea);
+		return SlickUtil.copy(relFramedArea);
 	}
 }

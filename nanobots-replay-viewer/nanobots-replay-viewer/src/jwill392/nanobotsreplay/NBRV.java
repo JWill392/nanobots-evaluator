@@ -1,5 +1,6 @@
 package jwill392.nanobotsreplay;
 
+import java.awt.Dimension;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -8,7 +9,6 @@ import java.util.List;
 import jwill392.nanobotsreplay.assets.Assets;
 import jwill392.nanobotsreplay.ui.AbstractUIComponent;
 import jwill392.nanobotsreplay.ui.Frame;
-import jwill392.nanobotsreplay.ui.UIComponent;
 import jwill392.nanobotsreplay.ui.WorldInfoPanel;
 import jwill392.nanobotsreplay.world.WorldModel;
 import jwill392.nanobotsreplay.world.display.WorldView;
@@ -20,7 +20,7 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.geom.Vector2f;
 
 import replay.ReplayProto.Replay;
 
@@ -30,9 +30,10 @@ import com.google.common.eventbus.EventBus;
 public class NBRV extends BasicGame {
 	public static final int HEIGHT = 600;
 	public static final int WIDTH = 800;
-	public static final Rectangle SCREEN = new Rectangle(0, 0, WIDTH, HEIGHT);
+	public static final Dimension SCREEN = new Dimension(WIDTH, HEIGHT);
 
 	public static final EventBus eventBus = new EventBus();
+	private GameContainer container;
 
 	private WorldView worldDisplay;
 	private WorldInfoPanel infoPanel;
@@ -56,6 +57,7 @@ public class NBRV extends BasicGame {
 		NBRV inst = new NBRV();
 		AppGameContainer app = new AppGameContainer(inst);
 
+		//app.setMouseGrabbed(true);
 		app.setShowFPS(false);
 		app.setDisplayMode((int)SCREEN.getWidth(), (int)SCREEN.getHeight(), false);
 		app.start();
@@ -64,20 +66,23 @@ public class NBRV extends BasicGame {
 	@Override
 	public void init(GameContainer container) throws SlickException {
 		container.getGraphics().setBackground(new Color(0x9990AA));
+		this.container = container;
 
 		Assets.loadSheet("assets/spritesheet");
 		Assets.loadFont(2);
 
-		UIComponent.setRoot(SCREEN, container);
+		AbstractUIComponent.setRoot(SCREEN, container);
 
-		worldFrame = new Frame(new Rectangle(1, 1, 598, 598));
+		worldFrame = new Frame(new Dimension(598, 598), new Vector2f(1, 1));
+		AbstractUIComponent.getRoot().addChild(worldFrame);
 
-		worldDisplay = new WorldView(worldFrame.getFramedArea());
+		worldDisplay = new WorldView(new Dimension(), new Vector2f());
+		worldFrame.setContents(worldDisplay); //sets self as parent
+
 		eventBus.register(worldDisplay);
 
-		worldFrame.setContents(worldDisplay);
-
-		infoPanel = new WorldInfoPanel(new Rectangle(601, 1, 198, 598));
+		infoPanel = new WorldInfoPanel(new Dimension(198, 598), new Vector2f(601, 1));
+		AbstractUIComponent.getRoot().addChild(infoPanel);
 		eventBus.register(infoPanel);
 
 
@@ -126,7 +131,7 @@ public class NBRV extends BasicGame {
 				worldModel.setTurn(worldModel.getTurn() - 9);
 			}
 		} else if (key == Input.KEY_SPACE) {
-			System.out.println(worldModel.getEndTurn());
+			container.exit();
 		}
 	}
 

@@ -6,6 +6,7 @@ import java.util.Comparator;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Vector2f;
 
+import teampg.grid2d.point.AbsPos;
 import teampg.grid2d.point.RelPos;
 
 public class SlickUtil {
@@ -43,6 +44,10 @@ public class SlickUtil {
 
 		return ax <= bx && (bx + bw) <= (ax + aw) &&
 				ay <= by && (by + bh) <= (ay + ah);
+	}
+
+	public static Vector2f getPos(Rectangle r) {
+		return new Vector2f(r.getX(), r.getY());
 	}
 
 	public static Rectangle copy(Rectangle r) {
@@ -90,5 +95,18 @@ public class SlickUtil {
 			return Double.compare(aDist, bDist);
 		}
 
+	}
+
+	public static void setSize(Rectangle drawArea, Dimension size) {
+		drawArea.setWidth(size.width);
+		drawArea.setHeight(size.height);
+	}
+
+	public static Rectangle newRect(Vector2f drawPos, Dimension drawSize) {
+		return new Rectangle(drawPos.x, drawPos.y, drawSize.width, drawSize.height);
+	}
+
+	public static AbsPos of(Vector2f viewOffset) {
+		return AbsPos.of((int) viewOffset.x, (int) viewOffset.y);
 	}
 }

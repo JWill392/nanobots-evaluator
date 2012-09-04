@@ -16,7 +16,6 @@ import teampg.grid2d.point.RelPos;
 import jwill392.nanobotsreplay.Settings;
 import jwill392.nanobotsreplay.assets.Assets;
 import jwill392.nanobotsreplay.world.EntityModel;
-import jwill392.nanobotsreplay.world.display.WorldView;
 import jwill392.slickutil.SlickUtil;
 
 public class DisplayBot extends WorldDisplayEntity {
@@ -26,8 +25,8 @@ public class DisplayBot extends WorldDisplayEntity {
 	private static ImmutableMap<Vector2f, Image> dirImg;
 	private static boolean initialized = false;
 
-	public DisplayBot(WorldView world, EntityModel data) {
-		super(world, data);
+	public DisplayBot(Vector2f pos, EntityModel data) {
+		super(pos, data);
 
 		PackedSpriteSheet sheet = Assets.getSheet("assets/spritesheet");
 

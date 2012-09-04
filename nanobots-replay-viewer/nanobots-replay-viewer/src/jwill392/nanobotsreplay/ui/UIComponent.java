@@ -1,5 +1,7 @@
 package jwill392.nanobotsreplay.ui;
 
+import jwill392.slickutil.SlickUtil;
+
 import org.newdawn.slick.geom.Rectangle;
 
 public abstract class UIComponent extends AbstractUIComponent {
@@ -21,6 +23,20 @@ public abstract class UIComponent extends AbstractUIComponent {
 
 	public AbstractUIComponent getParent() {
 		return parent;
+	}
+
+	/**
+	 * Gets absolute draw area; offset by parent's pos vector
+	 */
+	@Override
+	public Rectangle getDrawArea() {
+		Rectangle pos = super.getDrawArea();
+		pos.setLocation(SlickUtil.getPos(pos).add(SlickUtil.getPos(parent.getDrawArea())));
+		return pos; // FIXME COMPLETELY FUCKED
+	}
+
+	public Rectangle getRelativeDrawArea() {
+		return super.getDrawArea();
 	}
 
 	@Override
