@@ -2,7 +2,7 @@ spritesheet.png
 {
 	bot.gif
 	68
-	203
+	137
 	31
 	31
 	0
@@ -12,8 +12,8 @@ spritesheet.png
 }
 {
 	bot_attack.gif
-	35
-	203
+	2
+	71
 	31
 	31
 	0
@@ -23,8 +23,8 @@ spritesheet.png
 }
 {
 	bot_birth.gif
-	2
-	203
+	68
+	71
 	31
 	31
 	0
@@ -34,8 +34,8 @@ spritesheet.png
 }
 {
 	bot_conceive.gif
-	68
-	170
+	35
+	104
 	31
 	31
 	0
@@ -45,8 +45,8 @@ spritesheet.png
 }
 {
 	bot_dir_lb.gif
-	35
-	170
+	2
+	104
 	31
 	31
 	0
@@ -56,8 +56,8 @@ spritesheet.png
 }
 {
 	bot_dir_lm.gif
-	2
-	170
+	68
+	38
 	31
 	31
 	0
@@ -67,8 +67,8 @@ spritesheet.png
 }
 {
 	bot_dir_lu.gif
-	68
-	137
+	35
+	38
 	31
 	31
 	0
@@ -78,8 +78,8 @@ spritesheet.png
 }
 {
 	bot_dir_mb.gif
-	35
-	137
+	38
+	2
 	31
 	31
 	0
@@ -90,7 +90,7 @@ spritesheet.png
 {
 	bot_dir_mu.gif
 	2
-	137
+	38
 	31
 	31
 	0
@@ -100,8 +100,8 @@ spritesheet.png
 }
 {
 	bot_dir_rb.gif
-	68
-	104
+	71
+	2
 	31
 	31
 	0
@@ -112,7 +112,7 @@ spritesheet.png
 {
 	bot_dir_rm.gif
 	35
-	104
+	71
 	31
 	31
 	0
@@ -122,7 +122,7 @@ spritesheet.png
 }
 {
 	bot_dir_ru.gif
-	2
+	68
 	104
 	31
 	31
@@ -132,9 +132,20 @@ spritesheet.png
 	0
 }
 {
-	bot_harvest.gif
+	bot_focus.gif
 	68
-	71
+	170
+	31
+	31
+	0
+	0
+	0
+	0
+}
+{
+	bot_harvest.gif
+	2
+	203
 	31
 	31
 	0
@@ -144,8 +155,8 @@ spritesheet.png
 }
 {
 	bot_move.gif
-	35
-	71
+	68
+	203
 	31
 	31
 	0
@@ -155,8 +166,8 @@ spritesheet.png
 }
 {
 	bot_team_color.gif
-	2
-	71
+	35
+	203
 	31
 	31
 	0
@@ -166,8 +177,8 @@ spritesheet.png
 }
 {
 	bot_transfer.gif
-	68
-	38
+	2
+	137
 	31
 	31
 	0
@@ -178,7 +189,7 @@ spritesheet.png
 {
 	bot_transmit.gif
 	35
-	38
+	137
 	31
 	31
 	0
@@ -188,8 +199,8 @@ spritesheet.png
 }
 {
 	bot_wait.gif
-	2
-	38
+	35
+	170
 	31
 	31
 	0
@@ -198,11 +209,11 @@ spritesheet.png
 	0
 }
 {
-	food.png
-	94
+	food.gif
 	2
-	22
-	22
+	170
+	31
+	31
 	0
 	0
 	0
@@ -210,8 +221,8 @@ spritesheet.png
 }
 {
 	frame.gif
-	78
 	2
+	236
 	14
 	14
 	0
@@ -221,7 +232,7 @@ spritesheet.png
 }
 {
 	grid.gif
-	42
+	2
 	2
 	34
 	34
@@ -232,8 +243,8 @@ spritesheet.png
 }
 {
 	panel.png
-	26
-	2
+	18
+	236
 	14
 	14
 	0
@@ -243,8 +254,8 @@ spritesheet.png
 }
 {
 	wall.png
-	2
-	2
+	101
+	203
 	22
 	22
 	0

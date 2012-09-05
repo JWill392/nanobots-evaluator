@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.EnumMap;
 
 import org.newdawn.slick.Image;
+import org.newdawn.slick.Input;
 import org.newdawn.slick.PackedSpriteSheet;
 import org.newdawn.slick.geom.Vector2f;
 
@@ -20,7 +21,9 @@ import jwill392.slickutil.SlickUtil;
 
 public class DisplayBot extends WorldDisplayEntity {
 	private final Image baseBotImg;
+	private final Image focusBotImg;
 	private final Image teamFeatureImg;
+
 	private static EnumMap<Replay.Action.Type, Image> actionImg;
 	private static ImmutableMap<Vector2f, Image> dirImg;
 	private static boolean initialized = false;
@@ -57,26 +60,27 @@ public class DisplayBot extends WorldDisplayEntity {
 		}
 
 		baseBotImg = sheet.getSprite("bot.gif");
-		baseBotImg.setCenterOfRotation(baseBotImg.getWidth()/2, baseBotImg.getHeight()/2);
+
+		focusBotImg = sheet.getSprite("bot_focus.gif");
 
 		teamFeatureImg = sheet.getSprite("bot_team_color.gif");
-		teamFeatureImg.setCenterOfRotation(baseBotImg.getWidth()/2, baseBotImg.getHeight()/2);
 	}
 
 	@Override
 	protected void draw(float x, float y) {
 		// TODO button-ify... img hover/click etc is currently wrong
-		//if (isFocused() || (isMouseDown() && isMouseHover())) {
-		//	focusImg.draw(x, y);
-		//}
-		baseBotImg.draw(x, y);
+		if (isFocused() || (isMouseDown(Input.MOUSE_LEFT_BUTTON) && isMouseHover())) {
+			focusBotImg.draw(x, y);
+		} else {
+			baseBotImg.draw(x, y);
+		}
 		teamFeatureImg.draw(x, y, Settings.getTeamColor(getData().onTurn(getTurn()).getTid()));
 
 		drawActionIndicator(x, y);
 	}
 
 	private void drawActionIndicator(float x, float y) {
-		if (!getData().hasTurn(getTurn() + 1)) {
+		if (!getData().hasTurn(getTurn())) {
 			return;
 		}
 

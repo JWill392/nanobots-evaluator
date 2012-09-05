@@ -12,7 +12,6 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.ImageBuffer;
 import org.newdawn.slick.SlickException;
-import teampg.grid2d.point.AbsPos;
 
 
 public class ImgUtil {
@@ -145,9 +144,9 @@ public class ImgUtil {
 		return rect.y + rect.height;
 	}
 
-	public static void drawTiled(Image theme, AbsPos offset, Rectangle fillArea) {
-		int startX = offset.x % theme.getWidth();
-		int startY = offset.y % theme.getHeight();
+	public static void drawTiled(Image theme, Point relTileOffset, Rectangle fillArea) {
+		int startX = relTileOffset.x % theme.getWidth();
+		int startY = relTileOffset.y % theme.getHeight();
 		if (startX > 0) {
 			startX -= theme.getWidth();
 		}

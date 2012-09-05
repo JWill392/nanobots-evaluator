@@ -12,7 +12,7 @@ public class DisplayFood extends WorldDisplayEntity {
 	public DisplayFood(Vector2f pos, EntityModel data) {
 		super(pos, data);
 
-		foodImg = Assets.getSheet("assets/spritesheet").getSprite("food.png");
+		foodImg = Assets.getSheet("assets/spritesheet").getSprite("food.gif");
 		foodImg.setCenterOfRotation(foodImg.getWidth()/2, foodImg.getHeight()/2);
 	}
 

@@ -1,6 +1,7 @@
 package jwill392.nanobotsreplay.ui;
 
 import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Iterator;
@@ -15,7 +16,6 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.MouseListener;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Vector2f;
 import org.newdawn.slick.gui.GUIContext;
 
@@ -122,7 +122,7 @@ public abstract class AbstractUIComponent implements Iterable<AbstractUIComponen
 		return parent.getAbsPos().add(drawPos);
 	}
 	public Rectangle getAbsBounds() {
-		return SlickUtil.newRect(getAbsPos(), drawSize);
+		return new Rectangle(SlickUtil.asPoint(getAbsPos()), drawSize);
 	}
 
 	public void setRelPos(Vector2f drawPos) {
@@ -177,6 +177,9 @@ public abstract class AbstractUIComponent implements Iterable<AbstractUIComponen
 		child.parent = null;
 		onChildRemoved(child);
 	}
+	public final boolean hasChild(AbstractUIComponent child) {
+		return children.contains(child);
+	}
 	public final void removeAllChildren() {
 		for (Iterator<AbstractUIComponent> iter = iterator(); iter.hasNext();) {
 			iter.next();
@@ -191,7 +194,11 @@ public abstract class AbstractUIComponent implements Iterable<AbstractUIComponen
 		hidden = hid;
 	}
 
-	public final void render(GUIContext container, Graphics g) throws SlickException {
+	public void render(GUIContext container, Graphics g) throws SlickException {
+		throw new IllegalStateException("Should not render UIComponents directly; call root.render");
+	}
+
+	protected final void drawSelfThenChildren(GUIContext container, Graphics g) throws SlickException {
 		if (hidden) {
 			return;
 		}
@@ -199,7 +206,7 @@ public abstract class AbstractUIComponent implements Iterable<AbstractUIComponen
 		draw(container, g);
 
 		for (AbstractUIComponent child : children) {
-			child.render(container, g);
+			child.drawSelfThenChildren(container, g);
 		}
 	}
 
@@ -207,15 +214,21 @@ public abstract class AbstractUIComponent implements Iterable<AbstractUIComponen
 
 	public void update(GameContainer container, int delta)
 			throws SlickException {
+		throw new IllegalStateException("Should not update UIComponents directly; call root.update");
+	}
+
+	protected final void tickSelfThenChildren(GameContainer container, int delta) throws SlickException {
 		if (hidden) {
 			return;
 		}
 
+		tick(container, delta);
+
 		for (AbstractUIComponent child : children) {
-			child.update(container, delta);
+			child.tickSelfThenChildren(container, delta);
 		}
 	}
-
+	protected abstract void tick(GameContainer container, int delta) throws SlickException;
 
 
 	public void onHoverStart() {

@@ -1,6 +1,10 @@
 package jwill392.nanobotsreplay.world.display;
 
 import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.util.Iterator;
+
 import jwill392.nanobotsreplay.NBRV;
 import jwill392.nanobotsreplay.assets.Assets;
 import jwill392.nanobotsreplay.ui.AbstractUIComponent;
@@ -9,17 +13,15 @@ import jwill392.nanobotsreplay.world.EntityModel;
 import jwill392.nanobotsreplay.world.WorldModel;
 import jwill392.nanobotsreplay.world.WorldModel.ModelTurnChange;
 import jwill392.nanobotsreplay.world.display.ent.WorldDisplayEntity;
-import jwill392.slickutil.SlickUtil;
-
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Vector2f;
 import org.newdawn.slick.gui.GUIContext;
 
+import com.google.common.collect.Iterators;
 import com.google.common.eventbus.Subscribe;
 
 import replay.Util;
@@ -33,11 +35,9 @@ public class WorldView extends AbstractUIComponent {
 
 	//private Image worldGrid;
 	private final Image gridTheme;
-	private Rectangle gridSize;
 
-	private AbsPos panDown;
-	private Vector2f panVector;
 	private Vector2f viewOffset;
+
 
 	public WorldView(Dimension drawSize, Vector2f drawPos) {
 		super(drawSize, drawPos);
@@ -50,13 +50,6 @@ public class WorldView extends AbstractUIComponent {
 		worldData = model;
 
 
-		Dimension sizeInTiles = worldData.getSize();
-		gridSize = new Rectangle(0, 0, // TODO ugh
-				gridTheme.getWidth() * sizeInTiles.width,
-				gridTheme.getHeight() * sizeInTiles.height);
-
-
-		//worldGrid = ImgUtil.buildPanelImage(panelTheme, gridArea, 3, 3, 37, 37);
 
 		setTurn(0);
 	}
@@ -64,12 +57,22 @@ public class WorldView extends AbstractUIComponent {
 		return worldData;
 	}
 
+	private Rectangle getGridArea() {
+		Dimension sizeInTiles = worldData.getSize();
+		return new Rectangle(
+				(int)(getAbsPos().x + viewOffset.x),
+				(int)(getAbsPos().y + viewOffset.y),
+				gridTheme.getWidth() * sizeInTiles.width,
+				gridTheme.getHeight() * sizeInTiles.height);
+
+	}
+
 	/**
 	 * Gets drawing offset from world view pos, given a grid pos
 	 */
 	private Vector2f getDrawPosFromGridPos(AbsPos gridPos) {
 		return new Vector2f(
-				(CELL_SIZE.width * gridPos.x) + CELL_PADDING.width +  viewOffset.x,
+				(CELL_SIZE.width * gridPos.x) + CELL_PADDING.width + viewOffset.x,
 				(CELL_SIZE.height * gridPos.y) + CELL_PADDING.height + viewOffset.y);
 	}
 
@@ -78,13 +81,19 @@ public class WorldView extends AbstractUIComponent {
 		if (worldData == null) {
 			return;
 		}
+		Rectangle drawArea = getGridArea().intersection(getAbsBounds());
+		Point relTileOffset =  new Point(
+				getGridArea().x - drawArea.x,
+				getGridArea().y - drawArea.y
+				);
 
-		ImgUtil.drawTiled(gridTheme, SlickUtil.of(viewOffset), ImgUtil.getRectangle(getAbsBounds()));
+		ImgUtil.drawTiled(gridTheme, relTileOffset, drawArea);
 	}
 
 	@Override
-	public void update(GameContainer container, int delta) throws SlickException {
-		if (panDown != null) {
+	public void tick(GameContainer container, int delta) throws SlickException {
+		/* OLD FAST-PANNING... might switch back to this method if maps are too big
+		 * if (panDown != null) {
 			// TODO check if we'd have scrolled off map.  If so, only scroll to edge of map.
 			Vector2f adjustedPanVec = panVector.copy().scale(delta);
 
@@ -94,14 +103,16 @@ public class WorldView extends AbstractUIComponent {
 			}
 
 			viewOffset.add(adjustedPanVec);
-			int turnIndex = worldData.getTurn();
+		}*/
 
-			for (AbstractUIComponent child : this) {
-				WorldDisplayEntity dispEnt = (WorldDisplayEntity)child;
+		int turnIndex = worldData.getTurn();
 
-				child.setRelPos(getDrawPosFromGridPos(dispEnt.getGridPos(turnIndex)));
-			}
+		for (AbstractUIComponent child : this) {
+			WorldDisplayEntity dispEnt = (WorldDisplayEntity)child;
+
+			child.setRelPos(getDrawPosFromGridPos(dispEnt.getGridPos(turnIndex)));
 		}
+
 	}
 
 	@Subscribe
@@ -115,14 +126,24 @@ public class WorldView extends AbstractUIComponent {
 
 	private void setTurn(int turn) {
 		//TODO persist living ents; don't remake every turn
-		removeAllChildren();
+		for (Iterator<AbstractUIComponent> iter = iterator(); iter.hasNext();) {
+			AbstractUIComponent childComponent = iter.next();
+
+			WorldDisplayEntity entity = (WorldDisplayEntity) childComponent;
+
+			if (!Iterators.contains(worldData.iterator(), entity.getData())) {
+				iter.remove();
+			}
+		}
 		int turnIndex = worldData.getTurn();
 
 		for (EntityModel ent : worldData) {
 			Vector2f displayEntDrawPos = getDrawPosFromGridPos(Util.of(ent.onTurn(turnIndex).getPos()));
 			WorldDisplayEntity displayEnt = WorldDisplayEntity.getEnt(displayEntDrawPos, ent);
 
-			addChild(displayEnt);
+			if (!hasChild(displayEnt)) {
+				addChild(displayEnt);
+			}
 		}
 	}
 
@@ -139,32 +160,17 @@ public class WorldView extends AbstractUIComponent {
 				NBRV.eventBus.post(new SelectedEntityChange(null));
 			}
 			break;
-		case Input.MOUSE_MIDDLE_BUTTON:
-			panDown = AbsPos.of(x, y);
-			panVector = new Vector2f();
-		}
-	}
-
-	@Override
-	public void mouseReleased(int button, int x, int y) {
-		// TODO Auto-generated method stub
-		super.mouseReleased(button, x, y);
-
-		switch(button) {
-		case Input.MOUSE_MIDDLE_BUTTON:
-			panDown = null;
-			panVector = null;
 		}
 	}
 
 	@Override
 	public void mouseMoved(int oldx, int oldy, int newx, int newy) {
 		super.mouseMoved(oldx, oldy, newx, newy);
-		if (panDown == null) {
-			return;
+		if (isMouseDown(Input.MOUSE_MIDDLE_BUTTON)) {
+			viewOffset.add(new Vector2f(newx, newy).sub(new Vector2f(oldx, oldy)));
 		}
 
-		panVector = (new Vector2f(panDown.x, panDown.y).sub(new Vector2f(newx, newy)).scale(0.02f));
+
 	}
 
 

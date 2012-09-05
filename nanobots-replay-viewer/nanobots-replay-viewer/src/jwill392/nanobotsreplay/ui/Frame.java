@@ -6,6 +6,7 @@ import jwill392.nanobotsreplay.assets.Assets;
 import jwill392.nanobotsreplay.util.ImgUtil;
 import jwill392.slickutil.SlickUtil;
 
+import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
@@ -52,5 +53,9 @@ public class Frame extends AbstractUIComponent {
 
 	public Rectangle getFramedArea() {
 		return SlickUtil.copy(relFramedArea);
+	}
+
+	@Override
+	protected void tick(GameContainer container, int delta) throws SlickException {
 	}
 }

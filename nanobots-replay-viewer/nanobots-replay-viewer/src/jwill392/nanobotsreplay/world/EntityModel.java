@@ -53,10 +53,33 @@ public class EntityModel {
 
 	public Replay.Entity onTurn(int turn) {
 		assert getLifespan().contains(turn) : "Given turn " + turn + " is outside lifetime" + getLifespan() + "\n\n\n" + turnEntities;
-		return turnEntities.get(turn - lifespan.lowerEndpoint()); // FIXME above says valid, but this get gets out of range for 2086.
+		return turnEntities.get(turn - lifespan.lowerEndpoint());
 	}
 
 	public boolean hasTurn(int turn) {
 		return getLifespan().contains(turn);
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((turnEntities == null) ? 0 : turnEntities.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		EntityModel other = (EntityModel) obj;
+		return turnEntities.get(0).getEid() == other.turnEntities.get(0).getEid();
 	}
 }

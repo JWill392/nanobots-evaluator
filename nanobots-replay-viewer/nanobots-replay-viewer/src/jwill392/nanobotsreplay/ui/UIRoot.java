@@ -32,6 +32,24 @@ public class UIRoot extends AbstractUIComponent {
 	}
 
 	@Override
+	public void render(GUIContext container, Graphics g) throws SlickException {
+		for (AbstractUIComponent child : this) {
+			child.drawSelfThenChildren(container, g);
+		}
+	}
+
+	@Override
+	public void update(GameContainer container, int delta) throws SlickException {
+		for (AbstractUIComponent child : this) {
+			child.tickSelfThenChildren(container, delta);
+		}
+	}
+
+	@Override
 	protected void draw(GUIContext container, Graphics g) throws SlickException {
+	}
+
+	@Override
+	protected void tick(GameContainer container, int delta) throws SlickException {
 	}
 }

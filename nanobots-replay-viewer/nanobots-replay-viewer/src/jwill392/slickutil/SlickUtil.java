@@ -1,6 +1,7 @@
 package jwill392.slickutil;
 
 import java.awt.Dimension;
+import java.awt.Point;
 import java.util.Comparator;
 
 import org.newdawn.slick.geom.Rectangle;
@@ -108,5 +109,9 @@ public class SlickUtil {
 
 	public static AbsPos of(Vector2f viewOffset) {
 		return AbsPos.of((int) viewOffset.x, (int) viewOffset.y);
+	}
+
+	public static Point asPoint(Vector2f vec) {
+		return new Point((int) vec.x, (int) vec.y);
 	}
 }

@@ -28,8 +28,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 
 public class NBRV extends BasicGame {
-	public static final int HEIGHT = 600;
-	public static final int WIDTH = 800;
+	public static final int HEIGHT = 720;
+	public static final int WIDTH = 1280;
 	public static final Dimension SCREEN = new Dimension(WIDTH, HEIGHT);
 
 	public static final EventBus eventBus = new EventBus();
@@ -58,7 +58,9 @@ public class NBRV extends BasicGame {
 		AppGameContainer app = new AppGameContainer(inst);
 
 		//app.setMouseGrabbed(true);
-		app.setShowFPS(false);
+		app.setShowFPS(true);
+		app.setSmoothDeltas(true);
+		app.setVSync(true);
 		app.setDisplayMode((int)SCREEN.getWidth(), (int)SCREEN.getHeight(), false);
 		app.start();
 	}
@@ -73,7 +75,7 @@ public class NBRV extends BasicGame {
 
 		AbstractUIComponent.setRoot(SCREEN, container);
 
-		worldFrame = new Frame(new Dimension(598, 598), new Vector2f(1, 1));
+		worldFrame = new Frame(new Dimension(980, 718), new Vector2f(1, 1));
 		AbstractUIComponent.getRoot().addChild(worldFrame);
 
 		worldDisplay = new WorldView(new Dimension(), new Vector2f());
@@ -81,7 +83,7 @@ public class NBRV extends BasicGame {
 
 		eventBus.register(worldDisplay);
 
-		infoPanel = new WorldInfoPanel(new Dimension(198, 598), new Vector2f(601, 1));
+		infoPanel = new WorldInfoPanel(new Dimension(298, 718), new Vector2f(982, 1));
 		AbstractUIComponent.getRoot().addChild(infoPanel);
 		eventBus.register(infoPanel);
 
@@ -143,10 +145,6 @@ public class NBRV extends BasicGame {
 	@Override
 	public void update(GameContainer container, int delta) throws SlickException {
 		AbstractUIComponent.getRoot().update(container, delta);
-
-		if (worldDisplay != null) {
-			worldDisplay.update(container, delta);
-		}
 
 		inputTick(container.getInput());
 	}

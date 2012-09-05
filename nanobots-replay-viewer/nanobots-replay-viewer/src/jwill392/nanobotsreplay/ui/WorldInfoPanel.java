@@ -65,8 +65,7 @@ public class WorldInfoPanel extends AbstractUIComponent{
 	}
 
 	@Override
-	public void update(GameContainer container, int delta) throws SlickException {
-		super.update(container, delta);
+	public void tick(GameContainer container, int delta) throws SlickException {
 	}
 
 	private void setSelected(EntityModel ent) {

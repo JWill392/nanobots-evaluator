@@ -1,7 +1,9 @@
 package jwill392.nanobotsreplay.world.display.ent;
 
 import java.awt.Dimension;
+import java.util.Objects;
 
+import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Vector2f;
@@ -55,5 +57,32 @@ public abstract class WorldDisplayEntity extends AbstractUIComponent {
 		default:
 			throw new IllegalStateException();
 		}
+	}
+
+	@Override
+	protected void tick(GameContainer container, int delta) throws SlickException {
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((data == null) ? 0 : data.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		WorldDisplayEntity other = (WorldDisplayEntity) obj;
+		return Objects.equals(data, other.data);
 	}
 }
