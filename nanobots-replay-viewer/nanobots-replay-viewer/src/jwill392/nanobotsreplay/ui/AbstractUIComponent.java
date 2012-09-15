@@ -3,10 +3,12 @@ package jwill392.nanobotsreplay.ui;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Queue;
 
 import jwill392.slickutil.SlickUtil;
@@ -22,7 +24,7 @@ import org.newdawn.slick.gui.GUIContext;
 public abstract class AbstractUIComponent implements Iterable<AbstractUIComponent>, MouseListener {
 	private final Vector2f drawPos;
 	private final Dimension drawSize;
-	private final List<AbstractUIComponent> children;
+	private final PriorityQueue<AbstractUIComponent> children;
 	private AbstractUIComponent parent;
 
 	private boolean hidden;
@@ -103,10 +105,14 @@ public abstract class AbstractUIComponent implements Iterable<AbstractUIComponen
 	public AbstractUIComponent(Dimension drawSize, Vector2f drawPos) {
 		this.drawPos = drawPos;
 		this.drawSize = drawSize;
-		parent = parent;
 
 		hidden = false;
-		children = new ArrayList<>();
+		children = new PriorityQueue<>(5, new Comparator<AbstractUIComponent>() {
+			@Override
+			public int compare(AbstractUIComponent a, AbstractUIComponent b) {
+				return b.getDrawOrder() - a.getDrawOrder();
+			}
+		});
 		inputNotifications = new LinkedList<>();
 		downAndStartedInsideComponent = EnumSet.noneOf(MouseButton.class);
 	}
@@ -187,7 +193,7 @@ public abstract class AbstractUIComponent implements Iterable<AbstractUIComponen
 		}
 	}
 
-	public boolean getHidden() {
+	public boolean isHidden() {
 		return hidden;
 	}
 	public void setHidden(boolean hid) {
@@ -198,7 +204,7 @@ public abstract class AbstractUIComponent implements Iterable<AbstractUIComponen
 		throw new IllegalStateException("Should not render UIComponents directly; call root.render");
 	}
 
-	protected final void drawSelfThenChildren(GUIContext container, Graphics g) throws SlickException {
+	protected void drawSelfThenChildren(GUIContext container, Graphics g) throws SlickException {
 		if (hidden) {
 			return;
 		}
@@ -210,6 +216,12 @@ public abstract class AbstractUIComponent implements Iterable<AbstractUIComponen
 		}
 	}
 
+	/**
+	 * Lowest is drawn last (on top of everything else)
+	 */
+	protected int getDrawOrder() {
+		return 0;
+	}
 	protected abstract void draw(GUIContext container, Graphics g) throws SlickException;
 
 	public void update(GameContainer container, int delta)

@@ -159,6 +159,8 @@ public class ImgUtil {
 		List<Rectangle> tileRects = tileWithRects(fillArea, getDim(theme), start);
 
 		for (Rectangle drawRect : tileRects) {
+			/*
+			 * draws subsections of images to avoid drawing outside bounds -- not needed due to improvements to Frame.
 			int srcLeft = 0;
 			int srcTop = 0;
 
@@ -189,6 +191,8 @@ public class ImgUtil {
 
 			Image subsect = theme.getSubImage(srcLeft, srcTop, srcRight, srcBottom);
 			subsect.draw(drawRect.x, drawRect.y);
+			*/
+			theme.draw(drawRect.x, drawRect.y);
 		}
 	}
 

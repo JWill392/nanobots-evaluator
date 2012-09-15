@@ -8,6 +8,7 @@ import java.util.Iterator;
 import jwill392.nanobotsreplay.NBRV;
 import jwill392.nanobotsreplay.assets.Assets;
 import jwill392.nanobotsreplay.ui.AbstractUIComponent;
+import jwill392.nanobotsreplay.ui.MinimapPanel.MinimapCellClicked;
 import jwill392.nanobotsreplay.util.ImgUtil;
 import jwill392.nanobotsreplay.world.EntityModel;
 import jwill392.nanobotsreplay.world.WorldModel;
@@ -50,7 +51,7 @@ public class WorldView extends AbstractUIComponent {
 		worldData = model;
 
 
-
+		NBRV.eventBus.post(new ViewAreaChange(getWorldViewArea()));
 		setTurn(0);
 	}
 	public WorldModel getModel() {
@@ -76,6 +77,23 @@ public class WorldView extends AbstractUIComponent {
 				(CELL_SIZE.height * gridPos.y) + CELL_PADDING.height + viewOffset.y);
 	}
 
+	/**
+	 * Gets rectangle of map currently in viewport, <em>measured in tiles</em>.
+	 * @return
+	 */
+	public Rectangle getWorldViewArea() {
+		Rectangle pixelRect = getGridArea().intersection(getAbsBounds());
+
+		return new Rectangle(
+				Math.round((pixelRect.x - viewOffset.x - getAbsPos().x) / CELL_SIZE.width),
+				Math.round((pixelRect.y - viewOffset.y - getAbsPos().y) / CELL_SIZE.height),
+				Math.round((float)pixelRect.width / (float)CELL_SIZE.width - 0.001f),
+				Math.round((float)pixelRect.height / (float)CELL_SIZE.height - 0.001f)
+				);
+	}
+
+
+
 	@Override
 	protected void draw(GUIContext container, Graphics g) throws SlickException {
 		if (worldData == null) {
@@ -94,10 +112,10 @@ public class WorldView extends AbstractUIComponent {
 	public void tick(GameContainer container, int delta) throws SlickException {
 		/* OLD FAST-PANNING... might switch back to this method if maps are too big
 		 * if (panDown != null) {
-			// TODO check if we'd have scrolled off map.  If so, only scroll to edge of map.
+			// TO/DO check if we'd have scrolled off map.  If so, only scroll to edge of map.
 			Vector2f adjustedPanVec = panVector.copy().scale(delta);
 
-			// FIXME temp measure to stop accidentally scrolling off screen
+			// FIX/ME temp measure to stop accidentally scrolling off screen
 			if (!gridSize.contains(-(viewOffset.x + adjustedPanVec.x), -(viewOffset.y + adjustedPanVec.y))) {
 				return;
 			}
@@ -125,7 +143,7 @@ public class WorldView extends AbstractUIComponent {
 	}
 
 	private void setTurn(int turn) {
-		//TODO persist living ents; don't remake every turn
+		// persist living ents; don't remake every turn
 		for (Iterator<AbstractUIComponent> iter = iterator(); iter.hasNext();) {
 			AbstractUIComponent childComponent = iter.next();
 
@@ -147,6 +165,13 @@ public class WorldView extends AbstractUIComponent {
 		}
 	}
 
+	@Subscribe
+	public void setViewArea(MinimapCellClicked e) {
+		viewOffset.set(
+				-((CELL_SIZE.width * e.cell.x) + CELL_PADDING.width - getAbsBounds().width/2),
+				-((CELL_SIZE.height * e.cell.y) + CELL_PADDING.height - getAbsBounds().height/2));
+		NBRV.eventBus.post(new ViewAreaChange(getWorldViewArea()));
+	}
 
 	@Override
 	public void onPressed(int x, int y, int button) {
@@ -168,9 +193,8 @@ public class WorldView extends AbstractUIComponent {
 		super.mouseMoved(oldx, oldy, newx, newy);
 		if (isMouseDown(Input.MOUSE_MIDDLE_BUTTON)) {
 			viewOffset.add(new Vector2f(newx, newy).sub(new Vector2f(oldx, oldy)));
+			NBRV.eventBus.post(new ViewAreaChange(getWorldViewArea()));
 		}
-
-
 	}
 
 
@@ -179,6 +203,13 @@ public class WorldView extends AbstractUIComponent {
 		public final EntityModel selected;
 		public SelectedEntityChange(EntityModel selected) {
 			this.selected = selected;
+		}
+	}
+
+	public static class ViewAreaChange {
+		public final Rectangle viewArea;
+		public ViewAreaChange(Rectangle newViewArea) {
+			viewArea = newViewArea;
 		}
 	}
 }

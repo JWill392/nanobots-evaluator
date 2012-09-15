@@ -30,7 +30,7 @@ public class WorldInfoPanel extends AbstractUIComponent{
 		Image panelBackgroundTheme = Assets.getSheet("assets/spritesheet").getSprite("panel.png");
 
 		Dimension turnPanelSize = new Dimension(drawSize.width, 30);
-		Dimension mainPanelSize = new Dimension(drawSize.width, drawSize.height - 30);
+		Dimension mainPanelSize = new Dimension(drawSize.width, drawSize.height - 31);
 		turnPanel = ImgUtil.buildPanelImage(panelBackgroundTheme, turnPanelSize, 6, 6, 8, 8);
 		mainPanel = ImgUtil.buildPanelImage(panelBackgroundTheme, mainPanelSize, 6, 6, 8, 8);
 
@@ -40,7 +40,7 @@ public class WorldInfoPanel extends AbstractUIComponent{
 	@Override
 	protected void draw(GUIContext container, Graphics g) throws SlickException {
 		turnPanel.draw(getAbsPos().x, getAbsPos().y);
-		mainPanel.draw(getAbsPos().x, getAbsPos().y + 30);
+		mainPanel.draw(getAbsPos().x, getAbsPos().y + 31);
 
 		font.drawString(getAbsPos().x + 10, getAbsPos().y + 10, "Turn: " + turn);
 

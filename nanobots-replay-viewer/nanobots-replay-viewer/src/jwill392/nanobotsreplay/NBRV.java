@@ -9,6 +9,7 @@ import java.util.List;
 import jwill392.nanobotsreplay.assets.Assets;
 import jwill392.nanobotsreplay.ui.AbstractUIComponent;
 import jwill392.nanobotsreplay.ui.Frame;
+import jwill392.nanobotsreplay.ui.MinimapPanel;
 import jwill392.nanobotsreplay.ui.WorldInfoPanel;
 import jwill392.nanobotsreplay.world.WorldModel;
 import jwill392.nanobotsreplay.world.display.WorldView;
@@ -38,6 +39,7 @@ public class NBRV extends BasicGame {
 	private WorldView worldDisplay;
 	private WorldInfoPanel infoPanel;
 	private Frame worldFrame;
+	private MinimapPanel minimapPanel;
 
 	private WorldModel worldModel;
 
@@ -83,9 +85,16 @@ public class NBRV extends BasicGame {
 
 		eventBus.register(worldDisplay);
 
-		infoPanel = new WorldInfoPanel(new Dimension(298, 718), new Vector2f(982, 1));
+		infoPanel = new WorldInfoPanel(new Dimension(298, 498), new Vector2f(982, 1));
 		AbstractUIComponent.getRoot().addChild(infoPanel);
 		eventBus.register(infoPanel);
+
+		minimapPanel = new MinimapPanel(new Dimension(298, 219), new Vector2f(982, 500));
+		AbstractUIComponent.getRoot().addChild(minimapPanel);
+		eventBus.register(minimapPanel);
+
+		//Tooltip testTip = new Tooltip(new Dimension(100, 20), new Vector2f(100, 100));
+		//AbstractUIComponent.getRoot().addChild(testTip);
 
 
 		//Replay rep = Replay.parseFrom(new FileInputStream(args[0]));
