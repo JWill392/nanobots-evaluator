@@ -1,0 +1,10 @@
+*.class
+*/bin
+*/.settings
+*/lib
+*~
+
+# Package Files #
+*.jar
+*.war
+*.ear
