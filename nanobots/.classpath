@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry excluding="tests/|action/_ReproduceCmdTest.java" kind="src" path="src"/>
+	<classpathentry kind="src" path="src-gen"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Guava"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/teampg-datatypes"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Protocol Buffer"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
